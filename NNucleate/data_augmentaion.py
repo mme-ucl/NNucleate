@@ -3,6 +3,7 @@ import math
 from copy import deepcopy
 from utils import pbc, rotate_trajs
 import mdtraj as md
+import MDAnalysis as mda
 
 def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, bins=25, n_max=math.inf):
     """Takes in a trajectory and adds degenerate rotated frames such that the resulting trajectory represents and even histogram.
@@ -80,3 +81,6 @@ def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, 
     copy.save_xtc(savename + ".xtc")
     return
 
+# TODO: Add transformation function to n_dist
+
+# TODO: Add transformation function to kNN

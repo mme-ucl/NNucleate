@@ -1,4 +1,4 @@
-from utils import pbc
+from .utils import pbc
 import torch
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
@@ -10,7 +10,7 @@ from scipy.spatial.transform import Rotation as R
 
 class CVTrajectory(Dataset):
 
-    def __init__(self, cv_file, traj_name, top_file, cv_col, box, transform=None):
+    def __init__(self, cv_file, traj_name, top_file, cv_col, box_length, transform=None):
         """Instantiates a dataset from a trajectory file in xtc/xyz format and a text file containing the nucleation CVs (Assumes cubic cell)
 
         Args:
@@ -18,11 +18,15 @@ class CVTrajectory(Dataset):
             traj_name (str): Path to the trajectory in .xtc or .xyz file format
             top_file (str): Path to the topology file in .pdb file format
             cv_col (int): Indicates the column in which the desired CV is written in the CV file (0 indexing)
+            box_length (float). Length of the cubic cell
             transform (function, optional): A function to be applied to the configuration before returning e.g. to_dist(). 
         """
+
+        
         self.cv_labels = np.loadtxt(cv_file)[:, cv_col]
-        self.configs = pbc(md.load(traj_name, top=top_file), box).xyz
-        self.length = box[0]
+        self.length = box_length
+        self.configs = pbc(md.load(traj_name, top=top_file), self.length).xyz
+
         # Option to transform the configs before returning
         self.transform = transform
 

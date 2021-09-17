@@ -1,7 +1,7 @@
 import numpy as np
 import math
 from copy import deepcopy
-from utils import pbc, rotate_trajs, PeriodicCKDTree
+from .utils import pbc, rotate_trajs, PeriodicCKDTree
 import mdtraj as md
 import MDAnalysis as mda
 

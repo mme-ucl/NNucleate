@@ -1,6 +1,10 @@
+import heapq
+import itertools
+from scipy.spatial import cKDTree
 import numpy as np
 import mdtraj as md
 from scipy.spatial.transform import Rotation as R
+
 
 def pbc(trajectory, box_length):
     """Centers an mdtraj Trajectory around the centre of a cubic box with the given box length and wraps all atoms into the box.
@@ -39,19 +43,19 @@ def rotate_trajs(trajectories):
     Returns:
         list of md.trajectory: Returns the randomly rotated frames
     """
-    # 
+    #
     # Rotates each frame in the given trajectories according to a random quaternion
     # Parameters:
     #     trajectories: list of mdtraj.Trajectory objects
     # Returns:
     #     List of modified trajectory objects
-    # 
+    #
     for t in trajectories:
         for i in range(t.n_frames):
             quat = md.utils.uniform_quaternion()
             rot = R.from_quat(quat)
             t.xyz[i] = rot.apply(t.xyz[i])
-    
+
     return trajectories
 
 # A wrapper around scipy.spatial.kdtree to implement periodic boundary
@@ -61,10 +65,6 @@ def rotate_trajs(trajectories):
 # "https://github.com/patvarilly/periodic_kdtree"
 # Released under the scipy license
 
-import numpy as np
-from scipy.spatial import KDTree, cKDTree
-import itertools
-import heapq
 
 def _gen_relevant_images(x, bounds, distance_upper_bound):
     # Map x onto the canonical unit cell, then produce the relevant
@@ -72,134 +72,31 @@ def _gen_relevant_images(x, bounds, distance_upper_bound):
     real_x = x - np.where(bounds > 0.0,
                           np.floor(x / bounds) * bounds, 0.0)
     m = len(x)
-    
+
     xs_to_try = [real_x]
     for i in range(m):
         if bounds[i] > 0.0:
             disp = np.zeros(m)
             disp[i] = bounds[i]
-            
+
             if distance_upper_bound == np.inf:
                 xs_to_try = list(
                     itertools.chain.from_iterable(
                         (_ + disp, _, _ - disp) for _ in xs_to_try))
             else:
                 extra_xs = []
-                
+
                 # Point near lower boundary, include image on upper side
                 if abs(real_x[i]) < distance_upper_bound:
                     extra_xs.extend(_ + disp for _ in xs_to_try)
-                    
+
                 # Point near upper boundary, include image on lower side
                 if abs(bounds[i] - real_x[i]) < distance_upper_bound:
                     extra_xs.extend(_ - disp for _ in xs_to_try)
 
                 xs_to_try.extend(extra_xs)
-    
+
     return xs_to_try
-
-
-class PeriodicKDTree(KDTree):
-    """
-    kd-tree for quick nearest-neighbor lookup with periodic boundaries
-    See scipy.spatial.kdtree for details on kd-trees.
-    Searches with periodic boundaries are implemented by mapping all
-    initial data points to one canonical periodic image, building an
-    ordinary kd-tree with these points, then querying this kd-tree multiple
-    times, if necessary, with all the relevant periodic images of the
-    query point.
-    Note that to ensure that no two distinct images of the same point
-    appear in the results, it is essential to restrict the maximum
-    distance between a query point and a data point to half the smallest
-    box dimension.
-    """
-    
-    def __init__(self, bounds, data, leafsize=10):
-        """Construct a kd-tree.
-        Parameters
-        ----------
-        bounds : array_like, shape (k,)
-            Size of the periodic box along each spatial dimension.  A
-            negative or zero size for dimension k means that space is not
-            periodic along k.
-        data : array_like, shape (n,k)
-            The data points to be indexed. This array is not copied, and
-            so modifying this data will result in bogus results.
-        leafsize : positive int
-            The number of points at which the algorithm switches over to
-            brute-force.
-        """
-
-        # Map all points to canonical periodic image
-        self.bounds = np.array(bounds)
-        self.real_data = np.asarray(data)
-        wrapped_data = (
-            self.real_data - np.where(bounds > 0.0,
-                (np.floor(self.real_data / bounds) * bounds), 0.0))
-
-        # Calculate maximum distance_upper_bound
-        self.max_distance_upper_bound = np.min(
-            np.where(self.bounds > 0, 0.5 * self.bounds, np.inf))
-
-        # Set up underlying kd-tree
-        super(PeriodicKDTree, self).__init__(wrapped_data, leafsize)
-
-    # The following name is a kludge to override KDTree's private method
-    def _KDTree__query(self, x, k=1, eps=0, p=2, distance_upper_bound=np.inf):
-        # This is the internal query method, which guarantees that x
-        # is a single point, not an array of points
-        #
-        # A slight complication: k could be "None", which means "return
-        # all neighbors within the given distance_upper_bound".
-
-        # Cap distance_upper_bound
-        distance_upper_bound = np.min([distance_upper_bound,
-                                      self.max_distance_upper_bound])
-
-        # Run queries over all relevant images of x
-        hits_list = []
-        for real_x in _gen_relevant_images(x, self.bounds, distance_upper_bound):
-            hits_list.append(
-                super(PeriodicKDTree, self)._KDTree__query(
-                    real_x, k, eps, p, distance_upper_bound))
-        
-        # Now merge results
-        if k is None:
-            return list(heapq.merge(*hits_list))
-        elif k > 1:
-            return heapq.nsmallest(k, itertools.chain(*hits_list))
-        elif k == 1:
-            return [min(itertools.chain(*hits_list))]
-        else:
-            raise ValueError("Invalid k in periodic_kdtree._KDTree__query")
-
-    # The following name is a kludge to override KDTree's private method
-    def _KDTree__query_ball_point(self, x, r, p=2., eps=0):
-        # This is the internal query method, which guarantees that x
-        # is a single point, not an array of points
-        
-        # Cap r
-        r = np.min(r, self.max_distance_upper_bound)
-
-        # Run queries over all relevant images of x
-        results = []
-        for real_x in _gen_relevant_images(x, self.bounds, r):
-            results.extend(
-                super(PeriodicKDTree, self)._KDTree__query_ball_point(
-                    real_x, r, p, eps))
-        return results
-
-    def query_ball_tree(self, other, r, p=2., eps=0):
-        raise NotImplementedError()
-
-    def query_pairs(self, r, p=2., eps=0):
-        raise NotImplementedError()
-    
-    def count_neighbors(self, other, r, p=2.):
-        raise NotImplementedError()
-        
-    def sparse_distance_matrix(self, other, max_distance, p=2.):
-        raise NotImplementedError()
 
 
 class PeriodicCKDTree(cKDTree):
@@ -216,7 +113,7 @@ class PeriodicCKDTree(cKDTree):
     distance between a query point and a data point to half the smallest
     box dimension.
     """
-    
+
     def __init__(self, bounds, data, leafsize=10):
         """Construct a kd-tree.
         Parameters
@@ -240,7 +137,7 @@ class PeriodicCKDTree(cKDTree):
         self.real_data = np.asarray(data)
         wrapped_data = (
             self.real_data - np.where(bounds > 0.0,
-                (np.floor(self.real_data / bounds) * bounds), 0.0))
+                                      (np.floor(self.real_data / bounds) * bounds), 0.0))
 
         # Calculate maximum distance_upper_bound
         self.max_distance_upper_bound = np.min(
@@ -261,18 +158,18 @@ class PeriodicCKDTree(cKDTree):
 
         # Cap distance_upper_bound
         distance_upper_bound = np.min([distance_upper_bound,
-                                      self.max_distance_upper_bound])
+                                       self.max_distance_upper_bound])
 
         # Run queries over all relevant images of x
         hits_list = []
         for real_x in _gen_relevant_images(x, self.bounds, distance_upper_bound):
             d, i = super(PeriodicCKDTree, self).query(
-                    real_x, k, eps, p, distance_upper_bound)
+                real_x, k, eps, p, distance_upper_bound)
             if k > 1:
                 hits_list.append(list(zip(d, i)))
             else:
                 hits_list.append([(d, i)])
-        
+
         # Now merge results
         if k > 1:
             return heapq.nsmallest(k, itertools.chain(*hits_list))
@@ -317,52 +214,57 @@ class PeriodicCKDTree(cKDTree):
         """
         x = np.asarray(x)
         if np.shape(x)[-1] != self.m:
-            raise ValueError("x must consist of vectors of length %d but has shape %s" % (self.m, np.shape(x)))
-        if p<1:
+            raise ValueError("x must consist of vectors of length %d but has shape %s" % (
+                self.m, np.shape(x)))
+        if p < 1:
             raise ValueError("Only p-norms with 1<=p<=infinity permitted")
         retshape = np.shape(x)[:-1]
-        if retshape!=():
-            if k>1:
-                dd = np.empty(retshape+(k,),dtype=np.float)
+        if retshape != ():
+            if k > 1:
+                dd = np.empty(retshape+(k,), dtype=np.float)
                 dd.fill(np.inf)
-                ii = np.empty(retshape+(k,),dtype=np.int)
+                ii = np.empty(retshape+(k,), dtype=np.int)
                 ii.fill(self.n)
-            elif k==1:
-                dd = np.empty(retshape,dtype=np.float)
+            elif k == 1:
+                dd = np.empty(retshape, dtype=np.float)
                 dd.fill(np.inf)
-                ii = np.empty(retshape,dtype=np.int)
+                ii = np.empty(retshape, dtype=np.int)
                 ii.fill(self.n)
             else:
-                raise ValueError("Requested %s nearest neighbors; acceptable numbers are integers greater than or equal to one, or None")
+                raise ValueError(
+                    "Requested %s nearest neighbors; acceptable numbers are integers greater than or equal to one, or None")
             for c in np.ndindex(retshape):
-                hits = self.__query(x[c], k=k, eps=eps, p=p, distance_upper_bound=distance_upper_bound)
-                if k>1:
+                hits = self.__query(x[c], k=k, eps=eps, p=p,
+                                    distance_upper_bound=distance_upper_bound)
+                if k > 1:
                     for j in range(len(hits)):
                         dd[c+(j,)], ii[c+(j,)] = hits[j]
-                elif k==1:
-                    if len(hits)>0:
+                elif k == 1:
+                    if len(hits) > 0:
                         dd[c], ii[c] = hits[0]
                     else:
                         dd[c] = np.inf
                         ii[c] = self.n
             return dd, ii
         else:
-            hits = self.__query(x, k=k, eps=eps, p=p, distance_upper_bound=distance_upper_bound)
-            if k==1:
-                if len(hits)>0:
+            hits = self.__query(x, k=k, eps=eps, p=p,
+                                distance_upper_bound=distance_upper_bound)
+            if k == 1:
+                if len(hits) > 0:
                     return hits[0]
                 else:
                     return np.inf, self.n
-            elif k>1:
-                dd = np.empty(k,dtype=np.float)
+            elif k > 1:
+                dd = np.empty(k, dtype=np.float)
                 dd.fill(np.inf)
-                ii = np.empty(k,dtype=np.int)
+                ii = np.empty(k, dtype=np.int)
                 ii.fill(self.n)
                 for j in range(len(hits)):
                     dd[j], ii[j] = hits[j]
                 return dd, ii
             else:
-                raise ValueError("Requested %s nearest neighbors; acceptable numbers are integers greater than or equal to one, or None")
+                raise ValueError(
+                    "Requested %s nearest neighbors; acceptable numbers are integers greater than or equal to one, or None")
 
     # Ideally, KDTree and cKDTree would expose identical __query_ball_point
     # interfaces.  But they don't, and cKDTree.__query_ball_point is also
@@ -370,7 +272,7 @@ class PeriodicCKDTree(cKDTree):
     def __query_ball_point(self, x, r, p=2., eps=0):
         # This is the internal query method, which guarantees that x
         # is a single point, not an array of points
-        
+
         # Cap r
         r = min(r, self.max_distance_upper_bound)
 
@@ -411,7 +313,7 @@ class PeriodicCKDTree(cKDTree):
         """
         x = np.asarray(x).astype(np.float)
         if x.shape[-1] != self.m:
-            raise ValueError("Searching for a %d-dimensional point in a " \
+            raise ValueError("Searching for a %d-dimensional point in a "
                              "%d-dimensional KDTree" % (x.shape[-1], self.m))
         if len(x.shape) == 1:
             return self.__query_ball_point(x, r, p, eps)
@@ -427,9 +329,9 @@ class PeriodicCKDTree(cKDTree):
 
     def query_pairs(self, r, p=2., eps=0):
         raise NotImplementedError()
-    
+
     def count_neighbors(self, other, r, p=2.):
         raise NotImplementedError()
-        
+
     def sparse_distance_matrix(self, other, max_distance, p=2.):
         raise NotImplementedError()

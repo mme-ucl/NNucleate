@@ -1,7 +1,7 @@
 import numpy as np
 import math
 from copy import deepcopy
-from utils import pbc, rotate_trajs
+from utils import pbc, rotate_trajs, PeriodicCKDTree
 import mdtraj as md
 import MDAnalysis as mda
 
@@ -81,6 +81,49 @@ def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, 
     copy.save_xtc(savename + ".xtc")
     return
 
-# TODO: Add transformation function to n_dist
 
-# TODO: Add transformation function to kNN
+def transform_to_ndist_list(n_dist, traj, box):
+    """Transform the the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system
+
+    Args:
+        n_dist (int): Number of distances to include (max: n*(n-1)/2)
+        traj (array): List of list of coordinates to transform
+        box (list): List of the box vectors
+
+    Returns:
+        Array: Array of shape n_frames x n_atoms x n_dists
+    """
+
+    n_at = len(traj[0])
+    dist_frames = np.ones(shape=(len(traj), int((n_at*(n_at - 1))/2 )))
+    target = np.zeros( (int(n_at*(n_at-1)/2),))
+
+    for i in range(len( traj)):
+        dist_frames[i] = np.sort(mda.self_distance_array(traj[i], box, result=target))[:n_dist]
+
+    return dist_frames 
+
+
+
+def transform_to_knn_list(k, traj, box):
+    """Transforms the cartesian representation of a given trajectory to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
+
+    Args:
+        k (int): Number of neighbours to consider for each atom
+        traj (array): List of all the sets of coordinates to be transformed
+        box (list): List of box vectors
+
+    Returns:
+        Array: Returns an array of shape n_frames x n_atoms x k*n_atoms/2
+    """
+    n_at = len(traj[0])
+    box = np.array(box)
+    n_frames = len(traj)
+    result = np.zeros(shape=(n_frames, int(n_at*k/2)))
+
+    for i in range(n_frames):
+        d, j = PeriodicCKDTree(box, traj[i]).query(traj[i], k=k+1)
+        d = d.flatten()
+        d.sort()
+        result[i] = d[n_at:][::2]
+    return result

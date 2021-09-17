@@ -22,7 +22,7 @@ class CVTrajectory(Dataset):
         """
         self.cv_labels = np.loadtxt(cv_file)[:, cv_col]
         self.configs = pbc(md.load(traj_name, top=top_file), box).xyz
-        self.configs /= box[0]
+        self.length = box[0]
         # Option to transform the configs before returning
         self.transform = transform
 
@@ -40,7 +40,7 @@ class CVTrajectory(Dataset):
         if self.transform:
             config = self.transform(config)
 
-        return config, label
+        return config/self.length, label
 
 
 # Model

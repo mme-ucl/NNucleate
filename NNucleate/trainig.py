@@ -7,10 +7,11 @@ import numpy as np
 import mdtraj as md
 from scipy.spatial.transform import Rotation as R
 
+
 class CVTrajectory(Dataset):
 
     def __init__(self, cv_file, traj_name, top_file, cv_col, box, transform=None):
-        """Instantiates a dataset from a trajectory file in xtc/xyz format and a text file containing the nucleation CVs
+        """Instantiates a dataset from a trajectory file in xtc/xyz format and a text file containing the nucleation CVs (Assumes cubic cell)
 
         Args:
             cv_file (str): Path to text file structured in columns containing the CVs
@@ -21,9 +22,9 @@ class CVTrajectory(Dataset):
         """
         self.cv_labels = np.loadtxt(cv_file)[:, cv_col]
         self.configs = pbc(md.load(traj_name, top=top_file), box).xyz
+        self.configs /= box[0]
         # Option to transform the configs before returning
         self.transform = transform
-
 
     def __len__(self):
         # Returns the length of the dataset
@@ -82,7 +83,6 @@ class NNCV(nn.Module):
                 nn.Linear(l3, 1)
             )
 
-
     def forward(self, x):
         # defines the application of the network to data
         # NEVER call forward directly
@@ -91,22 +91,20 @@ class NNCV(nn.Module):
         label = self.sig_stack(x)
         return label
 
-def train_loop(dataloader, model, loss_fn, optimizer, device, n_trans=0, transform=None):
-    """Performs one training epoch for an NNCV. The loss is not just evaluated on the trajectory frames but on n_trans transformed ones.
+
+def train(dataloader, model, loss_fn, optimizer, device, print_batch=1000000):
+    """Performs one training epoch for a NNCV.
 
     Args:
-        dataloader (dataloader): The dataloader loading the training set
-        model (NNCV): The NNCV model to train
-        loss_fn (function): Pytorch loss function to be used
-        optimizer (function): Pytorch optimizer to be used
-        n_trans (int): Number of transformations performed on each frame for loss calculation
-        transform (str, optional): Describes the type of transformation (Either Permutation or Rotation). Defaults to "Permutation".
-
-    Raises:
-        ValueError: Raised if unknown transformation is given.
+        dataloader (Dataloader): Wrappper for the training set
+        model (NNCV): The network to be trained
+        loss_fn (function): Pytorch loss to be used during training
+        optimizer (function): Pytorch optimizer to be used during training
+        device (dvice): Pytorch device to run the calculation on. Supports CPU and GPU (cuda)
+        print_batch (int, optional): Set to recieve printed updates on the lost every print_batch batches. Defaults to 1000000.
 
     Returns:
-        float: The final training loss
+        float: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.
     """
     size = len(dataloader.dataset)
     for batch, (X, y) in enumerate(dataloader):
@@ -116,35 +114,59 @@ def train_loop(dataloader, model, loss_fn, optimizer, device, n_trans=0, transfo
         pred = model(X)
         loss = loss_fn(pred.flatten(), y)
 
-        if transform == "Permutation":
-            for i in range(n_trans):
-                # Shuffle the tensors in the batch
-                pred = model(X[:, torch.randperm(X.size()[1])])
-                loss += loss_fn(pred.flatten(), y)
-
-        elif transform == "Rotation":
-            for i in range(n_trans):
-                quat = md.utils.uniform_quaternion()
-                rot = R.from_quat(quat)
-                X = [rot.apply(x) for x in X]
-                pred = model(X)
-                loss += loss_fn(pred.flatten(), y)
-
-        elif transform:
-            raise ValueError("This function currently only supports transform= \"Permutation\" or transform = \"Rotation\"")
-        
-        loss /= n_trans
-        #print(loss.item())
         # Backpropagation
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
-            
-    loss, current = loss.item(), batch * len(X)        
-    print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
+        if batch % print_batch == 0:
+            loss, current = loss.item(), batch * len(X)
+            print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
 
     return loss.item()
+
+
+def train_perm(dataloader, model, loss_fn, optimizer, n_trans, device, print_batch=1000000):
+    """Performs one training epoch for a NNCV but the loss for each batch is not just calculated on one reference structure but a set of n_trans permutated versions of that structure.
+
+    Args:
+        dataloader (Dataloader): Wrapper around the training data
+        model (NNCV): The model that is to be trained
+        loss_fn (function): Pytorch loss function to be used for the training
+        optimizer (function): Pytorch optimizer to be used during training
+        n_trans (int): Number of permutated structures used for the loss calculations
+        device (device): Pytorch device to run the calculations on. Supports CPU and GPU (cuda)
+        print_batch (int, optional): Set to recieve printed updates on the loss every print_batches batches. Defaults to 1000000.
+
+    Returns:
+        float: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.
+    """
+    size = len(dataloader.dataset)
+    for batch, (X, y) in enumerate(dataloader):
+        X, y = X.to(device), y.to(device)
+
+        # Compute prediction error
+        pred = model(X)
+        loss = loss_fn(pred.flatten(), y)
+
+        for i in range(n_trans):
+            # Shuffle the tensors in the batch
+            pred = model(X[:, torch.randperm(X.size()[1])])
+            loss += loss_fn(pred.flatten(), y)
+
+        loss /= n_trans
+        # print(loss.item())
+        # Backpropagation
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if batch % print_batch == 0:
+            loss, current = loss.item(), batch * len(X)
+            print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
+
+    return loss.item()
+
 
 def test(dataloader, model, loss_fn, device):
     """Calculates the current average test set loss.

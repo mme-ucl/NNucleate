@@ -99,7 +99,7 @@ def transform_to_ndist_list(n_dist, traj, box):
     target = np.zeros( (int(n_at*(n_at-1)/2),))
 
     for i in range(len( traj)):
-        dist_frames[i] = np.sort(mda.self_distance_array(traj[i], box, result=target))[:n_dist]
+        dist_frames[i] = np.sort(mda.analysis.distances.self_distance_array(traj[i], box, result=target))[:n_dist]
 
     return dist_frames 
 

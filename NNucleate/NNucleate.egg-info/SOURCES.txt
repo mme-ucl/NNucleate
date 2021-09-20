@@ -1,0 +1,8 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+NNucleate/NNucleate.egg-info/PKG-INFO
+NNucleate/NNucleate.egg-info/SOURCES.txt
+NNucleate/NNucleate.egg-info/dependency_links.txt
+NNucleate/NNucleate.egg-info/top_level.txt

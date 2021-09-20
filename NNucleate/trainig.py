@@ -76,15 +76,9 @@ class KNNTrajectory(Dataset):
 
     def __getitem__(self, idx):
         # Gets a configuration from the given index
-        config = self.configs[idx]
+        config = torch.tensor(self.configs[idx]).float()
         # Label is read from the numpy array
         label = torch.tensor(self.cv_labels[idx]).float()
-        # if transformation functions are set they are applied to label and image
-
-        if self.transform:
-            config = torch.tensor(self.transform(config)).float()
-        else:
-            config = torch.tensor(config).float()
 
         return config/self.box[0], label
 
@@ -114,15 +108,9 @@ class NdistTrajectory(Dataset):
 
     def __getitem__(self, idx):
         # Gets a configuration from the given index
-        config = self.configs[idx]
+        config = torch.tensor(self.configs[idx]).float()
         # Label is read from the numpy array
         label = torch.tensor(self.cv_labels[idx]).float()
-        # if transformation functions are set they are applied to label and image
-
-        if self.transform:
-            config = torch.tensor(self.transform(config)).float()
-        else:
-            config = torch.tensor(config).float()
 
         return config/self.box[0], label
 

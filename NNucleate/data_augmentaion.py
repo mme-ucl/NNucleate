@@ -4,6 +4,7 @@ from copy import deepcopy
 from .utils import pbc, rotate_trajs, PeriodicCKDTree
 import mdtraj as md
 import MDAnalysis as mda
+from MDAnalysis.analysis.distances import self_distance_array
 
 def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, bins=25, n_max=math.inf):
     """Takes in a trajectory and adds degenerate rotated frames such that the resulting trajectory represents and even histogram.
@@ -99,7 +100,7 @@ def transform_to_ndist_list(n_dist, traj, box):
     target = np.zeros( (int(n_at*(n_at-1)/2),))
 
     for i in range(len( traj)):
-        dist_frames[i] = np.sort(mda.analysis.distances.self_distance_array(traj[i], box, result=target))[:n_dist]
+        dist_frames[i] = np.sort(self_distance_array(traj[i], box, result=target))[:n_dist]
 
     return dist_frames 
 

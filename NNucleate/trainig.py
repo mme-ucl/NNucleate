@@ -105,7 +105,7 @@ class NdistTrajectory(Dataset):
         
         self.cv_labels = np.loadtxt(cv_file)[:, cv_col]
         self.box = box
-        self.configs = transform_traj_to_ndist_list(n_dist, pbc(md.load(traj_name, top=top_file), self.length).xyz, box)
+        self.configs = transform_traj_to_ndist_list(n_dist, pbc(md.load(traj_name, top=top_file), self.box[0]).xyz, box)
 
 
     def __len__(self):

@@ -36,13 +36,15 @@ class CVTrajectory(Dataset):
 
     def __getitem__(self, idx):
         # Gets a configuration from the given index
-        config = torch.tensor(self.configs[idx]).float()
+        config = self.configs[idx]
         # Label is read from the numpy array
         label = torch.tensor(self.cv_labels[idx]).float()
         # if transformation functions are set they are applied to label and image
 
         if self.transform:
-            config = self.transform(config)
+            config = torch.tensor(self.transform(config)).float()
+        else:
+            config = torch.tensor(config).float()
 
         return config/self.length, label
 

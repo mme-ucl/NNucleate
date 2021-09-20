@@ -84,15 +84,15 @@ def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, 
 
 
 def transform_to_ndist_list(n_dist, traj, box):
-    """Transform the the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system
+    """Transform the the cartesian coordinates of a given trajectory frame into a sorted list of the n_dist shortest distances in the system
 
     Args:
         n_dist (int): Number of distances to include (max: n*(n-1)/2)
         traj (array): List of list of coordinates to transform
-        box (list): List of the box vectors
+        box (list): List of the box vectors and angles
 
     Returns:
-        Array: Array of shape n_frames x n_atoms x n_dists
+        Array: Array of shape n_atoms x n_dists
     """
 
     dist_frames = np.sort(self_distance_array(traj, box))[:n_dist]
@@ -102,24 +102,21 @@ def transform_to_ndist_list(n_dist, traj, box):
 
 
 def transform_to_knn_list(k, traj, box):
-    """Transforms the cartesian representation of a given trajectory to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
+    """Transforms the cartesian representation of a given trajectory frame to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
 
     Args:
         k (int): Number of neighbours to consider for each atom
-        traj (array): List of all the sets of coordinates to be transformed
+        traj (array): List of coordinates to be transformed
         box (list): List of box vectors
 
     Returns:
-        Array: Returns an array of shape n_frames x n_atoms x k*n_atoms/2
+        Array: Returns an array of shape n_atoms x k*n_atoms/2
     """
-    n_at = len(traj[0])
+    n_at = len(traj)
     box = np.array(box)
-    n_frames = len(traj)
-    result = np.zeros(shape=(n_frames, int(n_at*k/2)))
 
-    for i in range(n_frames):
-        d, j = PeriodicCKDTree(box, traj[i]).query(traj[i], k=k+1)
-        d = d.flatten()
-        d.sort()
-        result[i] = d[n_at:][::2]
+    d, j = PeriodicCKDTree(box, traj).query(traj, k=k+1)
+    d = d.flatten()
+    d.sort()
+    result = d[n_at:][::2]
     return result

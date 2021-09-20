@@ -95,12 +95,7 @@ def transform_to_ndist_list(n_dist, traj, box):
         Array: Array of shape n_frames x n_atoms x n_dists
     """
 
-    n_at = len(traj[0])
-    dist_frames = np.ones(shape=(len(traj), int((n_at*(n_at - 1))/2 )))
-    target = np.zeros( (int(n_at*(n_at-1)/2),))
-
-    for i in range(len( traj)):
-        dist_frames[i] = np.sort(self_distance_array(traj[i], box, result=target))[:n_dist]
+    dist_frames = np.sort(self_distance_array(traj, box))[:n_dist]
 
     return dist_frames 
 

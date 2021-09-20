@@ -1,4 +1,3 @@
-import NNucleate
 from NNucleate.trainig import test, train_perm, NNCV, CVTrajectory
 import matplotlib.pyplot as plt
 import torch

@@ -67,7 +67,7 @@ class KNNTrajectory(Dataset):
         
         self.cv_labels = np.loadtxt(cv_file)[:, cv_col]
         self.box = box
-        self.configs = transform_traj_to_knn_list(k, pbc(md.load(traj_name, top=top_file), self.length).xyz, box)
+        self.configs = transform_traj_to_knn_list(k, pbc(md.load(traj_name, top=top_file), self.box[0]).xyz, box)
 
 
     def __len__(self):

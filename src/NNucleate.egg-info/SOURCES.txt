@@ -1,0 +1,12 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+src/NNucleate/__init__.py
+src/NNucleate/data_augmentaion.py
+src/NNucleate/trainig.py
+src/NNucleate/utils.py
+src/NNucleate.egg-info/PKG-INFO
+src/NNucleate.egg-info/SOURCES.txt
+src/NNucleate.egg-info/dependency_links.txt
+src/NNucleate.egg-info/top_level.txt

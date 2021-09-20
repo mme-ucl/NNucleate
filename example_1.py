@@ -29,7 +29,7 @@ train_dataloader = DataLoader(train_set, batch_size=64, shuffle=True)
 test_dataloader = DataLoader(test_set, batch_size=64, shuffle=True)
 val_loader = DataLoader(ds_val, batch_size=64, shuffle=True)
 
-epochs = 200
+epochs = 20
 learning_rate = 1e-4
 loss_fn = nn.MSELoss()
 n_at = 421
@@ -62,14 +62,6 @@ for n in ns:
     print("---Validation---")
     val = test(val_loader, model, loss_fn, device)
     performance.append(val)
-
-    plt.plot(train_errors, label="Train")
-    plt.plot(test_errors, label="Test")
-    plt.yscale("log")
-    plt.xlabel("Epochs")
-    plt.ylabel("Loss")
-    plt.savefig("figs/lr_%d.png" % n)
-    plt.show()
 
     print(" n = %d Done!" % n)
 

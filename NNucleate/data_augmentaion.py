@@ -83,7 +83,7 @@ def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, 
     return
 
 
-def transform_to_ndist_list(n_dist, traj, box):
+def transform_frame_to_ndist_list(n_dist, traj, box):
     """Transform the the cartesian coordinates of a given trajectory frame into a sorted list of the n_dist shortest distances in the system
 
     Args:
@@ -99,9 +99,32 @@ def transform_to_ndist_list(n_dist, traj, box):
 
     return dist_frames 
 
+def transform_traj_to_ndist_list(n_dist, traj, box):
+    """Transform the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system
+
+    Args:
+        n_dist (int): Number of distances to include (max: n*(n-1)/2)
+        traj (list): Trajectory that is to be transformed.
+        box (list): List of the box vectors
+
+    Returns:
+        list: Array of shape n_frames x n_atoms x n_dists
+    """
+
+    box = [box[0], box[1], box[2], 90.0, 90.0, 90.0]
+    n_at = len(traj[0])
+    n_frames = len(traj)
+    dist_frames = np.ones(shape=(len(traj), int((n_at*(n_at - 1))/2 )))
+    target = np.zeros( (int(n_at*(n_at-1)/2),))
+
+    for i in range(n_frames):
+        dist_frames[i] = np.sort(self_distance_array(traj, box, result=target))[:n_dist]
+    
+    return dist_frames
 
 
-def transform_to_knn_list(k, traj, box):
+
+def transform_frame_to_knn_list(k, traj, box):
     """Transforms the cartesian representation of a given trajectory frame to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
 
     Args:
@@ -119,4 +142,19 @@ def transform_to_knn_list(k, traj, box):
     d = d.flatten()
     d.sort()
     result = d[n_at:][::2]
+    return result
+
+def transform_traj_to_knn_list(k, traj, box):
+
+    n_at = len(traj[0])
+    box = np.array(box)
+    n_frames = len(traj)
+    result = np.zeros(shape=(n_frames, int(n_at*k/2)))
+    
+    for i in range(10):
+        T = PeriodicCKDTree(box, traj[i])
+        d, j = T.query(traj[i], k=k+1)
+        d = d.flatten()
+        d.sort()
+        result[i] = d[n_at:][::2]
     return result

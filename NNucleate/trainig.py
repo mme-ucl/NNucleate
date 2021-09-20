@@ -1,4 +1,5 @@
 from .utils import pbc
+from .data_augmentaion import transform_traj_to_knn_list, transform_traj_to_ndist_list
 import torch
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
@@ -47,6 +48,83 @@ class CVTrajectory(Dataset):
             config = torch.tensor(config).float()
 
         return config/self.length, label
+
+
+class KNNTrajectory(Dataset):
+    def __init__(self, cv_file, traj_name, top_file, cv_col, box, k):
+        """Generates a dataset from a trajectory in .xtc/xyz format. 
+        The trajectory frames are represented via the sorted distances of all atoms to their k nearest neighbours.
+
+        Args:
+            cv_file (str): Path to the cv file.
+            traj_name (str): Path to the trajectory file (.xtc/.xyz)
+            top_file (str): Path to the topology file (.pdb)
+            cv_col (int): Gives the colimn in which the CV of interest is stored
+            box (list): List of box vectors (cubic).
+            k (int): Number of neighbours to consider.
+        """
+
+        
+        self.cv_labels = np.loadtxt(cv_file)[:, cv_col]
+        self.box = box
+        self.configs = transform_traj_to_knn_list(k, pbc(md.load(traj_name, top=top_file), self.length).xyz, box)
+
+
+    def __len__(self):
+        # Returns the length of the dataset
+        return len(self.cv_labels)
+
+    def __getitem__(self, idx):
+        # Gets a configuration from the given index
+        config = self.configs[idx]
+        # Label is read from the numpy array
+        label = torch.tensor(self.cv_labels[idx]).float()
+        # if transformation functions are set they are applied to label and image
+
+        if self.transform:
+            config = torch.tensor(self.transform(config)).float()
+        else:
+            config = torch.tensor(config).float()
+
+        return config/self.box[0], label
+
+class NdistTrajectory(Dataset):
+    def __init__(self, cv_file, traj_name, top_file, cv_col, box, n_dist):
+        """Generates a dataset from a trajectory in .xtc/xyz format. 
+        The trajectory frames are represented via the n_dist sorted distances.
+
+        Args:
+            cv_file (str): Path to the cv file.
+            traj_name (str): Path to the trajectory file (.xtc/.xyz)
+            top_file (str): Path to the topology file (.pdb)
+            cv_col (int): Gives the colimn in which the CV of interest is stored
+            box (list): List of box vectors (cubic).
+            n_dist (int): Number of distances to consider.
+        """
+
+        
+        self.cv_labels = np.loadtxt(cv_file)[:, cv_col]
+        self.box = box
+        self.configs = transform_traj_to_ndist_list(n_dist, pbc(md.load(traj_name, top=top_file), self.length).xyz, box)
+
+
+    def __len__(self):
+        # Returns the length of the dataset
+        return len(self.cv_labels)
+
+    def __getitem__(self, idx):
+        # Gets a configuration from the given index
+        config = self.configs[idx]
+        # Label is read from the numpy array
+        label = torch.tensor(self.cv_labels[idx]).float()
+        # if transformation functions are set they are applied to label and image
+
+        if self.transform:
+            config = torch.tensor(self.transform(config)).float()
+        else:
+            config = torch.tensor(config).float()
+
+        return config/self.box[0], label
 
 
 # Model

@@ -149,7 +149,7 @@ def transform_traj_to_knn_list(k, traj, box):
     n_at = len(traj[0])
     box = np.array(box)
     n_frames = len(traj)
-    result = np.zeros(shape=(n_frames, int(n_at*k/2)))
+    result = np.zeros(shape=(n_frames, int(n_at*k/2)+1))
     
     for i in range(10):
         T = PeriodicCKDTree(box, traj[i])

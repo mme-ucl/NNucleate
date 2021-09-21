@@ -14,7 +14,7 @@ setup(
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         packages=find_packages(),
-        install_requires=["numpy", "MDAnalysis", "mdtraj", "scipy", "cython"], # add any additional packages that 
+        install_requires=[], # add any additional packages that 
         # needs to be installed along with your package. Eg: 'caer'
         
         keywords=['python', 'first package'],
@@ -22,5 +22,6 @@ setup(
             "Development Status :: pre - Alpha",
             "Intended Audience :: Academic",
             "Programming Language :: Python :: 3",
-        ]
+        ],
+        license = "MIT"
 )

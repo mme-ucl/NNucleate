@@ -1,0 +1,14 @@
+Metadata-Version: 1.1
+Name: NNucleate
+Version: 0.0.1
+Summary: A package for training and constructing neural networks for the approximation of nucleation collective variables
+Home-page: UNKNOWN
+Author: Florian Dietrich
+Author-email: ucecfmd@ucl.ac.uk
+License: MIT
+Description: README
+Keywords: python,first package
+Platform: UNKNOWN
+Classifier: Development Status :: pre - Alpha
+Classifier: Intended Audience :: Academic
+Classifier: Programming Language :: Python :: 3

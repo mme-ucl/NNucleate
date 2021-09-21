@@ -1,28 +1,17 @@
 Metadata-Version: 2.1
 Name: NNucleate
-Version: 0.0.1
+Version: 0.1
 Summary: A package for training and constructing neural networks for the approximation of nucleation collective variables
 Home-page: https://github.com/Flofega/NNucleate
-Author: Florian Dietrich
-Author-email: ucecfmd@ucl.ac.uk
+Author: Jason Dsouza
+Author-email: <youremail@email.com>
 License: UNKNOWN
 Project-URL: Bug Tracker, https://github.com/Flofega/NNucleate/issues
+Description: README
+Keywords: python,first package
 Platform: UNKNOWN
+Classifier: Development Status :: pre - Alpha
+Classifier: Intended Audience :: Academic
 Classifier: Programming Language :: Python :: 3
-Classifier: License :: OSI Approved :: MIT License
-Classifier: Operating System :: OS Independent
 Requires-Python: >=3.6
 Description-Content-Type: text/markdown
-License-File: LICENSE
-
-# NNucleate
-
-This is a preliminary code collection of the NNCV approximation project.
-To train a model:
-- (Optionally) augment  the trajectory of interest with functions from data_augmentation.py (evenly_augment).
--  Create an instance of the CVTrajectory object using the trajectory file  that you want to use for training.
--  Create  a dataloader wrapping the CVTrajectory object.
--  Create a model using the NNCV class
--  Write a training loop using the desired train class and test
-
-

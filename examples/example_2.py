@@ -160,8 +160,8 @@ train_set, test_set = torch.utils.data.random_split(ds, [int(len(ds)*0.8)+1, int
 train_dataloader = DataLoader(train_set, batch_size=64, shuffle=True)
 test_dataloader = DataLoader(test_set, batch_size=64, shuffle=True)
 
-epochs = 20
-learning_rate = 1e-4
+epochs = 100
+learning_rate = 1e-3
 loss_fn = nn.MSELoss()
 n_at = 421
 

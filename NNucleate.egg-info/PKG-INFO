@@ -1,17 +1,13 @@
-Metadata-Version: 2.1
+Metadata-Version: 1.1
 Name: NNucleate
 Version: 0.0.1
 Summary: A package for training and constructing neural networks for the approximation of nucleation collective variables
-Home-page: https://github.com/Flofega/NNucleate
+Home-page: UNKNOWN
 Author: Florian Dietrich
 Author-email: ucecfmd@ucl.ac.uk
-License: UNKNOWN
-Project-URL: Bug Tracker, https://github.com/Flofega/NNucleate/issues
+License: MIT
 Description: README
-Keywords: python,first package
 Platform: UNKNOWN
 Classifier: Development Status :: pre - Alpha
 Classifier: Intended Audience :: Academic
 Classifier: Programming Language :: Python :: 3
-Requires-Python: >=3.6
-Description-Content-Type: text/markdown

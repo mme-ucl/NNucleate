@@ -14,10 +14,9 @@ setup(
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         packages=find_packages(),
-        install_requires=[], # add any additional packages that 
+        install_requires=["cython", "mdtraj", "numpy", "scipy", "MDAnalysis"], # add any additional packages that 
         # needs to be installed along with your package. Eg: 'caer'
-        
-        keywords=['python', 'first package'],
+    
         classifiers= [
             "Development Status :: pre - Alpha",
             "Intended Audience :: Academic",

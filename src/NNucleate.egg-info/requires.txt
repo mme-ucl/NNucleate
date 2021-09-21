@@ -1,5 +1,0 @@
-numpy
-MDAnalysis
-mdtraj
-scipy
-cython

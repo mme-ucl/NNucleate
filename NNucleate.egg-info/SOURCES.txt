@@ -1,7 +1,0 @@
-README.md
-pyproject.toml
-setup.py
-NNucleate.egg-info/PKG-INFO
-NNucleate.egg-info/SOURCES.txt
-NNucleate.egg-info/dependency_links.txt
-NNucleate.egg-info/top_level.txt

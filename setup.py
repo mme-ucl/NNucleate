@@ -8,9 +8,9 @@ LONG_DESCRIPTION = 'README'
 setup(
        # the name must match the folder name 'verysimplemodule'
         name="NNucleate", 
-        version=0.1,
-        author="Jason Dsouza",
-        author_email="<youremail@email.com>",
+        version=VERSION,
+        author="Florian Dietrich",
+        author_email="ucecfmd@ucl.ac.uk",
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         packages=find_packages(),

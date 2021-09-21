@@ -1,10 +1,10 @@
 Metadata-Version: 2.1
 Name: NNucleate
-Version: 0.1
+Version: 0.0.1
 Summary: A package for training and constructing neural networks for the approximation of nucleation collective variables
 Home-page: https://github.com/Flofega/NNucleate
-Author: Jason Dsouza
-Author-email: <youremail@email.com>
+Author: Florian Dietrich
+Author-email: ucecfmd@ucl.ac.uk
 License: UNKNOWN
 Project-URL: Bug Tracker, https://github.com/Flofega/NNucleate/issues
 Description: README

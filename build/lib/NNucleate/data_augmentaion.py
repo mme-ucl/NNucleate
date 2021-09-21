@@ -5,6 +5,7 @@ from .utils import pbc, rotate_trajs, PeriodicCKDTree
 import mdtraj as md
 import MDAnalysis as mda
 from MDAnalysis.analysis.distances import self_distance_array
+import math
 
 def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, bins=25, n_max=math.inf):
     """Takes in a trajectory and adds degenerate rotated frames such that the resulting trajectory represents and even histogram.
@@ -149,7 +150,7 @@ def transform_traj_to_knn_list(k, traj, box):
     n_at = len(traj[0])
     box = np.array(box)
     n_frames = len(traj)
-    result = np.zeros(shape=(n_frames, int(n_at*k/2)+1))
+    result = np.zeros(shape=(n_frames, int(math.ceil(n_at*k/2))))
     
     for i in range(10):
         T = PeriodicCKDTree(box, traj[i])

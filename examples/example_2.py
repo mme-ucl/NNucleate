@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
+import math
 
 # Train a model on the trajectory 13 with 5000 dist and 5 neighbours
 # Get a cpu or GPU for training
@@ -150,7 +151,6 @@ traj_path = "example_files/dump.3Dcolloid.13.xyz"
 cv_path = "example_files/cn.13.dat"
 top_path = "example_files/reference_13.pdb"
 
-# Start with n_dist
 k = 5
 # The critical difference
 ds = KNNTrajectory(cv_path, traj_path, top_path, 3, [92.83, 92.83, 92.83], k)
@@ -166,7 +166,7 @@ loss_fn = nn.MSELoss()
 n_at = 421
 
 # The model
-model_2 = NNCV(int(n_at*k/2)+1, 512, 256, 128).to(device) 
+model_2 = NNCV(int(math.ceil(n_at*k/2)), 512, 256, 128).to(device) 
 optimizer = torch.optim.Adam(model_2.parameters(), lr=learning_rate)
 
 train_errors = []

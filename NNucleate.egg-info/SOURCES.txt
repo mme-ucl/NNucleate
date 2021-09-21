@@ -1,6 +1,10 @@
 README.md
 pyproject.toml
 setup.py
+NNucleate/__init__.py
+NNucleate/data_augmentaion.py
+NNucleate/trainig.py
+NNucleate/utils.py
 NNucleate.egg-info/PKG-INFO
 NNucleate.egg-info/SOURCES.txt
 NNucleate.egg-info/dependency_links.txt

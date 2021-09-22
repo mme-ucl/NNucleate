@@ -7,3 +7,7 @@ To train a model:
 -  Create  a dataloader wrapping the CVTrajectory object.
 -  Create a model using the NNCV class
 -  Write a training loop using the desired train class and test
+
+## Installation
+
+`pip install git+https://github.com/Flofega/NNucleate.git`

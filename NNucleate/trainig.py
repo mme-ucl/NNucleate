@@ -152,7 +152,7 @@ class NNCV(nn.Module):
             self.sig_stack = nn.Sequential(
                 nn.Linear(insize, l1),
                 nn.Sigmoid(),
-                nn.Linear(l3, 1)
+                nn.Linear(l1, 1)
             )
 
     def forward(self, x):

@@ -3,6 +3,7 @@ import itertools
 from scipy.spatial import cKDTree
 import numpy as np
 import mdtraj as md
+import torch
 from scipy.spatial.transform import Rotation as R
 
 
@@ -51,13 +52,43 @@ def rotate_trajs(trajectories):
 
     return trajectories
 
-
+# GNN utils
 def unsorted_segment_sum(data, segment_ids, num_segments):
     result_shape = (num_segments, data.size(1))
     result = data.new_full(result_shape, 0)  # Init empty result tensor.
     segment_ids = segment_ids.unsqueeze(-1).expand(-1, data.size(1))
     result.scatter_add_(0, segment_ids, data)
     return result
+
+
+def get_rc_edges(rc, traj):
+    """Returns the edges of the graph constructed by interpreting the atoms in the trajectory as nodes that are connected to all other nodes within a distance of rc.
+
+    Args:
+        rc (float): Cut-off radius for the graph construction.
+        traj (md.trajectory): The trajectory for which the graphs shall be constructed.
+
+    Returns:
+        list(torch.tensor, torch.tensor): A list containing two tensors which represent the adjacency matrix of the graph.
+    """
+    n_at = len(traj.xyz[0])
+    n_frames = len(traj)
+
+    row_list = []
+    col_list = []
+    for i in range(n_frames):
+        frame_row = []
+        frame_col = []
+        dist = md.compute_neighborlist(traj, rc, frame=i)
+        for j in range(n_at):
+            for k in range(len(dist[j])):
+                frame_row.append(j)
+                frame_col.append(dist[j][k])
+        assert(len(frame_row) == len(frame_col))
+        row_list.append(torch.Tensor(frame_row))
+        col_list.append(torch.Tensor(frame_col))
+    
+    return row_list, col_list
 
 
 # A wrapper around scipy.spatial.kdtree to implement periodic boundary

@@ -55,23 +55,28 @@ class CVTrajectory(Dataset):
 
 
 class KNNTrajectory(Dataset):
-    def __init__(self, cv_file, traj_name, top_file, cv_col, box, k):
+    def __init__(self, cv_file, traj_name, top_file, cv_col, box_length, k, start=0, stop=-1, stride=1, root=1):
         """Generates a dataset from a trajectory in .xtc/xyz format. 
         The trajectory frames are represented via the sorted distances of all atoms to their k nearest neighbours.
+        WARNING: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
 
         Args:
             cv_file (str): Path to the cv file.
             traj_name (str): Path to the trajectory file (.xtc/.xyz)
             top_file (str): Path to the topology file (.pdb)
             cv_col (int): Gives the colimn in which the CV of interest is stored
-            box (list): List of box vectors (cubic).
+            box_length (float): Length of the cubic box
             k (int): Number of neighbours to consider.
+            start (int, optional): Starting frame of the trajectory
+            stop (int, optional): The last file of the trajectory that is read
+            stride (int, optional): The stride with which the trajectory frames are read
+            root (int, optional): Allows for the loading of the n-th root of the CV data (to compress the numerical range) 
         """
 
         
-        self.cv_labels = np.loadtxt(cv_file)[:, cv_col]
-        self.box = box
-        self.configs = transform_traj_to_knn_list(k, pbc(md.load(traj_name, top=top_file), self.box[0]).xyz, box)
+        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col]**(1/root)
+        self.box_length = box_length
+        self.configs = transform_traj_to_knn_list(k, pbc(md.load(traj_name, top=top_file), self.box_length)[start:stop:stride].xyz, box_length)
 
 
     def __len__(self):
@@ -85,6 +90,7 @@ class KNNTrajectory(Dataset):
         label = torch.tensor(self.cv_labels[idx]).float()
 
         return config/self.box[0], label
+
 
 class NdistTrajectory(Dataset):
     def __init__(self, cv_file, traj_name, top_file, cv_col, box, n_dist):

@@ -11,8 +11,9 @@ from scipy.spatial.transform import Rotation as R
 
 class CVTrajectory(Dataset):
 
-    def __init__(self, cv_file, traj_name, top_file, cv_col, box_length, transform=None):
+    def __init__(self, cv_file, traj_name, top_file, cv_col, box_length, transform=None, start=0, stop=-1, stride=1, root=1):
         """Instantiates a dataset from a trajectory file in xtc/xyz format and a text file containing the nucleation CVs (Assumes cubic cell)
+        WARNING: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
 
         Args:
             cv_file (str): Path to text file structured in columns containing the CVs
@@ -20,13 +21,16 @@ class CVTrajectory(Dataset):
             top_file (str): Path to the topology file in .pdb file format
             cv_col (int): Indicates the column in which the desired CV is written in the CV file (0 indexing)
             box_length (float). Length of the cubic cell
-            transform (function, optional): A function to be applied to the configuration before returning e.g. to_dist(). 
+            transform (function, optional): A function to be applied to the configuration before returning e.g. to_dist().
+            start (int, optional): Starting frame of the trajectory
+            stop (int, optional): The last file of the trajectory that is read
+            stride (int, optional): The stride with which the trajectory frames are read
+            root (int, optional): Allows for the loading of the n-th root of the CV data (to compress the numerical range) 
         """
 
-        
-        self.cv_labels = np.loadtxt(cv_file)[:, cv_col]
+        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col]**(1/root)
         self.length = box_length
-        self.configs = pbc(md.load(traj_name, top=top_file), self.length).xyz
+        self.configs = pbc(md.load(traj_name, top=top_file), self.length)[start:stop:stride]
 
         # Option to transform the configs before returning
         self.transform = transform

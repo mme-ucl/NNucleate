@@ -43,13 +43,6 @@ def rotate_trajs(trajectories):
     Returns:
         list of md.trajectory: Returns the randomly rotated frames
     """
-    #
-    # Rotates each frame in the given trajectories according to a random quaternion
-    # Parameters:
-    #     trajectories: list of mdtraj.Trajectory objects
-    # Returns:
-    #     List of modified trajectory objects
-    #
     for t in trajectories:
         for i in range(t.n_frames):
             quat = md.utils.uniform_quaternion()
@@ -323,15 +316,3 @@ class PeriodicCKDTree(cKDTree):
             for c in np.ndindex(retshape):
                 result[c] = self.__query_ball_point(x[c], r, p, eps)
             return result
-
-    def query_ball_tree(self, other, r, p=2., eps=0):
-        raise NotImplementedError()
-
-    def query_pairs(self, r, p=2., eps=0):
-        raise NotImplementedError()
-
-    def count_neighbors(self, other, r, p=2.):
-        raise NotImplementedError()
-
-    def sparse_distance_matrix(self, other, max_distance, p=2.):
-        raise NotImplementedError()

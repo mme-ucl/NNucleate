@@ -81,35 +81,36 @@ def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, 
     return
 
 
-def transform_frame_to_ndist_list(n_dist, traj, box):
+def transform_frame_to_ndist_list(n_dist, traj, box_length):
     """Transform the the cartesian coordinates of a given trajectory frame into a sorted list of the n_dist shortest distances in the system
 
     Args:
         n_dist (int): Number of distances to include (max: n*(n-1)/2)
         traj (array): List of list of coordinates to transform
-        box (list): List of the box vectors and angles
+        box (float): Length of the cubic box
 
     Returns:
         Array: Array of shape n_atoms x n_dists
     """
 
+    box = [box_length, box_length, box_length, 90.0, 90.0, 90.0]
     dist_frames = np.sort(self_distance_array(traj, box))[:n_dist]
 
     return dist_frames 
 
-def transform_traj_to_ndist_list(n_dist, traj, box):
+def transform_traj_to_ndist_list(n_dist, traj, box_length):
     """Transform the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system
 
     Args:
         n_dist (int): Number of distances to include (max: n*(n-1)/2)
         traj (list): Trajectory that is to be transformed.
-        box (list): List of the box vectors
+        box (float): Length of the cubic box
 
     Returns:
         list: Array of shape n_frames x n_atoms x n_dists
     """
 
-    box = [box[0], box[1], box[2], 90.0, 90.0, 90.0]
+    box = [box_length, box_length, box_length, 90.0, 90.0, 90.0]
     n_at = len(traj[0])
     n_frames = len(traj)
     dist_frames = np.ones(shape=(len(traj), int((n_at*(n_at - 1))/2 )))

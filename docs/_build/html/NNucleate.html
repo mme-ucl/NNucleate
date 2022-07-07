@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NNucleate package &mdash; NNucleate 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> NNucleate
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">NNucleate package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-NNucleate.data_augmentaion">NNucleate.data_augmentaion module</a></li>
+<li><a class="reference internal" href="#module-NNucleate.dataset">NNucleate.dataset module</a></li>
+<li><a class="reference internal" href="#module-NNucleate.models">NNucleate.models module</a></li>
+<li><a class="reference internal" href="#module-NNucleate.trainig">NNucleate.trainig module</a></li>
+<li><a class="reference internal" href="#module-NNucleate.utils">NNucleate.utils module</a></li>
+<li><a class="reference internal" href="#module-NNucleate">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NNucleate</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>NNucleate package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/NNucleate.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nnucleate-package">
+<h1>NNucleate package<a class="headerlink" href="#nnucleate-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-NNucleate.data_augmentaion">
+<span id="nnucleate-data-augmentaion-module"></span><h2>NNucleate.data_augmentaion module<a class="headerlink" href="#module-NNucleate.data_augmentaion" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.data_augmentaion.augment_evenly">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.data_augmentaion.</span></span><span class="sig-name descname"><span class="pre">augment_evenly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cvname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.data_augmentaion.augment_evenly" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Takes in a trajectory and adds degenerate rotated frames such that the resulting trajectory represents and even histogram.</dt><dd><p>Writes a new trajectory and CV file.</p>
+</dd>
+<dt>Args:</dt><dd><p>n (int): Height of the target histogram
+trajname (str): Path to the trajectory file (.xtc or .xyz)
+topology (str): Path to the topology file (.pdb)
+cvname (str): Path to the CV file. Text file with CVs organised in four columns
+savename (str): String without file ending under which the final CV and traj will be saved
+box (float): Box length for applying PBC
+n_min (int, optional): The minimum number of frames to add per frame. Defaults to 0.
+col (int, optional): The column in the CV file from which to read the CV (0 indexing). Defaults to 3.
+bins (int, optional): Number of bins in the target histogram. Defaults to 25.
+n_max (int, optional): Maximal height of a histogram column. Defaults to math.inf.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.data_augmentaion.transform_frame_to_knn_list">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.data_augmentaion.</span></span><span class="sig-name descname"><span class="pre">transform_frame_to_knn_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.data_augmentaion.transform_frame_to_knn_list" title="Permalink to this definition"></a></dt>
+<dd><p>Transforms the cartesian representation of a given trajectory frame to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>k (int): Number of neighbours to consider for each atom
+traj (array): List of coordinates to be transformed
+box_length (float): Length of the cubic box</p>
+</dd>
+<dt>Returns:</dt><dd><p>Array: Returns an array of shape n_atoms x k*n_atoms/2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.data_augmentaion.transform_frame_to_ndist_list">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.data_augmentaion.</span></span><span class="sig-name descname"><span class="pre">transform_frame_to_ndist_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.data_augmentaion.transform_frame_to_ndist_list" title="Permalink to this definition"></a></dt>
+<dd><p>Transform the the cartesian coordinates of a given trajectory frame into a sorted list of the n_dist shortest distances in the system</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>n_dist (int): Number of distances to include (max: n*(n-1)/2)
+traj (array): List of list of coordinates to transform
+box (float): Length of the cubic box</p>
+</dd>
+<dt>Returns:</dt><dd><p>Array: Array of shape n_atoms x n_dists</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.data_augmentaion.transform_traj_to_knn_list">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.data_augmentaion.</span></span><span class="sig-name descname"><span class="pre">transform_traj_to_knn_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.data_augmentaion.transform_traj_to_knn_list" title="Permalink to this definition"></a></dt>
+<dd><p>Transforms the cartesian representation of a given trajectory to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>k (int): Number of neighbours to consider for each atom
+traj (array): List of coordinates to be transformed
+box_length (float): Length of the cubic box</p>
+</dd>
+<dt>Returns:</dt><dd><p>Array: Returns an array of shape n_frames x n_atoms x k*n_atoms/2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.data_augmentaion.transform_traj_to_ndist_list">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.data_augmentaion.</span></span><span class="sig-name descname"><span class="pre">transform_traj_to_ndist_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.data_augmentaion.transform_traj_to_ndist_list" title="Permalink to this definition"></a></dt>
+<dd><p>Transform the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>n_dist (int): Number of distances to include (max: n*(n-1)/2)
+traj (list): Trajectory that is to be transformed.
+box (float): Length of the cubic box</p>
+</dd>
+<dt>Returns:</dt><dd><p>list: Array of shape n_frames x n_atoms x n_dists</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-NNucleate.dataset">
+<span id="nnucleate-dataset-module"></span><h2>NNucleate.dataset module<a class="headerlink" href="#module-NNucleate.dataset" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="NNucleate.dataset.CVTrajectory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">CVTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.CVTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="NNucleate.dataset.GNNTrajectory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">GNNTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.GNNTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="NNucleate.dataset.KNNTrajectory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">KNNTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.KNNTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="NNucleate.dataset.NdistTrajectory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">NdistTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.NdistTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+</dd></dl>
+
+</section>
+<section id="module-NNucleate.models">
+<span id="nnucleate-models-module"></span><h2>NNucleate.models module<a class="headerlink" href="#module-NNucleate.models" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="NNucleate.models.GCL">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.models.</span></span><span class="sig-name descname"><span class="pre">GCL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hidden_nf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ReLU()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GCL" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="NNucleate.models.GCL.edge_model">
+<span class="sig-name descname"><span class="pre">edge_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GCL.edge_model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NNucleate.models.GCL.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GCL.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NNucleate.models.GCL.node_model">
+<span class="sig-name descname"><span class="pre">node_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_attr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GCL.node_model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="NNucleate.models.GCL.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#NNucleate.models.GCL.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="NNucleate.models.GNNCV">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.models.</span></span><span class="sig-name descname"><span class="pre">GNNCV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_node_nf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_nf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ReLU()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GNNCV" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="NNucleate.models.GNNCV.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GNNCV.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="NNucleate.models.GNNCV.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#NNucleate.models.GNNCV.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="NNucleate.models.NNCV">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.models.</span></span><span class="sig-name descname"><span class="pre">NNCV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">insize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.NNCV" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="NNucleate.models.NNCV.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.NNCV.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="NNucleate.models.NNCV.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#NNucleate.models.NNCV.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-NNucleate.trainig">
+<span id="nnucleate-trainig-module"></span><h2>NNucleate.trainig module<a class="headerlink" href="#module-NNucleate.trainig" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.trainig.test">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.trainig.</span></span><span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.trainig.test" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the current average test set loss.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>dataloader (dataloader): Dataloader loading the test set
+model (NNCV): model that is being trained
+loss_fn (function): Pytorch loss function</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Current avg. test set loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.trainig.train_egnn">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.trainig.</span></span><span class="sig-name descname"><span class="pre">train_egnn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_l1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.trainig.train_egnn" title="Permalink to this definition"></a></dt>
+<dd><p>Function to perform one epoch of a GNN training.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>loader (torch.utils.data.Dataloader): Wrapper around a GNNTrajectory dataset.
+n_at (int): Number of nodes per frame.
+optimizer (torch.optim): The optimizer object for the training.
+loss_l1 (torch.nn._Loss): Loss function for the training.
+model_1 (GNNCV): Graph-based model to be trained.
+device (str): Device that the training is performed on. (Required for GPU compatibility)</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Training loss at the end of the epoch.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.trainig.train_linear">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.trainig.</span></span><span class="sig-name descname"><span class="pre">train_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_batch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.trainig.train_linear" title="Permalink to this definition"></a></dt>
+<dd><p>Performs one training epoch for a NNCV.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>dataloader (Dataloader): Wrappper for the training set
+model (NNCV): The network to be trained
+loss_fn (function): Pytorch loss to be used during training
+optimizer (function): Pytorch optimizer to be used during training
+device (dvice): Pytorch device to run the calculation on. Supports CPU and GPU (cuda)
+print_batch (int, optional): Set to recieve printed updates on the lost every print_batch batches. Defaults to 1000000.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.trainig.train_perm">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.trainig.</span></span><span class="sig-name descname"><span class="pre">train_perm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trans</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_batch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.trainig.train_perm" title="Permalink to this definition"></a></dt>
+<dd><p>Performs one training epoch for a NNCV but the loss for each batch is not just calculated on one reference structure but a set of n_trans permutated versions of that structure.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>dataloader (Dataloader): Wrapper around the training data
+model (NNCV): The model that is to be trained
+loss_fn (function): Pytorch loss function to be used for the training
+optimizer (function): Pytorch optimizer to be used during training
+n_trans (int): Number of permutated structures used for the loss calculations
+device (device): Pytorch device to run the calculations on. Supports CPU and GPU (cuda)
+print_batch (int, optional): Set to recieve printed updates on the loss every print_batches batches. Defaults to 1000000.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-NNucleate.utils">
+<span id="nnucleate-utils-module"></span><h2>NNucleate.utils module<a class="headerlink" href="#module-NNucleate.utils" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="NNucleate.utils.PeriodicCKDTree">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">PeriodicCKDTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leafsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.PeriodicCKDTree" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cKDTree</span></code></p>
+<p>Cython kd-tree for quick nearest-neighbor lookup with periodic boundaries
+See scipy.spatial.ckdtree for details on kd-trees.
+Searches with periodic boundaries are implemented by mapping all
+initial data points to one canonical periodic image, building an
+ordinary kd-tree with these points, then querying this kd-tree multiple
+times, if necessary, with all the relevant periodic images of the
+query point.
+Note that to ensure that no two distinct images of the same point
+appear in the results, it is essential to restrict the maximum
+distance between a query point and a data point to half the smallest
+box dimension.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="NNucleate.utils.PeriodicCKDTree.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_upper_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.PeriodicCKDTree.query" title="Permalink to this definition"></a></dt>
+<dd><p>Query the kd-tree for nearest neighbors
+Parameters
+———-
+x : array_like, last dimension self.m</p>
+<blockquote>
+<div><p>An array of points to query.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>k<span class="classifier">integer</span></dt><dd><p>The number of nearest neighbors to return.</p>
+</dd>
+<dt>eps<span class="classifier">non-negative float</span></dt><dd><p>Return approximate nearest neighbors; the kth returned value 
+is guaranteed to be no further than (1+eps) times the 
+distance to the real k-th nearest neighbor.</p>
+</dd>
+<dt>p<span class="classifier">float, 1&lt;=p&lt;=infinity</span></dt><dd><p>Which Minkowski p-norm to use. 
+1 is the sum-of-absolute-values “Manhattan” distance
+2 is the usual Euclidean distance
+infinity is the maximum-coordinate-difference distance</p>
+</dd>
+<dt>distance_upper_bound<span class="classifier">nonnegative float</span></dt><dd><p>Return only neighbors within this distance.  This is used to prune
+tree searches, so if you are doing a series of nearest-neighbor
+queries, it may help to supply the distance to the nearest neighbor
+of the most recent point.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>d<span class="classifier">array of floats</span></dt><dd><p>The distances to the nearest neighbors. 
+If x has shape tuple+(self.m,), then d has shape tuple+(k,).
+Missing neighbors are indicated with infinite distances.</p>
+</dd>
+<dt>i<span class="classifier">ndarray of ints</span></dt><dd><p>The locations of the neighbors in self.data.
+If <cite>x</cite> has shape tuple+(self.m,), then <cite>i</cite> has shape tuple+(k,).
+Missing neighbors are indicated with self.n.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NNucleate.utils.PeriodicCKDTree.query_ball_point">
+<span class="sig-name descname"><span class="pre">query_ball_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.PeriodicCKDTree.query_ball_point" title="Permalink to this definition"></a></dt>
+<dd><p>Find all points within distance r of point(s) x.
+Parameters
+———-
+x : array_like, shape tuple + (self.m,)</p>
+<blockquote>
+<div><p>The point or points to search for neighbors of.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>r<span class="classifier">positive float</span></dt><dd><p>The radius of points to return.</p>
+</dd>
+<dt>p<span class="classifier">float, optional</span></dt><dd><p>Which Minkowski p-norm to use.  Should be in the range [1, inf].</p>
+</dd>
+<dt>eps<span class="classifier">nonnegative float, optional</span></dt><dd><p>Approximate search. Branches of the tree are not explored if their
+nearest points are further than <code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">/</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">eps)</span></code>, and branches are
+added in bulk if their furthest points are nearer than
+<code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">*</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">eps)</span></code>.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>results<span class="classifier">list or array of lists</span></dt><dd><p>If <cite>x</cite> is a single point, returns a list of the indices of the
+neighbors of <cite>x</cite>. If <cite>x</cite> is an array of points, returns an object
+array of shape tuple containing lists of neighbors.</p>
+</dd>
+</dl>
+<p>If you have many points whose neighbors you want to find, you may
+save substantial amounts of time by putting them in a
+PeriodicCKDTree and using query_ball_tree.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.utils.get_rc_edges">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">get_rc_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.get_rc_edges" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the edges of the graph constructed by interpreting the atoms in the trajectory as nodes that are connected to all other nodes within a distance of rc.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>rc (float): Cut-off radius for the graph construction.
+traj (md.trajectory): The trajectory for which the graphs shall be constructed.</p>
+</dd>
+<dt>Returns:</dt><dd><p>list(torch.tensor, torch.tensor): A list containing two tensors which represent the adjacency matrix of the graph.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.utils.pbc">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">pbc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.pbc" title="Permalink to this definition"></a></dt>
+<dd><p>Centers an mdtraj Trajectory around the centre of a cubic box with the given box length and wraps all atoms into the box.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>trajectory (mdtraj.trajectory): The trajectory that is to be modified
+box_length (float): Length of the target cubic box</p>
+</dd>
+<dt>Returns:</dt><dd><p>mdtraj.trajectory: A trajectory object obeying PBC according to the given box length</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.utils.rotate_trajs">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">rotate_trajs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectories</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.rotate_trajs" title="Permalink to this definition"></a></dt>
+<dd><p>Rotates each frame in the given trajectories according to a random quaternion</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>trajectories (list of md.trajectory): list of mdtraj.trajectory objects to be modified</p>
+</dd>
+<dt>Returns:</dt><dd><p>list of md.trajectory: Returns the randomly rotated frames</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.utils.unsorted_segment_sum">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">unsorted_segment_sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_segments</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.unsorted_segment_sum" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-NNucleate">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-NNucleate" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Florian Dietrich.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

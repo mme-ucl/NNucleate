@@ -122,19 +122,19 @@ def transform_traj_to_ndist_list(n_dist, traj, box):
 
 
 
-def transform_frame_to_knn_list(k, traj, box):
+def transform_frame_to_knn_list(k, traj, box_length):
     """Transforms the cartesian representation of a given trajectory frame to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
 
     Args:
         k (int): Number of neighbours to consider for each atom
         traj (array): List of coordinates to be transformed
-        box (list): List of box vectors
+        box_length (float): Length of the cubic box
 
     Returns:
         Array: Returns an array of shape n_atoms x k*n_atoms/2
     """
     n_at = len(traj)
-    box = np.array(box)
+    box = np.array([box_length, box_length, box_length])
 
     d, j = PeriodicCKDTree(box, traj).query(traj, k=k+1)
     d = d.flatten()
@@ -142,10 +142,19 @@ def transform_frame_to_knn_list(k, traj, box):
     result = d[n_at:][::2]
     return result
 
-def transform_traj_to_knn_list(k, traj, box):
+def transform_traj_to_knn_list(k, traj, box_length):
+    """Transforms the cartesian representation of a given trajectory to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
 
+    Args:
+        k (int): Number of neighbours to consider for each atom
+        traj (array): List of coordinates to be transformed
+        box_length (float): Length of the cubic box
+
+    Returns:
+        Array: Returns an array of shape n_frames x n_atoms x k*n_atoms/2
+    """
     n_at = len(traj[0])
-    box = np.array(box)
+    box = np.array([box_length, box_length, box_length])
     n_frames = len(traj)
     result = np.zeros(shape=(n_frames, int(math.ceil(n_at*k/2))))
     

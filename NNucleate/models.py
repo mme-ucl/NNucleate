@@ -1,6 +1,6 @@
 from torch import nn
 import torch
-from utils import unsorted_segment_sum
+from .utils import unsorted_segment_sum
 
 # Linear Model
 class NNCV(nn.Module):

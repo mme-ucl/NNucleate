@@ -2,11 +2,8 @@ from .utils import pbc
 from .data_augmentaion import transform_traj_to_knn_list, transform_traj_to_ndist_list
 import torch
 from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
-from torch import nn
 import numpy as np
 import mdtraj as md
-from scipy.spatial.transform import Rotation as R
 
 
 class CVTrajectory(Dataset):
@@ -128,54 +125,6 @@ class NdistTrajectory(Dataset):
 
         return config/self.box[0], label
 
-
-# Model
-class NNCV(nn.Module):
-    def __init__(self, insize, l1, l2=0, l3=0):
-        """Instantiates an NN for approximating CVs. Supported are architectures with up to 3 layers.
-
-        Args:
-            insize (int): Size of the input layer
-            l1 (int): Size of dense layer 1
-            l2 (int, optional): Size of dense layer 2. Defaults to 0.
-            l3 (int, optional): Size of dense layer 3. Defaults to 0.
-        """
-        super(NNCV, self).__init__()
-        self.flatten = nn.Flatten()
-        # defines the structure
-        if l2 > 0:
-            if l3 > 0:
-                self.sig_stack = nn.Sequential(
-                    nn.Linear(insize, l1),
-                    nn.Sigmoid(),
-                    nn.Linear(l1, l2),
-                    nn.Sigmoid(),
-                    nn.Linear(l2, l3),
-                    nn.Sigmoid(),
-                    nn.Linear(l3, 1)
-                )
-            else:
-                self.sig_stack = nn.Sequential(
-                    nn.Linear(insize, l1),
-                    nn.Sigmoid(),
-                    nn.Linear(l1, l2),
-                    nn.Sigmoid(),
-                    nn.Linear(l2, 1)
-                )
-        else:
-            self.sig_stack = nn.Sequential(
-                nn.Linear(insize, l1),
-                nn.Sigmoid(),
-                nn.Linear(l1, 1)
-            )
-
-    def forward(self, x):
-        # defines the application of the network to data
-        # NEVER call forward directly
-        # Only say model(x)
-        x = self.flatten(x)
-        label = self.sig_stack(x)
-        return label
 
 
 def train(dataloader, model, loss_fn, optimizer, device, print_batch=1000000):

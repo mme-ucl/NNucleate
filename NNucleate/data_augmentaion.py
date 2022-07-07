@@ -26,11 +26,11 @@ def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, 
 
     # Load the trajectory and cvs
     traj = md.load(trajname, top=topology)
-    cvs = np.loadtxt(cvname)
+    cvs = np.loadtxt(cvname)[:, col]
     traj = pbc(traj, box)
     
     # Create the starting histogram
-    counts, bins = np.histogram(cvs[:, col], bins=bins)
+    counts, bins = np.histogram(cvs, bins=bins)
 
     # Calculate the number of degenerate frames to add per frame 
     rot_per_frame = []
@@ -48,8 +48,8 @@ def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, 
     # join the copies together and append to the super copy list
     for i in range(len(rot_per_frame)):
         # mask for frames in bin
-        m1 = cvs[:, col] >= bins[i]
-        m2 = cvs[:, col] < bins[i+1]
+        m1 = cvs >= bins[i]
+        m2 = cvs < bins[i+1]
         mask = m1 & m2
         c = 0
         for m in mask:
@@ -73,12 +73,9 @@ def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, 
     copy = pbc(copy, box)
     
     # save the cvs and trajectory
-    ###################################################
-    # WARNING: number of coloumns in CV file hard coded
-    ###################################################
     with open(savename + '_cv' + ".dat", 'w') as f:
-        for item in cvs_long:
-            f.write("%f %f %f %f\n" % (item[0], item[1], item[2], item[3]))
+        for i in range(len(cvs_long)):
+            f.write("%i %f \n" % (i, cvs_long[i]))
     
     copy.save_xtc(savename + ".xtc")
     return

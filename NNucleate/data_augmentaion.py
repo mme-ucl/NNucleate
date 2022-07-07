@@ -7,7 +7,19 @@ import MDAnalysis as mda
 from MDAnalysis.analysis.distances import self_distance_array
 import math
 
-def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, bins=25, n_max=math.inf):
+
+def augment_evenly(
+    n,
+    trajname,
+    topology,
+    cvname,
+    savename,
+    box,
+    n_min=0,
+    col=3,
+    bins=25,
+    n_max=math.inf,
+):
     """Takes in a trajectory and adds degenerate rotated frames such that the resulting trajectory represents and even histogram.
        Writes a new trajectory and CV file.
 
@@ -28,15 +40,15 @@ def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, 
     traj = md.load(trajname, top=topology)
     cvs = np.loadtxt(cvname)[:, col]
     traj = pbc(traj, box)
-    
+
     # Create the starting histogram
     counts, bins = np.histogram(cvs, bins=bins)
 
-    # Calculate the number of degenerate frames to add per frame 
+    # Calculate the number of degenerate frames to add per frame
     rot_per_frame = []
     for i in range(len(counts)):
         # Add either so many that the resulting histogram is n high or the minimum amount
-        amount = min(math.ceil(max( (n - counts[i])/counts[i], n_min )), n_max)
+        amount = min(math.ceil(max((n - counts[i]) / counts[i], n_min)), n_max)
         rot_per_frame.append(amount)
 
     copy = deepcopy(traj)
@@ -49,12 +61,12 @@ def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, 
     for i in range(len(rot_per_frame)):
         # mask for frames in bin
         m1 = cvs >= bins[i]
-        m2 = cvs < bins[i+1]
+        m2 = cvs < bins[i + 1]
         mask = m1 & m2
         c = 0
         for m in mask:
             if m:
-                c +=1
+                c += 1
 
         # make the copies
         sub_copies = []
@@ -62,21 +74,19 @@ def augment_evenly(n,trajname, topology, cvname, savename, box, n_min=0, col=3, 
         for j in range(rot_per_frame[i]):
             sub_copies.append(deepcopy(traj[mask]))
             cvs_long = cvs_long + cvs[mask].tolist()
-          
-        sub_copies = rotate_trajs(sub_copies)  
+
+        sub_copies = rotate_trajs(sub_copies)
         for sub_copy in sub_copies:
             copy = copy.join(sub_copy)
 
-        
-    
     # center the trajectory and apply PBC
     copy = pbc(copy, box)
-    
+
     # save the cvs and trajectory
-    with open(savename + '_cv' + ".dat", 'w') as f:
+    with open(savename + "_cv" + ".dat", "w") as f:
         for i in range(len(cvs_long)):
             f.write("%i %f \n" % (i, cvs_long[i]))
-    
+
     copy.save_xtc(savename + ".xtc")
     return
 
@@ -96,7 +106,8 @@ def transform_frame_to_ndist_list(n_dist, traj, box_length):
     box = [box_length, box_length, box_length, 90.0, 90.0, 90.0]
     dist_frames = np.sort(self_distance_array(traj, box))[:n_dist]
 
-    return dist_frames 
+    return dist_frames
+
 
 def transform_traj_to_ndist_list(n_dist, traj, box_length):
     """Transform the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system
@@ -113,14 +124,13 @@ def transform_traj_to_ndist_list(n_dist, traj, box_length):
     box = [box_length, box_length, box_length, 90.0, 90.0, 90.0]
     n_at = len(traj[0])
     n_frames = len(traj)
-    dist_frames = np.ones(shape=(len(traj), int((n_at*(n_at - 1))/2 )))
-    target = np.zeros( (int(n_at*(n_at-1)/2),))
+    dist_frames = np.ones(shape=(len(traj), int((n_at * (n_at - 1)) / 2)))
+    target = np.zeros((int(n_at * (n_at - 1) / 2),))
 
     for i in range(n_frames):
         dist_frames[i] = np.sort(self_distance_array(traj, box, result=target))[:n_dist]
-    
-    return dist_frames
 
+    return dist_frames
 
 
 def transform_frame_to_knn_list(k, traj, box_length):
@@ -137,11 +147,12 @@ def transform_frame_to_knn_list(k, traj, box_length):
     n_at = len(traj)
     box = np.array([box_length, box_length, box_length])
 
-    d, j = PeriodicCKDTree(box, traj).query(traj, k=k+1)
+    d, j = PeriodicCKDTree(box, traj).query(traj, k=k + 1)
     d = d.flatten()
     d.sort()
     result = d[n_at:][::2]
     return result
+
 
 def transform_traj_to_knn_list(k, traj, box_length):
     """Transforms the cartesian representation of a given trajectory to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
@@ -157,11 +168,11 @@ def transform_traj_to_knn_list(k, traj, box_length):
     n_at = len(traj[0])
     box = np.array([box_length, box_length, box_length])
     n_frames = len(traj)
-    result = np.zeros(shape=(n_frames, int(math.ceil(n_at*k/2))))
-    
+    result = np.zeros(shape=(n_frames, int(math.ceil(n_at * k / 2))))
+
     for i in range(n_frames):
         T = PeriodicCKDTree(box, traj[i])
-        d, j = T.query(traj[i], k=k+1)
+        d, j = T.query(traj[i], k=k + 1)
         d = d.flatten()
         d.sort()
         result[i] = d[n_at:][::2]

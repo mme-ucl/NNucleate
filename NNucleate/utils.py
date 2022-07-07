@@ -19,9 +19,9 @@ def pbc(trajectory, box_length):
     """
     # function defining PBC
     def transform(x):
-        while(x >= box_length):
+        while x >= box_length:
             x -= box_length
-        while(x <= 0):
+        while x <= 0:
             x += box_length
         return x
 
@@ -51,6 +51,7 @@ def rotate_trajs(trajectories):
             t.xyz[i] = rot.apply(t.xyz[i])
 
     return trajectories
+
 
 # GNN utils
 def unsorted_segment_sum(data, segment_ids, num_segments):
@@ -84,10 +85,10 @@ def get_rc_edges(rc, traj):
             for k in range(len(dist[j])):
                 frame_row.append(j)
                 frame_col.append(dist[j][k])
-        assert(len(frame_row) == len(frame_col))
+        assert len(frame_row) == len(frame_col)
         row_list.append(torch.Tensor(frame_row))
         col_list.append(torch.Tensor(frame_col))
-    
+
     return row_list, col_list
 
 
@@ -102,8 +103,7 @@ def get_rc_edges(rc, traj):
 def _gen_relevant_images(x, bounds, distance_upper_bound):
     # Map x onto the canonical unit cell, then produce the relevant
     # mirror images
-    real_x = x - np.where(bounds > 0.0,
-                          np.floor(x / bounds) * bounds, 0.0)
+    real_x = x - np.where(bounds > 0.0, np.floor(x / bounds) * bounds, 0.0)
     m = len(x)
 
     xs_to_try = [real_x]
@@ -115,7 +115,9 @@ def _gen_relevant_images(x, bounds, distance_upper_bound):
             if distance_upper_bound == np.inf:
                 xs_to_try = list(
                     itertools.chain.from_iterable(
-                        (_ + disp, _, _ - disp) for _ in xs_to_try))
+                        (_ + disp, _, _ - disp) for _ in xs_to_try
+                    )
+                )
             else:
                 extra_xs = []
 
@@ -168,13 +170,14 @@ class PeriodicCKDTree(cKDTree):
         # Map all points to canonical periodic image
         self.bounds = np.array(bounds)
         self.real_data = np.asarray(data)
-        wrapped_data = (
-            self.real_data - np.where(bounds > 0.0,
-                                      (np.floor(self.real_data / bounds) * bounds), 0.0))
+        wrapped_data = self.real_data - np.where(
+            bounds > 0.0, (np.floor(self.real_data / bounds) * bounds), 0.0
+        )
 
         # Calculate maximum distance_upper_bound
         self.max_distance_upper_bound = np.min(
-            np.where(self.bounds > 0, 0.5 * self.bounds, np.inf))
+            np.where(self.bounds > 0, 0.5 * self.bounds, np.inf)
+        )
 
         # Set up underlying kd-tree
         super(PeriodicCKDTree, self).__init__(wrapped_data, leafsize)
@@ -190,14 +193,16 @@ class PeriodicCKDTree(cKDTree):
         # all neighbors within the given distance_upper_bound".
 
         # Cap distance_upper_bound
-        distance_upper_bound = np.min([distance_upper_bound,
-                                       self.max_distance_upper_bound])
+        distance_upper_bound = np.min(
+            [distance_upper_bound, self.max_distance_upper_bound]
+        )
 
         # Run queries over all relevant images of x
         hits_list = []
         for real_x in _gen_relevant_images(x, self.bounds, distance_upper_bound):
             d, i = super(PeriodicCKDTree, self).query(
-                real_x, k, eps, p, distance_upper_bound)
+                real_x, k, eps, p, distance_upper_bound
+            )
             if k > 1:
                 hits_list.append(list(zip(d, i)))
             else:
@@ -247,16 +252,18 @@ class PeriodicCKDTree(cKDTree):
         """
         x = np.asarray(x)
         if np.shape(x)[-1] != self.m:
-            raise ValueError("x must consist of vectors of length %d but has shape %s" % (
-                self.m, np.shape(x)))
+            raise ValueError(
+                "x must consist of vectors of length %d but has shape %s"
+                % (self.m, np.shape(x))
+            )
         if p < 1:
             raise ValueError("Only p-norms with 1<=p<=infinity permitted")
         retshape = np.shape(x)[:-1]
         if retshape != ():
             if k > 1:
-                dd = np.empty(retshape+(k,), dtype=np.float)
+                dd = np.empty(retshape + (k,), dtype=np.float)
                 dd.fill(np.inf)
-                ii = np.empty(retshape+(k,), dtype=np.int)
+                ii = np.empty(retshape + (k,), dtype=np.int)
                 ii.fill(self.n)
             elif k == 1:
                 dd = np.empty(retshape, dtype=np.float)
@@ -265,13 +272,15 @@ class PeriodicCKDTree(cKDTree):
                 ii.fill(self.n)
             else:
                 raise ValueError(
-                    "Requested %s nearest neighbors; acceptable numbers are integers greater than or equal to one, or None")
+                    "Requested %s nearest neighbors; acceptable numbers are integers greater than or equal to one, or None"
+                )
             for c in np.ndindex(retshape):
-                hits = self.__query(x[c], k=k, eps=eps, p=p,
-                                    distance_upper_bound=distance_upper_bound)
+                hits = self.__query(
+                    x[c], k=k, eps=eps, p=p, distance_upper_bound=distance_upper_bound
+                )
                 if k > 1:
                     for j in range(len(hits)):
-                        dd[c+(j,)], ii[c+(j,)] = hits[j]
+                        dd[c + (j,)], ii[c + (j,)] = hits[j]
                 elif k == 1:
                     if len(hits) > 0:
                         dd[c], ii[c] = hits[0]
@@ -280,8 +289,9 @@ class PeriodicCKDTree(cKDTree):
                         ii[c] = self.n
             return dd, ii
         else:
-            hits = self.__query(x, k=k, eps=eps, p=p,
-                                distance_upper_bound=distance_upper_bound)
+            hits = self.__query(
+                x, k=k, eps=eps, p=p, distance_upper_bound=distance_upper_bound
+            )
             if k == 1:
                 if len(hits) > 0:
                     return hits[0]
@@ -297,12 +307,13 @@ class PeriodicCKDTree(cKDTree):
                 return dd, ii
             else:
                 raise ValueError(
-                    "Requested %s nearest neighbors; acceptable numbers are integers greater than or equal to one, or None")
+                    "Requested %s nearest neighbors; acceptable numbers are integers greater than or equal to one, or None"
+                )
 
     # Ideally, KDTree and cKDTree would expose identical __query_ball_point
     # interfaces.  But they don't, and cKDTree.__query_ball_point is also
     # inaccessible from Python.  We do our best here to cope.
-    def __query_ball_point(self, x, r, p=2., eps=0):
+    def __query_ball_point(self, x, r, p=2.0, eps=0):
         # This is the internal query method, which guarantees that x
         # is a single point, not an array of points
 
@@ -312,11 +323,12 @@ class PeriodicCKDTree(cKDTree):
         # Run queries over all relevant images of x
         results = []
         for real_x in _gen_relevant_images(x, self.bounds, r):
-            results.extend(super(PeriodicCKDTree, self).query_ball_point(
-                real_x, r, p, eps))
+            results.extend(
+                super(PeriodicCKDTree, self).query_ball_point(real_x, r, p, eps)
+            )
         return results
 
-    def query_ball_point(self, x, r, p=2., eps=0):
+    def query_ball_point(self, x, r, p=2.0, eps=0):
         """
         Find all points within distance r of point(s) x.
         Parameters
@@ -346,8 +358,10 @@ class PeriodicCKDTree(cKDTree):
         """
         x = np.asarray(x).astype(np.float)
         if x.shape[-1] != self.m:
-            raise ValueError("Searching for a %d-dimensional point in a "
-                             "%d-dimensional KDTree" % (x.shape[-1], self.m))
+            raise ValueError(
+                "Searching for a %d-dimensional point in a "
+                "%d-dimensional KDTree" % (x.shape[-1], self.m)
+            )
         if len(x.shape) == 1:
             return self.__query_ball_point(x, r, p, eps)
         else:

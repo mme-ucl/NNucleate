@@ -25,7 +25,7 @@ class NNCV(nn.Module):
                     nn.Sigmoid(),
                     nn.Linear(l2, l3),
                     nn.Sigmoid(),
-                    nn.Linear(l3, 1)
+                    nn.Linear(l3, 1),
                 )
             else:
                 self.sig_stack = nn.Sequential(
@@ -33,13 +33,11 @@ class NNCV(nn.Module):
                     nn.Sigmoid(),
                     nn.Linear(l1, l2),
                     nn.Sigmoid(),
-                    nn.Linear(l2, 1)
+                    nn.Linear(l2, 1),
                 )
         else:
             self.sig_stack = nn.Sequential(
-                nn.Linear(insize, l1),
-                nn.Sigmoid(),
-                nn.Linear(l1, 1)
+                nn.Linear(insize, l1), nn.Sigmoid(), nn.Linear(l1, 1)
             )
 
     def forward(self, x):
@@ -53,7 +51,6 @@ class NNCV(nn.Module):
 
 # Graph model
 class GCL(nn.Module):
-
     def __init__(self, hidden_nf, act_fn=nn.ReLU()):
         """The graph convolutional layer for the graph-based model. Do not instantiate this directly.
         
@@ -68,20 +65,21 @@ class GCL(nn.Module):
             nn.Linear(hidden_nf, hidden_nf),
             act_fn,
             # Maps to the same dimension
-            nn.Linear(hidden_nf, hidden_nf))
+            nn.Linear(hidden_nf, hidden_nf),
+        )
 
         self.node_mlp = nn.Sequential(
             # Node MLP just takes the current vector and the resulting neighbourhood vector
             nn.Linear(hidden_nf * 2, hidden_nf),
             act_fn,
-            nn.Linear(hidden_nf, hidden_nf))
+            nn.Linear(hidden_nf, hidden_nf),
+        )
 
         layer = nn.Linear(hidden_nf, 1, bias=False)
         torch.nn.init.xavier_uniform_(layer.weight, gain=0.001)
 
-
     def edge_model(self, source, target):
-        
+
         out = torch.cat([source - target], dim=1)
         out = self.edge_mlp(out)
         return out
@@ -95,7 +93,6 @@ class GCL(nn.Module):
 
         return out
 
-
     def forward(self, h, edge_index):
         row, col = edge_index
 
@@ -105,7 +102,9 @@ class GCL(nn.Module):
 
 
 class GNNCV(nn.Module):
-    def __init__(self, in_node_nf = 3, hidden_nf = 3, device='cpu', act_fn=nn.ReLU(), n_layers=1):
+    def __init__(
+        self, in_node_nf=3, hidden_nf=3, device="cpu", act_fn=nn.ReLU(), n_layers=1
+    ):
         """Graph-based model for the approximation of collective variables.
 
         Args:
@@ -126,23 +125,26 @@ class GNNCV(nn.Module):
         for i in range(0, n_layers):
             self.add_module("gcl_%d" % i, GCL(self.hidden_nf, act_fn=act_fn))
 
-        self.node_dec = nn.Sequential(nn.Linear(self.hidden_nf, self.hidden_nf),
-                                      act_fn,
-                                      nn.Linear(self.hidden_nf, self.hidden_nf))
+        self.node_dec = nn.Sequential(
+            nn.Linear(self.hidden_nf, self.hidden_nf),
+            act_fn,
+            nn.Linear(self.hidden_nf, self.hidden_nf),
+        )
 
-        self.graph_dec = nn.Sequential(nn.Linear(self.hidden_nf, self.hidden_nf),
-                                       act_fn,
-                                       nn.Linear(self.hidden_nf, 1))
+        self.graph_dec = nn.Sequential(
+            nn.Linear(self.hidden_nf, self.hidden_nf),
+            act_fn,
+            nn.Linear(self.hidden_nf, 1),
+        )
         self.to(self.device)
 
     def forward(self, x, edges, n_nodes):
-        h = self.embedding(x) # turn 1D h into internal h
+        h = self.embedding(x)  # turn 1D h into internal h
         for i in range(0, self.n_layers):
-            h = self._modules["gcl_%d" % i](h, edges) # update h
+            h = self._modules["gcl_%d" % i](h, edges)  # update h
 
-
-        h = self.node_dec(h) # pipe H through a MLP
-        h = h.view(-1, n_nodes, self.hidden_nf) # stacks all the hidden_nf
-        h = torch.sum(h, dim=1) # create one vector containinf the hidden h sums
-        pred = self.graph_dec(h) # 
-        return pred.squeeze(1) 
+        h = self.node_dec(h)  # pipe H through a MLP
+        h = h.view(-1, n_nodes, self.hidden_nf)  # stacks all the hidden_nf
+        h = torch.sum(h, dim=1)  # create one vector containinf the hidden h sums
+        pred = self.graph_dec(h)  #
+        return pred.squeeze(1)

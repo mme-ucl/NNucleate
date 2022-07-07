@@ -49,7 +49,7 @@ def train_egnn(loader, n_at, optimizer, loss_l1, model_1, device):
     Returns:
         float: Training loss at the end of the epoch.
     """
-    res = {'loss': 0, 'counter': 0}
+    res = {"loss": 0, "counter": 0}
     for batch, (X, y, r, c) in enumerate(loader):
         model_1.train()
         optimizer.zero_grad()
@@ -62,10 +62,10 @@ def train_egnn(loader, n_at, optimizer, loss_l1, model_1, device):
         col_new = col_new[col_new > 0]
         j = 0
         for i in range(1, len(row_new)):
-            row_new[i] += j*n_at
-            col_new[i] += j*n_at
+            row_new[i] += j * n_at
+            col_new[i] += j * n_at
 
-            if row_new[i-1] > row_new[i]:
+            if row_new[i - 1] > row_new[i]:
                 j += 1
                 row_new[i] += n_at
                 col_new[i] += n_at
@@ -73,18 +73,20 @@ def train_egnn(loader, n_at, optimizer, loss_l1, model_1, device):
         edges = [row_new.long().to(device), col_new.long().to(device)]
         label = y.to(device)
 
-        pred = model_1(x=atom_positions, edges=edges, n_nodes = n_at)
+        pred = model_1(x=atom_positions, edges=edges, n_nodes=n_at)
         loss = loss_l1(pred, label)
         loss.backward()
         optimizer.step()
 
-        res['loss'] += loss.item() * batch_size
-        res['counter'] += batch_size
+        res["loss"] += loss.item() * batch_size
+        res["counter"] += batch_size
 
-    return res['loss'] / res['counter']
+    return res["loss"] / res["counter"]
 
 
-def train_perm(dataloader, model, loss_fn, optimizer, n_trans, device, print_batch=1000000):
+def train_perm(
+    dataloader, model, loss_fn, optimizer, n_trans, device, print_batch=1000000
+):
     """Performs one training epoch for a NNCV but the loss for each batch is not just calculated on one reference structure but a set of n_trans permutated versions of that structure.
 
     Args:

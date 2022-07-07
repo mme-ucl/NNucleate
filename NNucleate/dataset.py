@@ -8,8 +8,19 @@ from .data_augmentaion import transform_traj_to_knn_list, transform_traj_to_ndis
 
 
 class CVTrajectory(Dataset):
-
-    def __init__(self, cv_file, traj_name, top_file, cv_col, box_length, transform=None, start=0, stop=-1, stride=1, root=1):
+    def __init__(
+        self,
+        cv_file,
+        traj_name,
+        top_file,
+        cv_col,
+        box_length,
+        transform=None,
+        start=0,
+        stop=-1,
+        stride=1,
+        root=1,
+    ):
         """Instantiates a dataset from a trajectory file in xtc/xyz format and a text file containing the nucleation CVs (Assumes cubic cell)
         WARNING: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
 
@@ -26,9 +37,11 @@ class CVTrajectory(Dataset):
             root (int, optional): Allows for the loading of the n-th root of the CV data (to compress the numerical range) 
         """
 
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col]**(1/root)
+        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
         self.length = box_length
-        self.configs = pbc(md.load(traj_name, top=top_file), self.length)[start:stop:stride]
+        self.configs = pbc(md.load(traj_name, top=top_file), self.length)[
+            start:stop:stride
+        ]
 
         # Option to transform the configs before returning
         self.transform = transform
@@ -49,11 +62,23 @@ class CVTrajectory(Dataset):
         else:
             config = torch.tensor(config).float()
 
-        return config/self.length, label
+        return config / self.length, label
 
 
 class KNNTrajectory(Dataset):
-    def __init__(self, cv_file, traj_name, top_file, cv_col, box_length, k, start=0, stop=-1, stride=1, root=1):
+    def __init__(
+        self,
+        cv_file,
+        traj_name,
+        top_file,
+        cv_col,
+        box_length,
+        k,
+        start=0,
+        stop=-1,
+        stride=1,
+        root=1,
+    ):
         """Generates a dataset from a trajectory in .xtc/xyz format. 
         The trajectory frames are represented via the sorted distances of all atoms to their k nearest neighbours.
         WARNING: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
@@ -71,11 +96,15 @@ class KNNTrajectory(Dataset):
             root (int, optional): Allows for the loading of the n-th root of the CV data (to compress the numerical range) 
         """
 
-        
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col]**(1/root)
+        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
         self.box_length = box_length
-        self.configs = transform_traj_to_knn_list(k, pbc(md.load(traj_name, top=top_file), self.box_length)[start:stop:stride].xyz, box_length)
-
+        self.configs = transform_traj_to_knn_list(
+            k,
+            pbc(md.load(traj_name, top=top_file), self.box_length)[
+                start:stop:stride
+            ].xyz,
+            box_length,
+        )
 
     def __len__(self):
         # Returns the length of the dataset
@@ -87,11 +116,23 @@ class KNNTrajectory(Dataset):
         # Label is read from the numpy array
         label = torch.tensor(self.cv_labels[idx]).float()
 
-        return config/self.box_length, label
+        return config / self.box_length, label
 
 
 class NdistTrajectory(Dataset):
-    def __init__(self, cv_file, traj_name, top_file, cv_col, box_length, n_dist, start=0, stop=-1, stride=1, root=1):
+    def __init__(
+        self,
+        cv_file,
+        traj_name,
+        top_file,
+        cv_col,
+        box_length,
+        n_dist,
+        start=0,
+        stop=-1,
+        stride=1,
+        root=1,
+    ):
         """Generates a dataset from a trajectory in .xtc/xyz format. 
         The trajectory frames are represented via the n_dist sorted distances.
         WARNING: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
@@ -109,11 +150,15 @@ class NdistTrajectory(Dataset):
             root (int, optional): Allows for the loading of the n-th root of the CV data (to compress the numerical range) 
         """
 
-        
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col]**(1/root)
+        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
         self.box_length = box_length
-        self.configs = transform_traj_to_ndist_list(n_dist, pbc(md.load(traj_name, top=top_file), self.box_length)[start:stop:stride].xyz, box_length)
-
+        self.configs = transform_traj_to_ndist_list(
+            n_dist,
+            pbc(md.load(traj_name, top=top_file), self.box_length)[
+                start:stop:stride
+            ].xyz,
+            box_length,
+        )
 
     def __len__(self):
         # Returns the length of the dataset
@@ -125,13 +170,23 @@ class NdistTrajectory(Dataset):
         # Label is read from the numpy array
         label = torch.tensor(self.cv_labels[idx]).float()
 
-        return config/self.box_length, label
-
+        return config / self.box_length, label
 
 
 class GNNTrajectory(Dataset):
-
-    def __init__(self, cv_file, traj_name, top_file, cv_col, box_length, rc, start=0, stop=-1, stride=1, root=1):
+    def __init__(
+        self,
+        cv_file,
+        traj_name,
+        top_file,
+        cv_col,
+        box_length,
+        rc,
+        start=0,
+        stop=-1,
+        stride=1,
+        root=1,
+    ):
         """Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN. 
 
         Args:
@@ -147,22 +202,20 @@ class GNNTrajectory(Dataset):
             root (int, optional): Allows for the loading of the n-th root of the CV data (to compress the numerical range). Defaults to 1. 
         """
 
-        
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col]**(1/root)
+        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
         self.length = box_length
         traj = pbc(md.load(traj_name, top=top_file), self.length)[start:stop:stride]
         vecs = np.zeros((len(traj), 3, 3))
         for i in range(len(traj)):
             vecs[i, 0] = np.array([self.length, 0, 0])
             vecs[i, 1] = np.array([0, self.length, 0])
-            vecs[i, 2] = np.array([0, 0, self.length]) 
+            vecs[i, 2] = np.array([0, 0, self.length])
         traj.unitcell_vectors = vecs
         traj = pbc(traj, self.length)
         self.rows, self.cols = get_rc_edges(rc, traj)
         self.max_l = np.max([len(r) for r in self.rows])
         print(self.max_l)
         self.configs = traj.xyz
-
 
     def __len__(self):
         # Returns the length of the dataset
@@ -177,6 +230,6 @@ class GNNTrajectory(Dataset):
         config = torch.tensor(config).float()
         rows = self.rows[idx]
         cols = self.cols[idx]
-        rows = nn.functional.pad(rows, [0, self.max_l-len(rows)], value=-1)
-        cols = nn.functional.pad(cols, [0, self.max_l-len(cols)], value=-1)
-        return config/self.length, label, rows, cols
+        rows = nn.functional.pad(rows, [0, self.max_l - len(rows)], value=-1)
+        cols = nn.functional.pad(cols, [0, self.max_l - len(cols)], value=-1)
+        return config / self.length, label, rows, cols

@@ -10,12 +10,12 @@ from scipy.spatial.transform import Rotation as R
 def pbc(trajectory, box_length):
     """Centers an mdtraj Trajectory around the centre of a cubic box with the given box length and wraps all atoms into the box.
 
-    Args:
-        trajectory (mdtraj.trajectory): The trajectory that is to be modified
-        box_length (float): Length of the target cubic box
-
-    Returns:
-        mdtraj.trajectory: A trajectory object obeying PBC according to the given box length
+    :param trajectory: The trajectory that is to be modified, i.e. contains the configurations that shall be wrapped back into the simulation box.
+    :type trajectory: mdtraj.trajectory
+    :param box_length: Length of the cubic box which shall contain all the positions.
+    :type box_length: float
+    :return: Returns a trajectory object obeying PBC according to the given box length.
+    :rtype: mdtraj.trajectory
     """
     # function defining PBC
     def transform(x):
@@ -36,13 +36,12 @@ def pbc(trajectory, box_length):
 
 
 def rotate_trajs(trajectories):
-    """Rotates each frame in the given trajectories according to a random quaternion
+    """Rotates each frame in the given trajectories according to a random quaternion.
 
-    Args:
-        trajectories (list of md.trajectory): list of mdtraj.trajectory objects to be modified
-
-    Returns:
-        list of md.trajectory: Returns the randomly rotated frames
+    :param trajectories: A list of mdtraj.trajectory objects to be modified.
+    :type trajectories: list of md.trajectory
+    :return: Returns a list of trajectories, the frames of which have been randomly rotated and wrapped back into the box
+    :rtype: list of md.trajectory
     """
     for t in trajectories:
         for i in range(t.n_frames):
@@ -55,6 +54,17 @@ def rotate_trajs(trajectories):
 
 # GNN utils
 def unsorted_segment_sum(data, segment_ids, num_segments):
+    """Function that sums the segments of a matrix. Each row has a non-unique ID and all rows with the same ID are summed such that a matrix with the number of rows equal to the number of unique IDs is obtained.
+
+    :param data: A tensor that contains the data that is to be summed.
+    :type data: torch.tensor
+    :param segment_ids: An array that has the same number of entries as data has rows which indicates which rows shall be summed.
+    :type segment_ids: torch.tensor
+    :param num_segments: This is the number of unique IDs, i.e. the dimensionality of the resulting tensor.
+    :type num_segments: int
+    :return: Returns a tensor shaped num_segments x data.size(1) containing all the segment sums
+    :rtype: torch.Tensor
+    """
     result_shape = (num_segments, data.size(1))
     result = data.new_full(result_shape, 0)  # Init empty result tensor.
     segment_ids = segment_ids.unsqueeze(-1).expand(-1, data.size(1))
@@ -65,12 +75,12 @@ def unsorted_segment_sum(data, segment_ids, num_segments):
 def get_rc_edges(rc, traj):
     """Returns the edges of the graph constructed by interpreting the atoms in the trajectory as nodes that are connected to all other nodes within a distance of rc.
 
-    Args:
-        rc (float): Cut-off radius for the graph construction.
-        traj (md.trajectory): The trajectory for which the graphs shall be constructed.
-
-    Returns:
-        list(torch.tensor, torch.tensor): A list containing two tensors which represent the adjacency matrix of the graph.
+    :param rc: Cut-off radius for the graph construction.
+    :type rc: float
+    :param traj: The trajectory for which the graphs shall be constructed.
+    :type traj: md.trajectory
+    :return: A list containing two tensors which represent the adjacency matrix of the graph.
+    :rtype: list of torch.tensor
     """
     n_at = len(traj.xyz[0])
     n_frames = len(traj)
@@ -136,6 +146,12 @@ def _gen_relevant_images(x, bounds, distance_upper_bound):
 
 class PeriodicCKDTree(cKDTree):
     """
+    A wrapper around scipy.spatial.kdtree to implement periodic boundary conditions
+
+    !!!!Written by Patrick Varilly, 6 Jul 2012!!!
+    "https://github.com/patvarilly/periodic_kdtree"
+    Released under the scipy license
+
     Cython kd-tree for quick nearest-neighbor lookup with periodic boundaries
     See scipy.spatial.ckdtree for details on kd-trees.
     Searches with periodic boundaries are implemented by mapping all
@@ -151,20 +167,19 @@ class PeriodicCKDTree(cKDTree):
 
     def __init__(self, bounds, data, leafsize=10):
         """Construct a kd-tree.
-        Parameters
-        ----------
-        bounds : array_like, shape (k,)
-            Size of the periodic box along each spatial dimension.  A
+
+        :param bounds: Size of the periodic box along each spatial dimension.  A
             negative or zero size for dimension k means that space is not
             periodic along k.
-        data : array-like, shape (n,m)
-            The n data points of dimension mto be indexed. This array is 
+        :type bounds: array_like, shape (k,)
+        :param data: The n data points of dimension mto be indexed. This array is 
             not copied unless this is necessary to produce a contiguous 
             array of doubles, and so modifying this data will result in 
             bogus results.
-        leafsize : positive integer
-            The number of points at which the algorithm switches over to
-            brute-force.
+        :type data: array-like, shape (n,m)
+        :param leafsize: The number of points at which the algorithm switches over to
+            brute-force, defaults to 10.
+        :type leafsize: int, optional
         """
 
         # Map all points to canonical periodic image
@@ -216,39 +231,36 @@ class PeriodicCKDTree(cKDTree):
         else:
             raise ValueError("Invalid k in periodic_kdtree._KDTree__query")
 
+
     def query(self, x, k=1, eps=0, p=2, distance_upper_bound=np.inf):
-        """
-        Query the kd-tree for nearest neighbors
-        Parameters
-        ----------
-        x : array_like, last dimension self.m
-            An array of points to query.
-        k : integer
-            The number of nearest neighbors to return.
-        eps : non-negative float
-            Return approximate nearest neighbors; the kth returned value 
+        """Query the kd-tree for nearest neighbors.
+
+        :param x: An array of points to query.
+        :type x: array_like, last dimension self.m
+        :param k: The number of nearest neighbors to return, defaults to 1
+        :type k: int, optional
+        :param eps: Return approximate nearest neighbors; the kth returned value 
             is guaranteed to be no further than (1+eps) times the 
-            distance to the real k-th nearest neighbor.
-        p : float, 1<=p<=infinity
-            Which Minkowski p-norm to use. 
+            distance to the real k-th nearest neighbor, defaults to 0
+        :type eps: int, optional
+        :param p: Which Minkowski p-norm to use. 
             1 is the sum-of-absolute-values "Manhattan" distance
             2 is the usual Euclidean distance
-            infinity is the maximum-coordinate-difference distance
-        distance_upper_bound : nonnegative float
-            Return only neighbors within this distance.  This is used to prune
+            infinity is the maximum-coordinate-difference distance, defaults to 2
+        :type p: int, optional
+        :param distance_upper_bound: Return only neighbors within this distance. This is used to prune
             tree searches, so if you are doing a series of nearest-neighbor
             queries, it may help to supply the distance to the nearest neighbor
-            of the most recent point.
-        Returns
-        -------
-        d : array of floats
-            The distances to the nearest neighbors. 
+            of the most recent point, defaults to np.inf.
+        :type distance_upper_bound: float, optional
+        :return: The distances to the nearest neighbors. 
             If x has shape tuple+(self.m,), then d has shape tuple+(k,).
             Missing neighbors are indicated with infinite distances.
-        i : ndarray of ints
-            The locations of the neighbors in self.data.
+        :rtype: array of floats
+        :return: The locations of the neighbors in self.data.
             If `x` has shape tuple+(self.m,), then `i` has shape tuple+(k,).
             Missing neighbors are indicated with self.n.
+        :rtype: ndarray of ints
         """
         x = np.asarray(x)
         if np.shape(x)[-1] != self.m:
@@ -328,12 +340,11 @@ class PeriodicCKDTree(cKDTree):
             )
         return results
 
-    def query_ball_point(self, x, r, p=2.0, eps=0):
         """
         Find all points within distance r of point(s) x.
         Parameters
         ----------
-        x : array_like, shape tuple + (self.m,)
+        x : 
             The point or points to search for neighbors of.
         r : positive float
             The radius of points to return.
@@ -355,6 +366,28 @@ class PeriodicCKDTree(cKDTree):
         If you have many points whose neighbors you want to find, you may
         save substantial amounts of time by putting them in a
         PeriodicCKDTree and using query_ball_tree.
+        """
+    def query_ball_point(self, x, r, p=2.0, eps=0):
+        """Find all points within distance r of point(s) x.
+        Notes: If you have many points whose neighbors you want to find, you may
+        save substantial amounts of time by putting them in a
+        PeriodicCKDTree and using query_ball_tree.
+
+        :param x: The point or points to search for neighbors of.
+        :type x: array_like, shape tuple + (self.m,)
+        :param r: The radius of points to return.
+        :type r: float
+        :param p: Which Minkowski p-norm to use.  Should be in the range [1, inf], defaults to 2.0
+        :type p: float, optional
+        :param eps: Approximate search. Branches of the tree are not explored if their
+            nearest points are further than ``r / (1 + eps)``, and branches are
+            added in bulk if their furthest points are nearer than
+            ``r * (1 + eps)``, defaults to 0
+        :type eps: int, optional
+        :return: If `x` is a single point, returns a list of the indices of the
+            neighbors of `x`. If `x` is an array of points, returns an object
+            array of shape tuple containing lists of neighbors.
+        :rtype: list or array of lists
         """
         x = np.asarray(x).astype(np.float)
         if x.shape[-1] != self.m:

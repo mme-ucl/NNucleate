@@ -348,6 +348,10 @@ print_batch (int, optional): Set to recieve printed updates on the loss every pr
 <dt class="sig sig-object py" id="NNucleate.utils.PeriodicCKDTree">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">PeriodicCKDTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leafsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.PeriodicCKDTree" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cKDTree</span></code></p>
+<p>A wrapper around scipy.spatial.kdtree to implement periodic boundary conditions</p>
+<p>!!!!Written by Patrick Varilly, 6 Jul 2012!!!
+“<a class="reference external" href="https://github.com/patvarilly/periodic_kdtree">https://github.com/patvarilly/periodic_kdtree</a>”
+Released under the scipy license</p>
 <p>Cython kd-tree for quick nearest-neighbor lookup with periodic boundaries
 See scipy.spatial.ckdtree for details on kd-trees.
 Searches with periodic boundaries are implemented by mapping all
@@ -362,39 +366,40 @@ box dimension.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="NNucleate.utils.PeriodicCKDTree.query">
 <span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_upper_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.PeriodicCKDTree.query" title="Permalink to this definition"></a></dt>
-<dd><p>Query the kd-tree for nearest neighbors
-Parameters
-———-
-x : array_like, last dimension self.m</p>
-<blockquote>
-<div><p>An array of points to query.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>k<span class="classifier">integer</span></dt><dd><p>The number of nearest neighbors to return.</p>
-</dd>
-<dt>eps<span class="classifier">non-negative float</span></dt><dd><p>Return approximate nearest neighbors; the kth returned value 
+<dd><p>Query the kd-tree for nearest neighbors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>last dimension self.m</em>) – An array of points to query.</p></li>
+<li><p><strong>k</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of nearest neighbors to return, defaults to 1</p></li>
+<li><p><strong>eps</strong> (<em>int</em><em>, </em><em>optional</em>) – Return approximate nearest neighbors; the kth returned value 
 is guaranteed to be no further than (1+eps) times the 
-distance to the real k-th nearest neighbor.</p>
-</dd>
-<dt>p<span class="classifier">float, 1&lt;=p&lt;=infinity</span></dt><dd><p>Which Minkowski p-norm to use. 
+distance to the real k-th nearest neighbor, defaults to 0</p></li>
+<li><p><strong>p</strong> (<em>int</em><em>, </em><em>optional</em>) – Which Minkowski p-norm to use. 
 1 is the sum-of-absolute-values “Manhattan” distance
 2 is the usual Euclidean distance
-infinity is the maximum-coordinate-difference distance</p>
-</dd>
-<dt>distance_upper_bound<span class="classifier">nonnegative float</span></dt><dd><p>Return only neighbors within this distance.  This is used to prune
+infinity is the maximum-coordinate-difference distance, defaults to 2</p></li>
+<li><p><strong>distance_upper_bound</strong> (<em>float</em><em>, </em><em>optional</em>) – Return only neighbors within this distance. This is used to prune
 tree searches, so if you are doing a series of nearest-neighbor
 queries, it may help to supply the distance to the nearest neighbor
-of the most recent point.</p>
+of the most recent point, defaults to np.inf.</p></li>
+</ul>
 </dd>
-</dl>
-<dl class="simple">
-<dt>d<span class="classifier">array of floats</span></dt><dd><p>The distances to the nearest neighbors. 
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The distances to the nearest neighbors. 
 If x has shape tuple+(self.m,), then d has shape tuple+(k,).
 Missing neighbors are indicated with infinite distances.</p>
 </dd>
-<dt>i<span class="classifier">ndarray of ints</span></dt><dd><p>The locations of the neighbors in self.data.
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array of floats</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The locations of the neighbors in self.data.
 If <cite>x</cite> has shape tuple+(self.m,), then <cite>i</cite> has shape tuple+(k,).
 Missing neighbors are indicated with self.n.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray of ints</p>
 </dd>
 </dl>
 </dd></dl>
@@ -403,32 +408,30 @@ Missing neighbors are indicated with self.n.</p>
 <dt class="sig sig-object py" id="NNucleate.utils.PeriodicCKDTree.query_ball_point">
 <span class="sig-name descname"><span class="pre">query_ball_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.PeriodicCKDTree.query_ball_point" title="Permalink to this definition"></a></dt>
 <dd><p>Find all points within distance r of point(s) x.
-Parameters
-———-
-x : array_like, shape tuple + (self.m,)</p>
-<blockquote>
-<div><p>The point or points to search for neighbors of.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>r<span class="classifier">positive float</span></dt><dd><p>The radius of points to return.</p>
-</dd>
-<dt>p<span class="classifier">float, optional</span></dt><dd><p>Which Minkowski p-norm to use.  Should be in the range [1, inf].</p>
-</dd>
-<dt>eps<span class="classifier">nonnegative float, optional</span></dt><dd><p>Approximate search. Branches of the tree are not explored if their
+Notes: If you have many points whose neighbors you want to find, you may
+save substantial amounts of time by putting them in a
+PeriodicCKDTree and using query_ball_tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>shape tuple +</em><em> (</em><em>self.m</em><em>,</em><em>)</em>) – The point or points to search for neighbors of.</p></li>
+<li><p><strong>r</strong> (<em>float</em>) – The radius of points to return.</p></li>
+<li><p><strong>p</strong> (<em>float</em><em>, </em><em>optional</em>) – Which Minkowski p-norm to use.  Should be in the range [1, inf], defaults to 2.0</p></li>
+<li><p><strong>eps</strong> (<em>int</em><em>, </em><em>optional</em>) – Approximate search. Branches of the tree are not explored if their
 nearest points are further than <code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">/</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">eps)</span></code>, and branches are
 added in bulk if their furthest points are nearer than
-<code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">*</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">eps)</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">*</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">eps)</span></code>, defaults to 0</p></li>
+</ul>
 </dd>
-</dl>
-<dl class="simple">
-<dt>results<span class="classifier">list or array of lists</span></dt><dd><p>If <cite>x</cite> is a single point, returns a list of the indices of the
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>If <cite>x</cite> is a single point, returns a list of the indices of the
 neighbors of <cite>x</cite>. If <cite>x</cite> is an array of points, returns an object
 array of shape tuple containing lists of neighbors.</p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list or array of lists</p>
+</dd>
 </dl>
-<p>If you have many points whose neighbors you want to find, you may
-save substantial amounts of time by putting them in a
-PeriodicCKDTree and using query_ball_tree.</p>
 </dd></dl>
 
 </dd></dl>
@@ -437,11 +440,18 @@ PeriodicCKDTree and using query_ball_tree.</p>
 <dt class="sig sig-object py" id="NNucleate.utils.get_rc_edges">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">get_rc_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.get_rc_edges" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the edges of the graph constructed by interpreting the atoms in the trajectory as nodes that are connected to all other nodes within a distance of rc.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>rc (float): Cut-off radius for the graph construction.
-traj (md.trajectory): The trajectory for which the graphs shall be constructed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rc</strong> (<em>float</em>) – Cut-off radius for the graph construction.</p></li>
+<li><p><strong>traj</strong> (<em>md.trajectory</em>) – The trajectory for which the graphs shall be constructed.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>list(torch.tensor, torch.tensor): A list containing two tensors which represent the adjacency matrix of the graph.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list containing two tensors which represent the adjacency matrix of the graph.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of torch.tensor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -450,11 +460,18 @@ traj (md.trajectory): The trajectory for which the graphs shall be constructed.<
 <dt class="sig sig-object py" id="NNucleate.utils.pbc">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">pbc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.pbc" title="Permalink to this definition"></a></dt>
 <dd><p>Centers an mdtraj Trajectory around the centre of a cubic box with the given box length and wraps all atoms into the box.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>trajectory (mdtraj.trajectory): The trajectory that is to be modified
-box_length (float): Length of the target cubic box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectory</strong> (<em>mdtraj.trajectory</em>) – The trajectory that is to be modified, i.e. contains the configurations that shall be wrapped back into the simulation box.</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box which shall contain all the positions.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>mdtraj.trajectory: A trajectory object obeying PBC according to the given box length</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns a trajectory object obeying PBC according to the given box length.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>mdtraj.trajectory</p>
 </dd>
 </dl>
 </dd></dl>
@@ -462,11 +479,16 @@ box_length (float): Length of the target cubic box</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="NNucleate.utils.rotate_trajs">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">rotate_trajs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectories</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.rotate_trajs" title="Permalink to this definition"></a></dt>
-<dd><p>Rotates each frame in the given trajectories according to a random quaternion</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>trajectories (list of md.trajectory): list of mdtraj.trajectory objects to be modified</p>
+<dd><p>Rotates each frame in the given trajectories according to a random quaternion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trajectories</strong> (<em>list of md.trajectory</em>) – A list of mdtraj.trajectory objects to be modified.</p>
 </dd>
-<dt>Returns:</dt><dd><p>list of md.trajectory: Returns the randomly rotated frames</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns a list of trajectories, the frames of which have been randomly rotated and wrapped back into the box</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of md.trajectory</p>
 </dd>
 </dl>
 </dd></dl>
@@ -474,7 +496,23 @@ box_length (float): Length of the target cubic box</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="NNucleate.utils.unsorted_segment_sum">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">unsorted_segment_sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_segments</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.unsorted_segment_sum" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Function that sums the segments of a matrix. Each row has a non-unique ID and all rows with the same ID are summed such that a matrix with the number of rows equal to the number of unique IDs is obtained.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>torch.tensor</em>) – A tensor that contains the data that is to be summed.</p></li>
+<li><p><strong>segment_ids</strong> (<em>torch.tensor</em>) – An array that has the same number of entries as data has rows which indicates which rows shall be summed.</p></li>
+<li><p><strong>num_segments</strong> (<em>int</em>) – This is the number of unique IDs, i.e. the dimensionality of the resulting tensor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns a tensor shaped num_segments x data.size(1) containing all the segment sums</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-NNucleate">

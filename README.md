@@ -14,4 +14,4 @@ To train a model:
 
 ## Documentation
 
-[Documentation](flofega.github.io/nnucleate/)
+www.flofega.github.io/nnucleate/

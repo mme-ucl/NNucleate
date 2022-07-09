@@ -34,7 +34,20 @@ class CVTrajectory(Dataset):
     :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
     :type root: int, optional
     """
-    def __init__(self, cv_file, traj_name, top_file, cv_col, box_length, transform=None, start=0, stop=-1, stride=1, root=1):
+
+    def __init__(
+        self,
+        cv_file,
+        traj_name,
+        top_file,
+        cv_col,
+        box_length,
+        transform=None,
+        start=0,
+        stop=-1,
+        stride=1,
+        root=1,
+    ):
 
         self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
         self.length = box_length
@@ -91,6 +104,7 @@ class KNNTrajectory(Dataset):
     :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
     :type root: int, optional
     """
+
     def __init__(
         self,
         cv_file,
@@ -155,6 +169,7 @@ class NdistTrajectory(Dataset):
     :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
     :type root: int, optional
     """
+
     def __init__(
         self,
         cv_file,

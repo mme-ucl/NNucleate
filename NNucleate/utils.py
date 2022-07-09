@@ -229,7 +229,6 @@ class PeriodicCKDTree(cKDTree):
         else:
             raise ValueError("Invalid k in periodic_kdtree._KDTree__query")
 
-
     def query(self, x, k=1, eps=0, p=2, distance_upper_bound=np.inf):
         """Query the kd-tree for nearest neighbors.
 
@@ -365,6 +364,7 @@ class PeriodicCKDTree(cKDTree):
         save substantial amounts of time by putting them in a
         PeriodicCKDTree and using query_ball_tree.
         """
+
     def query_ball_point(self, x, r, p=2.0, eps=0):
         """Find all points within distance r of point(s) x.
         Notes: If you have many points whose neighbors you want to find, you may

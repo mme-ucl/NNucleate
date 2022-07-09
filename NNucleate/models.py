@@ -62,6 +62,7 @@ class GCL(nn.Module):
     :param act_fn: PyTorch activation function to be used in the multi-layer perceptrons, defaults to nn.ReLU()
     :type act_fn: torch.nn.modules.activation, optional
     """
+
     def __init__(self, hidden_nf, act_fn=nn.ReLU()):
         super(GCL, self).__init__()
 
@@ -120,6 +121,7 @@ class GNNCV(nn.Module):
     :param n_layers:  The number of graph convolutional layers, defaults to 1
     :type n_layers: int, optional
     """
+
     def __init__(
         self, in_node_nf=3, hidden_nf=3, device="cpu", act_fn=nn.ReLU(), n_layers=1
     ):

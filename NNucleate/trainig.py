@@ -1,5 +1,6 @@
 import torch
 
+
 def train_linear(dataloader, model, loss_fn, optimizer, device, print_batch=1000000):
     """Performs one training epoch for a NNCV.
 

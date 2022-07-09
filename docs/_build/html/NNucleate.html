@@ -87,16 +87,21 @@
 <dd><dl class="simple">
 <dt>Takes in a trajectory and adds degenerate rotated frames such that the resulting trajectory represents and even histogram.</dt><dd><p>Writes a new trajectory and CV file.</p>
 </dd>
-<dt>Args:</dt><dd><p>n (int): Height of the target histogram
-trajname (str): Path to the trajectory file (.xtc or .xyz)
-topology (str): Path to the topology file (.pdb)
-cvname (str): Path to the CV file. Text file with CVs organised in four columns
-savename (str): String without file ending under which the final CV and traj will be saved
-box (float): Box length for applying PBC
-n_min (int, optional): The minimum number of frames to add per frame. Defaults to 0.
-col (int, optional): The column in the CV file from which to read the CV (0 indexing). Defaults to 3.
-bins (int, optional): Number of bins in the target histogram. Defaults to 25.
-n_max (int, optional): Maximal height of a histogram column. Defaults to math.inf.</p>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – The height of the target histogram</p></li>
+<li><p><strong>trajname</strong> (<em>str</em>) – Path to the trajectory file (.xtc or .xyz)</p></li>
+<li><p><strong>topology</strong> (<em>str</em>) – Path to the topology file (.pdb)</p></li>
+<li><p><strong>cvname</strong> (<em>str</em>) – Path to the CV file. Text file with CVs organised in four columns</p></li>
+<li><p><strong>savename</strong> (<em>str</em>) – String without file ending under which the final CV and traj will be saved</p></li>
+<li><p><strong>box</strong> (<em>float</em>) – Box length for applying PBC</p></li>
+<li><p><strong>n_min</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum number of frames to add per frame, defaults to 0</p></li>
+<li><p><strong>col</strong> (<em>int</em><em>, </em><em>optional</em>) – The column in the CV file from which to read the CV (0 indexing), defaults to 3</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of bins in the target histogram, defaults to 25</p></li>
+<li><p><strong>n_max</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximal height of a histogram column, defaults to math.inf</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -105,12 +110,19 @@ n_max (int, optional): Maximal height of a histogram column. Defaults to math.in
 <dt class="sig sig-object py" id="NNucleate.data_augmentaion.transform_frame_to_knn_list">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.data_augmentaion.</span></span><span class="sig-name descname"><span class="pre">transform_frame_to_knn_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.data_augmentaion.transform_frame_to_knn_list" title="Permalink to this definition"></a></dt>
 <dd><p>Transforms the cartesian representation of a given trajectory frame to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>k (int): Number of neighbours to consider for each atom
-traj (array): List of coordinates to be transformed
-box_length (float): Length of the cubic box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k</strong> (<em>int</em>) – Number of neighbours to consider for each atom</p></li>
+<li><p><strong>traj</strong> (<em>ndarray of float</em>) – List of coordinates to be transformed</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>Array: Returns an array of shape n_atoms x k*n_atoms/2</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns an array of shape n_atoms x k*n_atoms/2</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray of float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -119,12 +131,19 @@ box_length (float): Length of the cubic box</p>
 <dt class="sig sig-object py" id="NNucleate.data_augmentaion.transform_frame_to_ndist_list">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.data_augmentaion.</span></span><span class="sig-name descname"><span class="pre">transform_frame_to_ndist_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.data_augmentaion.transform_frame_to_ndist_list" title="Permalink to this definition"></a></dt>
 <dd><p>Transform the the cartesian coordinates of a given trajectory frame into a sorted list of the n_dist shortest distances in the system</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>n_dist (int): Number of distances to include (max: n*(n-1)/2)
-traj (array): List of list of coordinates to transform
-box (float): Length of the cubic box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_dist</strong> (<em>int</em>) – Number of distances to include (max: n*(n-1)/2)</p></li>
+<li><p><strong>traj</strong> (<em>ndarray of float</em>) – List of list of coordinates to transform</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>Array: Array of shape n_atoms x n_dists</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Array of shape n_atoms x n_dists</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray of float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -133,12 +152,19 @@ box (float): Length of the cubic box</p>
 <dt class="sig sig-object py" id="NNucleate.data_augmentaion.transform_traj_to_knn_list">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.data_augmentaion.</span></span><span class="sig-name descname"><span class="pre">transform_traj_to_knn_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.data_augmentaion.transform_traj_to_knn_list" title="Permalink to this definition"></a></dt>
 <dd><p>Transforms the cartesian representation of a given trajectory to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>k (int): Number of neighbours to consider for each atom
-traj (array): List of coordinates to be transformed
-box_length (float): Length of the cubic box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k</strong> (<em>int</em>) – Number of neighbours to consider for each atom</p></li>
+<li><p><strong>traj</strong> (<em>ndarray of ndarray of float</em>) – List of coordinates to be transformed</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>Array: Returns an array of shape n_frames x n_atoms x k*n_atoms/2</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns an array of shape n_frames x n_atoms x k*n_atoms/2</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray of ndarray of float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -147,12 +173,19 @@ box_length (float): Length of the cubic box</p>
 <dt class="sig sig-object py" id="NNucleate.data_augmentaion.transform_traj_to_ndist_list">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.data_augmentaion.</span></span><span class="sig-name descname"><span class="pre">transform_traj_to_ndist_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.data_augmentaion.transform_traj_to_ndist_list" title="Permalink to this definition"></a></dt>
 <dd><p>Transform the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>n_dist (int): Number of distances to include (max: n*(n-1)/2)
-traj (list): Trajectory that is to be transformed.
-box (float): Length of the cubic box</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_dist</strong> (<em>int</em>) – Number of distances to include (max: n*(n-1)/2)</p></li>
+<li><p><strong>traj</strong> (<em>ndarray of ndarray of float</em>) – Trajectory that is to be transformed.</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>list: Array of shape n_frames x n_atoms x n_dists</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Array of shape n_frames x n_atoms x n_dists</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray of ndarray of float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -164,24 +197,117 @@ box (float): Length of the cubic box</p>
 <dt class="sig sig-object py" id="NNucleate.dataset.CVTrajectory">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">CVTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.CVTrajectory" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<p>Instantiates a dataset from a trajectory file in xtc/xyz format and a text file containing the nucleation CVs (Assumes cubic cell)</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>For .xtc give the boxlength in nm and for .xyz give the boxlength in Å</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cv_file</strong> (<em>str</em>) – Path to text file structured in columns containing the CVs</p></li>
+<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory in .xtc or .xyz file format</p></li>
+<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file in .pdb file format</p></li>
+<li><p><strong>cv_col</strong> (<em>int</em>) – Indicates the column in which the desired CV is written in the CV file (0 indexing)</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic cell</p></li>
+<li><p><strong>transform</strong> (<em>function</em><em>, </em><em>optional</em>) – A function to be applied to the configuration before returning e.g. to_dist(), defaults to None</p></li>
+<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0</p></li>
+<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is read, defaults to -1</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1</p></li>
+<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="NNucleate.dataset.GNNTrajectory">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">GNNTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.GNNTrajectory" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<p>Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN. 
+.. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cv_file</strong> (<em>str</em>) – Path to the cv file.</p></li>
+<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz)</p></li>
+<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb)</p></li>
+<li><p><strong>cv_col</strong> (<em>int</em>) – Gives the colimn in which the CV of interest is stored</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
+<li><p><strong>rc</strong> (<em>float</em>) – Cut-off radius for the construction of the graph</p></li>
+<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0</p></li>
+<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is rea, defaults to -1</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1</p></li>
+<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="NNucleate.dataset.KNNTrajectory">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">KNNTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.KNNTrajectory" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<dl class="simple">
+<dt>Generates a dataset from a trajectory in .xtc/xyz format. </dt><dd><p>The trajectory frames are represented via the sorted distances of all atoms to their k nearest neighbours.</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>For .xtc give the boxlength in nm and for .xyz give the boxlength in Å</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cv_file</strong> (<em>str</em>) – Path to the cv file.</p></li>
+<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz)</p></li>
+<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb)</p></li>
+<li><p><strong>cv_col</strong> (<em>int</em>) – Gives the colimn in which the CV of interest is stored</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – Number of neighbours to consider.</p></li>
+<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0</p></li>
+<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is read, defaults to -1</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1</p></li>
+<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="NNucleate.dataset.NdistTrajectory">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">NdistTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.NdistTrajectory" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<dl class="simple">
+<dt>Generates a dataset from a trajectory in .xtc/xyz format. </dt><dd><p>The trajectory frames are represented via the n_dist sorted distances.</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>For .xtc give the boxlength in nm and for .xyz give the boxlength in Å</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cv_file</strong> (<em>str</em>) – Path to the cv file.</p></li>
+<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz)</p></li>
+<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb)</p></li>
+<li><p><strong>cv_col</strong> (<em>int</em>) – Gives the colimn in which the CV of interest is stored</p></li>
+<li><p><strong>box_length</strong> – Length of the cubic box.</p></li>
+</ul>
+</dd>
+</dl>
+<p>:type box_length:float
+:param n_dist: Number of distances to consider.
+:type n_dist: int
+:param start: Starting frame of the trajectory, defaults to 0
+:type start: int, optional
+:param stop: The last file of the trajectory that is read, defaults to -1
+:type stop: int, optional
+:param stride: The stride with which the trajectory frames are read, defaults to 1
+:type stride: int, optional
+:param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
+:type root: int, optional</p>
 </dd></dl>
 
 </section>
@@ -362,7 +488,23 @@ query point.
 Note that to ensure that no two distinct images of the same point
 appear in the results, it is essential to restrict the maximum
 distance between a query point and a data point to half the smallest
-box dimension.</p>
+box dimension.
+Construct a kd-tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bounds</strong> (<em>array_like</em><em>, </em><em>shape</em><em> (</em><em>k</em><em>,</em><em>)</em>) – Size of the periodic box along each spatial dimension.  A
+negative or zero size for dimension k means that space is not
+periodic along k.</p></li>
+<li><p><strong>data</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>n</em><em>,</em><em>m</em><em>)</em>) – The n data points of dimension mto be indexed. This array is 
+not copied unless this is necessary to produce a contiguous 
+array of doubles, and so modifying this data will result in 
+bogus results.</p></li>
+<li><p><strong>leafsize</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of points at which the algorithm switches over to
+brute-force, defaults to 10.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="NNucleate.utils.PeriodicCKDTree.query">
 <span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_upper_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.utils.PeriodicCKDTree.query" title="Permalink to this definition"></a></dt>

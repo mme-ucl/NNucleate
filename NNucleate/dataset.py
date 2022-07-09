@@ -8,34 +8,33 @@ from .data_augmentaion import transform_traj_to_knn_list, transform_traj_to_ndis
 
 
 class CVTrajectory(Dataset):
-    def __init__(
-        self,
-        cv_file,
-        traj_name,
-        top_file,
-        cv_col,
-        box_length,
-        transform=None,
-        start=0,
-        stop=-1,
-        stride=1,
-        root=1,
-    ):
-        """Instantiates a dataset from a trajectory file in xtc/xyz format and a text file containing the nucleation CVs (Assumes cubic cell)
-        WARNING: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
+    """
+    Instantiates a dataset from a trajectory file in xtc/xyz format and a text file containing the nucleation CVs (Assumes cubic cell)
+    
+    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
 
-        Args:
-            cv_file (str): Path to text file structured in columns containing the CVs
-            traj_name (str): Path to the trajectory in .xtc or .xyz file format
-            top_file (str): Path to the topology file in .pdb file format
-            cv_col (int): Indicates the column in which the desired CV is written in the CV file (0 indexing)
-            box_length (float). Length of the cubic cell
-            transform (function, optional): A function to be applied to the configuration before returning e.g. to_dist().
-            start (int, optional): Starting frame of the trajectory
-            stop (int, optional): The last file of the trajectory that is read
-            stride (int, optional): The stride with which the trajectory frames are read
-            root (int, optional): Allows for the loading of the n-th root of the CV data (to compress the numerical range) 
-        """
+    :param cv_file: Path to text file structured in columns containing the CVs
+    :type cv_file: str
+    :param traj_name: Path to the trajectory in .xtc or .xyz file format
+    :type traj_name: str
+    :param top_file: Path to the topology file in .pdb file format
+    :type top_file: str
+    :param cv_col: Indicates the column in which the desired CV is written in the CV file (0 indexing)
+    :type cv_col: int
+    :param box_length: Length of the cubic cell
+    :type box_length: float
+    :param transform: A function to be applied to the configuration before returning e.g. to_dist(), defaults to None
+    :type transform: function, optional
+    :param start: Starting frame of the trajectory, defaults to 0
+    :type start: int, optional
+    :param stop: The last file of the trajectory that is read, defaults to -1
+    :type stop: int, optional
+    :param stride: The stride with which the trajectory frames are read, defaults to 1
+    :type stride: int, optional
+    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
+    :type root: int, optional
+    """
+    def __init__(self, cv_file, traj_name, top_file, cv_col, box_length, transform=None, start=0, stop=-1, stride=1, root=1):
 
         self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
         self.length = box_length
@@ -66,6 +65,32 @@ class CVTrajectory(Dataset):
 
 
 class KNNTrajectory(Dataset):
+    """Generates a dataset from a trajectory in .xtc/xyz format. 
+        The trajectory frames are represented via the sorted distances of all atoms to their k nearest neighbours.
+
+    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
+
+    :param cv_file: Path to the cv file.
+    :type cv_file: str
+    :param traj_name: Path to the trajectory file (.xtc/.xyz)
+    :type traj_name: str
+    :param top_file: Path to the topology file (.pdb)
+    :type top_file: str
+    :param cv_col: Gives the colimn in which the CV of interest is stored
+    :type cv_col: int
+    :param box_length: Length of the cubic box
+    :type box_length: float
+    :param k: Number of neighbours to consider.
+    :type k: int
+    :param start: Starting frame of the trajectory, defaults to 0
+    :type start: int, optional
+    :param stop: The last file of the trajectory that is read, defaults to -1
+    :type stop: int, optional
+    :param stride: The stride with which the trajectory frames are read, defaults to 1
+    :type stride: int, optional
+    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
+    :type root: int, optional
+    """
     def __init__(
         self,
         cv_file,
@@ -79,22 +104,6 @@ class KNNTrajectory(Dataset):
         stride=1,
         root=1,
     ):
-        """Generates a dataset from a trajectory in .xtc/xyz format. 
-        The trajectory frames are represented via the sorted distances of all atoms to their k nearest neighbours.
-        WARNING: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
-
-        Args:
-            cv_file (str): Path to the cv file.
-            traj_name (str): Path to the trajectory file (.xtc/.xyz)
-            top_file (str): Path to the topology file (.pdb)
-            cv_col (int): Gives the colimn in which the CV of interest is stored
-            box_length (float): Length of the cubic box
-            k (int): Number of neighbours to consider.
-            start (int, optional): Starting frame of the trajectory
-            stop (int, optional): The last file of the trajectory that is read
-            stride (int, optional): The stride with which the trajectory frames are read
-            root (int, optional): Allows for the loading of the n-th root of the CV data (to compress the numerical range) 
-        """
 
         self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
         self.box_length = box_length
@@ -120,6 +129,32 @@ class KNNTrajectory(Dataset):
 
 
 class NdistTrajectory(Dataset):
+    """Generates a dataset from a trajectory in .xtc/xyz format. 
+        The trajectory frames are represented via the n_dist sorted distances.
+    
+    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
+
+    :param cv_file: Path to the cv file.
+    :type cv_file: str
+    :param traj_name: Path to the trajectory file (.xtc/.xyz)
+    :type traj_name: str
+    :param top_file: Path to the topology file (.pdb)
+    :type top_file: str
+    :param cv_col: Gives the colimn in which the CV of interest is stored
+    :type cv_col: int
+    :param box_length: Length of the cubic box.
+    :type box_length:float
+    :param n_dist: Number of distances to consider.
+    :type n_dist: int
+    :param start: Starting frame of the trajectory, defaults to 0
+    :type start: int, optional
+    :param stop: The last file of the trajectory that is read, defaults to -1
+    :type stop: int, optional
+    :param stride: The stride with which the trajectory frames are read, defaults to 1
+    :type stride: int, optional
+    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
+    :type root: int, optional
+    """
     def __init__(
         self,
         cv_file,
@@ -133,22 +168,6 @@ class NdistTrajectory(Dataset):
         stride=1,
         root=1,
     ):
-        """Generates a dataset from a trajectory in .xtc/xyz format. 
-        The trajectory frames are represented via the n_dist sorted distances.
-        WARNING: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
-
-        Args:
-            cv_file (str): Path to the cv file.
-            traj_name (str): Path to the trajectory file (.xtc/.xyz)
-            top_file (str): Path to the topology file (.pdb)
-            cv_col (int): Gives the colimn in which the CV of interest is stored
-            box_length (float): Length of the cubic box.
-            n_dist (int): Number of distances to consider.
-            start (int, optional): Starting frame of the trajectory
-            stop (int, optional): The last file of the trajectory that is read
-            stride (int, optional): The stride with which the trajectory frames are read
-            root (int, optional): Allows for the loading of the n-th root of the CV data (to compress the numerical range) 
-        """
 
         self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
         self.box_length = box_length
@@ -174,6 +193,31 @@ class NdistTrajectory(Dataset):
 
 
 class GNNTrajectory(Dataset):
+    """Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN. 
+    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
+
+    :param cv_file: Path to the cv file.
+    :type cv_file: str
+    :param traj_name: Path to the trajectory file (.xtc/.xyz)
+    :type traj_name: str
+    :param top_file: Path to the topology file (.pdb)
+    :type top_file: str
+    :param cv_col: Gives the colimn in which the CV of interest is stored
+    :type cv_col: int
+    :param box_length: Length of the cubic box
+    :type box_length: float
+    :param rc: Cut-off radius for the construction of the graph
+    :type rc: float
+    :param start: Starting frame of the trajectory, defaults to 0
+    :type start: int, optional
+    :param stop: The last file of the trajectory that is rea, defaults to -1
+    :type stop: int, optional
+    :param stride: The stride with which the trajectory frames are read, defaults to 1
+    :type stride: int, optional
+    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
+    :type root: int, optional
+    """
+
     def __init__(
         self,
         cv_file,
@@ -187,20 +231,6 @@ class GNNTrajectory(Dataset):
         stride=1,
         root=1,
     ):
-        """Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN. 
-
-        Args:
-            cv_file (str): Path to the cv file.
-            traj_name (str): Path to the trajectory file (.xtc/.xyz)
-            top_file (str): Path to the topology file (.pdb)
-            cv_col (int): Gives the colimn in which the CV of interest is stored
-            box_length (float): Length of the cubic box.
-            rc (float): Cut-off radius for the construction of the graph
-            start (int, optional): Starting frame of the trajectory. Defaults to 0.
-            stop (int, optional): The last file of the trajectory that is read. Defaults to -1.
-            stride (int, optional): The stride with which the trajectory frames are read. Defaults to 1.
-            root (int, optional): Allows for the loading of the n-th root of the CV data (to compress the numerical range). Defaults to 1. 
-        """
 
         self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
         self.length = box_length

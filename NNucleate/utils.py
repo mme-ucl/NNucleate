@@ -163,25 +163,23 @@ class PeriodicCKDTree(cKDTree):
     appear in the results, it is essential to restrict the maximum
     distance between a query point and a data point to half the smallest
     box dimension.
+    Construct a kd-tree.
+
+    :param bounds: Size of the periodic box along each spatial dimension.  A
+        negative or zero size for dimension k means that space is not
+        periodic along k.
+    :type bounds: array_like, shape (k,)
+    :param data: The n data points of dimension mto be indexed. This array is 
+        not copied unless this is necessary to produce a contiguous 
+        array of doubles, and so modifying this data will result in 
+        bogus results.
+    :type data: array-like, shape (n,m)
+    :param leafsize: The number of points at which the algorithm switches over to
+        brute-force, defaults to 10.
+    :type leafsize: int, optional
     """
 
     def __init__(self, bounds, data, leafsize=10):
-        """Construct a kd-tree.
-
-        :param bounds: Size of the periodic box along each spatial dimension.  A
-            negative or zero size for dimension k means that space is not
-            periodic along k.
-        :type bounds: array_like, shape (k,)
-        :param data: The n data points of dimension mto be indexed. This array is 
-            not copied unless this is necessary to produce a contiguous 
-            array of doubles, and so modifying this data will result in 
-            bogus results.
-        :type data: array-like, shape (n,m)
-        :param leafsize: The number of points at which the algorithm switches over to
-            brute-force, defaults to 10.
-        :type leafsize: int, optional
-        """
-
         # Map all points to canonical periodic image
         self.bounds = np.array(bounds)
         self.real_data = np.asarray(data)

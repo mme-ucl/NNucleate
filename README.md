@@ -11,3 +11,7 @@ To train a model:
 ## Installation
 
 `pip install git+https://github.com/Flofega/NNucleate.git`
+
+## Documentation
+
+ flofega.github.io/nnucleate/

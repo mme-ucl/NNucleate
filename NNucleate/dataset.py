@@ -11,27 +11,27 @@ class CVTrajectory(Dataset):
     """
     Instantiates a dataset from a trajectory file in xtc/xyz format and a text file containing the nucleation CVs (Assumes cubic cell)
     
-    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
+    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.
 
-    :param cv_file: Path to text file structured in columns containing the CVs
+    :param cv_file: Path to text file structured in columns containing the CVs.
     :type cv_file: str
-    :param traj_name: Path to the trajectory in .xtc or .xyz file format
+    :param traj_name: Path to the trajectory in .xtc or .xyz file format.
     :type traj_name: str
-    :param top_file: Path to the topology file in .pdb file format
+    :param top_file: Path to the topology file in .pdb file format.
     :type top_file: str
-    :param cv_col: Indicates the column in which the desired CV is written in the CV file (0 indexing)
+    :param cv_col: Indicates the column in which the desired CV is written in the CV file (0 indexing).
     :type cv_col: int
-    :param box_length: Length of the cubic cell
+    :param box_length: Length of the cubic cell.
     :type box_length: float
-    :param transform: A function to be applied to the configuration before returning e.g. to_dist(), defaults to None
+    :param transform: A function to be applied to the configuration before returning e.g. to_dist(), defaults to None.
     :type transform: function, optional
-    :param start: Starting frame of the trajectory, defaults to 0
+    :param start: Starting frame of the trajectory, defaults to 0.
     :type start: int, optional
-    :param stop: The last file of the trajectory that is read, defaults to -1
+    :param stop: The last file of the trajectory that is read, defaults to -1.
     :type stop: int, optional
-    :param stride: The stride with which the trajectory frames are read, defaults to 1
+    :param stride: The stride with which the trajectory frames are read, defaults to 1.
     :type stride: int, optional
-    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
+    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
     :type root: int, optional
     """
 
@@ -81,27 +81,27 @@ class KNNTrajectory(Dataset):
     """Generates a dataset from a trajectory in .xtc/xyz format. 
         The trajectory frames are represented via the sorted distances of all atoms to their k nearest neighbours.
 
-    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
+    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.
 
     :param cv_file: Path to the cv file.
     :type cv_file: str
-    :param traj_name: Path to the trajectory file (.xtc/.xyz)
+    :param traj_name: Path to the trajectory file (.xtc/.xyz).
     :type traj_name: str
-    :param top_file: Path to the topology file (.pdb)
+    :param top_file: Path to the topology file (.pdb).
     :type top_file: str
-    :param cv_col: Gives the colimn in which the CV of interest is stored
+    :param cv_col: Gives the colimn in which the CV of interest is stored.
     :type cv_col: int
-    :param box_length: Length of the cubic box
+    :param box_length: Length of the cubic box.
     :type box_length: float
     :param k: Number of neighbours to consider.
     :type k: int
-    :param start: Starting frame of the trajectory, defaults to 0
+    :param start: Starting frame of the trajectory, defaults to 0.
     :type start: int, optional
-    :param stop: The last file of the trajectory that is read, defaults to -1
+    :param stop: The last file of the trajectory that is read, defaults to -1.
     :type stop: int, optional
-    :param stride: The stride with which the trajectory frames are read, defaults to 1
+    :param stride: The stride with which the trajectory frames are read, defaults to 1.
     :type stride: int, optional
-    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
+    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
     :type root: int, optional
     """
 
@@ -146,27 +146,27 @@ class NdistTrajectory(Dataset):
     """Generates a dataset from a trajectory in .xtc/xyz format. 
         The trajectory frames are represented via the n_dist sorted distances.
     
-    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
+    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.
 
     :param cv_file: Path to the cv file.
     :type cv_file: str
-    :param traj_name: Path to the trajectory file (.xtc/.xyz)
+    :param traj_name: Path to the trajectory file (.xtc/.xyz).
     :type traj_name: str
-    :param top_file: Path to the topology file (.pdb)
+    :param top_file: Path to the topology file (.pdb).
     :type top_file: str
-    :param cv_col: Gives the colimn in which the CV of interest is stored
+    :param cv_col: Gives the colimn in which the CV of interest is stored.
     :type cv_col: int
     :param box_length: Length of the cubic box.
     :type box_length:float
     :param n_dist: Number of distances to consider.
     :type n_dist: int
-    :param start: Starting frame of the trajectory, defaults to 0
+    :param start: Starting frame of the trajectory, defaults to 0.
     :type start: int, optional
-    :param stop: The last file of the trajectory that is read, defaults to -1
+    :param stop: The last file of the trajectory that is read, defaults to -1.
     :type stop: int, optional
-    :param stride: The stride with which the trajectory frames are read, defaults to 1
+    :param stride: The stride with which the trajectory frames are read, defaults to 1.
     :type stride: int, optional
-    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
+    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
     :type root: int, optional
     """
 
@@ -209,27 +209,27 @@ class NdistTrajectory(Dataset):
 
 class GNNTrajectory(Dataset):
     """Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN. 
-    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å
+    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.
 
     :param cv_file: Path to the cv file.
     :type cv_file: str
-    :param traj_name: Path to the trajectory file (.xtc/.xyz)
+    :param traj_name: Path to the trajectory file (.xtc/.xyz).
     :type traj_name: str
-    :param top_file: Path to the topology file (.pdb)
+    :param top_file: Path to the topology file (.pdb).
     :type top_file: str
-    :param cv_col: Gives the colimn in which the CV of interest is stored
+    :param cv_col: Gives the colimn in which the CV of interest is stored.
     :type cv_col: int
-    :param box_length: Length of the cubic box
+    :param box_length: Length of the cubic box.
     :type box_length: float
-    :param rc: Cut-off radius for the construction of the graph
+    :param rc: Cut-off radius for the construction of the graph.
     :type rc: float
-    :param start: Starting frame of the trajectory, defaults to 0
+    :param start: Starting frame of the trajectory, defaults to 0.
     :type start: int, optional
-    :param stop: The last file of the trajectory that is rea, defaults to -1
+    :param stop: The last file of the trajectory that is rea, defaults to -1.
     :type stop: int, optional
-    :param stride: The stride with which the trajectory frames are read, defaults to 1
+    :param stride: The stride with which the trajectory frames are read, defaults to 1.
     :type stride: int, optional
-    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
+    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
     :type root: int, optional
     """
 

@@ -6,13 +6,13 @@ from .utils import unsorted_segment_sum
 class NNCV(nn.Module):
     """Instantiates an NN for approximating CVs. Supported are architectures with up to 3 layers.
 
-    :param insize: Size of the input layer
+    :param insize: Size of the input layer.
     :type insize: int
-    :param l1: Size of dense layer 1
+    :param l1: Size of dense layer 1.
     :type l1: int
-    :param l2: Size of dense layer 2, defaults to 0
+    :param l2: Size of dense layer 2, defaults to 0.
     :type l2: int, optional
-    :param l3: Size of dense layer 3, defaults to 0
+    :param l3: Size of dense layer 3, defaults to 0.
     :type l3: int, optional
     """
 
@@ -110,15 +110,15 @@ class GCL(nn.Module):
 class GNNCV(nn.Module):
     """_summary_
 
-    :param in_node_nf: Dimensionality of the data in the graph nodes, defaults to 3
+    :param in_node_nf: Dimensionality of the data in the graph nodes, defaults to 3.
     :type in_node_nf: int, optional
-    :param hidden_nf: Hidden dimensionality of the latent node representation, defaults to 3
+    :param hidden_nf: Hidden dimensionality of the latent node representation, defaults to 3.
     :type hidden_nf: int, optional
-    :param device: Device the model should be stored on (For GPU support), defaults to "cpu"
+    :param device: Device the model should be stored on (For GPU support), defaults to "cpu".
     :type device: str, optional
-    :param act_fn: PyTorch activation function to be used in the multi-layer perceptrons, defaults to nn.ReLU()
+    :param act_fn: PyTorch activation function to be used in the multi-layer perceptrons, defaults to nn.ReLU().
     :type act_fn: torch.nn.modules.activation, optional
-    :param n_layers:  The number of graph convolutional layers, defaults to 1
+    :param n_layers:  The number of graph convolutional layers, defaults to 1.
     :type n_layers: int, optional
     """
 

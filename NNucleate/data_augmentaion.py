@@ -22,40 +22,40 @@ def augment_evenly(
     """Takes in a trajectory and adds degenerate rotated frames such that the resulting trajectory represents and even histogram.
        Writes a new trajectory and CV file.
 
-    :param n: The height of the target histogram
+    :param n: The height of the target histogram.
     :type n: int
-    :param trajname: Path to the trajectory file (.xtc or .xyz)
+    :param trajname: Path to the trajectory file (.xtc or .xyz).
     :type trajname: str
-    :param topology: Path to the topology file (.pdb)
+    :param topology: Path to the topology file (.pdb).
     :type topology: str
-    :param cvname: Path to the CV file. Text file with CVs organised in four columns
+    :param cvname: Path to the CV file. Text file with CVs organised in columns.
     :type cvname: str
-    :param savename: String without file ending under which the final CV and traj will be saved
+    :param savename: String without file ending under which the final CV and traj will be saved.
     :type savename: str
-    :param box: Box length for applying PBC
+    :param box: Box length for applying PBC.
     :type box: float
-    :param n_min: The minimum number of frames to add per frame, defaults to 0
+    :param n_min: The minimum number of frames to add per frame, defaults to 0.
     :type n_min: int, optional
-    :param col: The column in the CV file from which to read the CV (0 indexing), defaults to 3
+    :param col: The column in the CV file from which to read the CV (0 indexing), defaults to 3.
     :type col: int, optional
-    :param bins: Number of bins in the target histogram, defaults to 25
+    :param bins: Number of bins in the target histogram, defaults to 25.
     :type bins: int, optional
-    :param n_max: Maximal height of a histogram column, defaults to math.inf
+    :param n_max: Maximal height of a histogram column, defaults to math.inf.
     :type n_max: int, optional
     """
 
-    # Load the trajectory and cvs
+    # Load the trajectory and cvs.
     traj = md.load(trajname, top=topology)
     cvs = np.loadtxt(cvname)[:, col]
     traj = pbc(traj, box)
 
-    # Create the starting histogram
+    # Create the starting histogram.
     counts, bins = np.histogram(cvs, bins=bins)
 
-    # Calculate the number of degenerate frames to add per frame
+    # Calculate the number of degenerate frames to add per frame.
     rot_per_frame = []
     for i in range(len(counts)):
-        # Add either so many that the resulting histogram is n high or the minimum amount
+        # Add either so many that the resulting histogram is n high or the minimum amount.
         amount = min(math.ceil(max((n - counts[i]) / counts[i], n_min)), n_max)
         rot_per_frame.append(amount)
 
@@ -100,15 +100,15 @@ def augment_evenly(
 
 
 def transform_frame_to_ndist_list(n_dist, traj, box_length):
-    """Transform the the cartesian coordinates of a given trajectory frame into a sorted list of the n_dist shortest distances in the system
+    """Transform the the cartesian coordinates of a given trajectory frame into a sorted list of the n_dist shortest distances in the system.
 
-    :param n_dist: Number of distances to include (max: n*(n-1)/2)
+    :param n_dist: Number of distances to include (max: n*(n-1)/2).
     :type n_dist: int
-    :param traj: List of list of coordinates to transform
+    :param traj: List of list of coordinates to transform.
     :type traj: ndarray of float
-    :param box_length: Length of the cubic box
+    :param box_length: Length of the cubic box.
     :type box_length: float
-    :return: Array of shape n_atoms x n_dists
+    :return: Array of shape n_atoms x n_dists.
     :rtype: ndarray of float
     """
 
@@ -119,15 +119,15 @@ def transform_frame_to_ndist_list(n_dist, traj, box_length):
 
 
 def transform_traj_to_ndist_list(n_dist, traj, box_length):
-    """Transform the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system
+    """Transform the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system.
 
-    :param n_dist: Number of distances to include (max: n*(n-1)/2)
+    :param n_dist: Number of distances to include (max: n*(n-1)/2).
     :type n_dist: int
     :param traj: Trajectory that is to be transformed.
     :type traj: ndarray of ndarray of float
-    :param box_length: Length of the cubic box
+    :param box_length: Length of the cubic box.
     :type box_length: float
-    :return: Array of shape n_frames x n_atoms x n_dists
+    :return: Array of shape n_frames x n_atoms x n_dists.
     :rtype: ndarray of ndarray of float
     """
 
@@ -146,13 +146,13 @@ def transform_traj_to_ndist_list(n_dist, traj, box_length):
 def transform_frame_to_knn_list(k, traj, box_length):
     """Transforms the cartesian representation of a given trajectory frame to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
 
-    :param k: Number of neighbours to consider for each atom
+    :param k: Number of neighbours to consider for each atom.
     :type k: int
-    :param traj: List of coordinates to be transformed
+    :param traj: List of coordinates to be transformed.
     :type traj: ndarray of float
-    :param box_length: Length of the cubic box
+    :param box_length: Length of the cubic box.
     :type box_length: float
-    :return: Returns an array of shape n_atoms x k*n_atoms/2
+    :return: Returns an array of shape n_atoms x k*n_atoms/2.
     :rtype: ndarray of float
     """
     n_at = len(traj)
@@ -168,13 +168,13 @@ def transform_frame_to_knn_list(k, traj, box_length):
 def transform_traj_to_knn_list(k, traj, box_length):
     """Transforms the cartesian representation of a given trajectory to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
 
-    :param k: Number of neighbours to consider for each atom
+    :param k: Number of neighbours to consider for each atom.
     :type k: int
-    :param traj: List of coordinates to be transformed
+    :param traj: List of coordinates to be transformed.
     :type traj: ndarray of ndarray of float
-    :param box_length: Length of the cubic box
+    :param box_length: Length of the cubic box.
     :type box_length: float
-    :return: Returns an array of shape n_frames x n_atoms x k*n_atoms/2
+    :return: Returns an array of shape n_frames x n_atoms x k*n_atoms/2.
     :rtype: ndarray of ndarray of float
     """
     n_at = len(traj[0])

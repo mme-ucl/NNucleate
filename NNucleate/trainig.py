@@ -4,17 +4,17 @@ import torch
 def train_linear(dataloader, model, loss_fn, optimizer, device, print_batch=1000000):
     """Performs one training epoch for a NNCV.
 
-    :param dataloader: Wrappper for the training set
+    :param dataloader: Wrappper for the training set.
     :type dataloader: torch.utils.data.Dataloader
-    :param model: The network to be trained
+    :param model: The network to be trained.
     :type model: NNCV
-    :param loss_fn: Pytorch loss to be used during training
+    :param loss_fn: Pytorch loss to be used during training.
     :type loss_fn: torch.nn._Loss
-    :param optimizer: Pytorch optimizer to be used during training
+    :param optimizer: Pytorch optimizer to be used during training.
     :type optimizer: torch.optim
-    :param device: Pytorch device to run the calculation on. Supports CPU and GPU (cuda)
+    :param device: Pytorch device to run the calculation on. Supports CPU and GPU (cuda).
     :type device: str
-    :param print_batch: Set to recieve printed updates on the lost every print_batch batches, defaults to 1000000
+    :param print_batch: Set to recieve printed updates on the lost every print_batch batches, defaults to 1000000.
     :type print_batch: int, optional
     :return: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.
     :rtype: float
@@ -105,11 +105,11 @@ def train_perm(
     :type optimizer: torch.nn._Loss
     :param loss_fn: Loss function for the training.
     :type loss_fn: torch.nn._Loss
-    :param n_trans: Number of permutated structures used for the loss calculations
+    :param n_trans: Number of permutated structures used for the loss calculations.
     :type n_trans: int
-    :param device: Pytorch device to run the calculations on. Supports CPU and GPU (cuda)
+    :param device: Pytorch device to run the calculations on. Supports CPU and GPU (cuda).
     :type device: str
-    :param print_batch: Set to recieve printed updates on the loss every print_batches batches, defaults to 1000000
+    :param print_batch: Set to recieve printed updates on the loss every print_batches batches, defaults to 1000000.
     :type print_batch: int, optional
     :return: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.
     :rtype: float
@@ -144,15 +144,15 @@ def train_perm(
 def test(dataloader, model, loss_fn, device):
     """Calculates the current average test set loss.
 
-    :param dataloader: Dataloader loading the test set
+    :param dataloader: Dataloader loading the test set.
     :type dataloader: torch.utils.data.Dataloader
-    :param model: Model that is being trained
+    :param model: Model that is being trained.
     :type model: NNCV
-    :param loss_fn: Pytorch loss function
+    :param loss_fn: Pytorch loss function.
     :type loss_fn: torch.nn._Loss
-    :param device: Pytorch device to run the calculations on. Supports CPU and GPU (cuda)
+    :param device: Pytorch device to run the calculations on. Supports CPU and GPU (cuda).
     :type device: str
-    :return: Current avg. test set loss
+    :return: Current avg. test set loss.
     :rtype: float
     """
     size = len(dataloader.dataset)

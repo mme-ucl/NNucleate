@@ -40,7 +40,7 @@ def rotate_trajs(trajectories):
 
     :param trajectories: A list of mdtraj.trajectory objects to be modified.
     :type trajectories: list of md.trajectory
-    :return: Returns a list of trajectories, the frames of which have been randomly rotated and wrapped back into the box
+    :return: Returns a list of trajectories, the frames of which have been randomly rotated and wrapped back into the box.
     :rtype: list of md.trajectory
     """
     for t in trajectories:
@@ -62,7 +62,7 @@ def unsorted_segment_sum(data, segment_ids, num_segments):
     :type segment_ids: torch.tensor
     :param num_segments: This is the number of unique IDs, i.e. the dimensionality of the resulting tensor.
     :type num_segments: int
-    :return: Returns a tensor shaped num_segments x data.size(1) containing all the segment sums
+    :return: Returns a tensor shaped num_segments x data.size(1) containing all the segment sums.
     :rtype: torch.Tensor
     """
     result_shape = (num_segments, data.size(1))
@@ -235,15 +235,15 @@ class PeriodicCKDTree(cKDTree):
         :param x: An array of points to query.
         :type x: array_like, last dimension self.m
         :param k: The number of nearest neighbors to return, defaults to 1
-        :type k: int, optional
+        :type k: int, optional.
         :param eps: Return approximate nearest neighbors; the kth returned value 
             is guaranteed to be no further than (1+eps) times the 
-            distance to the real k-th nearest neighbor, defaults to 0
+            distance to the real k-th nearest neighbor, defaults to 0.
         :type eps: int, optional
         :param p: Which Minkowski p-norm to use. 
             1 is the sum-of-absolute-values "Manhattan" distance
             2 is the usual Euclidean distance
-            infinity is the maximum-coordinate-difference distance, defaults to 2
+            infinity is the maximum-coordinate-difference distance, defaults to 2.
         :type p: int, optional
         :param distance_upper_bound: Return only neighbors within this distance. This is used to prune
             tree searches, so if you are doing a series of nearest-neighbor
@@ -337,33 +337,6 @@ class PeriodicCKDTree(cKDTree):
             )
         return results
 
-        """
-        Find all points within distance r of point(s) x.
-        Parameters
-        ----------
-        x : 
-            The point or points to search for neighbors of.
-        r : positive float
-            The radius of points to return.
-        p : float, optional
-            Which Minkowski p-norm to use.  Should be in the range [1, inf].
-        eps : nonnegative float, optional
-            Approximate search. Branches of the tree are not explored if their
-            nearest points are further than ``r / (1 + eps)``, and branches are
-            added in bulk if their furthest points are nearer than
-            ``r * (1 + eps)``.
-        Returns
-        -------
-        results : list or array of lists
-            If `x` is a single point, returns a list of the indices of the
-            neighbors of `x`. If `x` is an array of points, returns an object
-            array of shape tuple containing lists of neighbors.
-        Notes
-        -----
-        If you have many points whose neighbors you want to find, you may
-        save substantial amounts of time by putting them in a
-        PeriodicCKDTree and using query_ball_tree.
-        """
 
     def query_ball_point(self, x, r, p=2.0, eps=0):
         """Find all points within distance r of point(s) x.
@@ -375,12 +348,12 @@ class PeriodicCKDTree(cKDTree):
         :type x: array_like, shape tuple + (self.m,)
         :param r: The radius of points to return.
         :type r: float
-        :param p: Which Minkowski p-norm to use.  Should be in the range [1, inf], defaults to 2.0
+        :param p: Which Minkowski p-norm to use.  Should be in the range [1, inf], defaults to 2.0.
         :type p: float, optional
         :param eps: Approximate search. Branches of the tree are not explored if their
             nearest points are further than ``r / (1 + eps)``, and branches are
             added in bulk if their furthest points are nearer than
-            ``r * (1 + eps)``, defaults to 0
+            ``r * (1 + eps)``, defaults to 0.
         :type eps: int, optional
         :return: If `x` is a single point, returns a list of the indices of the
             neighbors of `x`. If `x` is an array of points, returns an object

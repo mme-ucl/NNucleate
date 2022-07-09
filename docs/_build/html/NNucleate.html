@@ -91,16 +91,16 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<em>int</em>) – The height of the target histogram</p></li>
-<li><p><strong>trajname</strong> (<em>str</em>) – Path to the trajectory file (.xtc or .xyz)</p></li>
-<li><p><strong>topology</strong> (<em>str</em>) – Path to the topology file (.pdb)</p></li>
-<li><p><strong>cvname</strong> (<em>str</em>) – Path to the CV file. Text file with CVs organised in four columns</p></li>
-<li><p><strong>savename</strong> (<em>str</em>) – String without file ending under which the final CV and traj will be saved</p></li>
-<li><p><strong>box</strong> (<em>float</em>) – Box length for applying PBC</p></li>
-<li><p><strong>n_min</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum number of frames to add per frame, defaults to 0</p></li>
-<li><p><strong>col</strong> (<em>int</em><em>, </em><em>optional</em>) – The column in the CV file from which to read the CV (0 indexing), defaults to 3</p></li>
-<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of bins in the target histogram, defaults to 25</p></li>
-<li><p><strong>n_max</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximal height of a histogram column, defaults to math.inf</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – The height of the target histogram.</p></li>
+<li><p><strong>trajname</strong> (<em>str</em>) – Path to the trajectory file (.xtc or .xyz).</p></li>
+<li><p><strong>topology</strong> (<em>str</em>) – Path to the topology file (.pdb).</p></li>
+<li><p><strong>cvname</strong> (<em>str</em>) – Path to the CV file. Text file with CVs organised in columns.</p></li>
+<li><p><strong>savename</strong> (<em>str</em>) – String without file ending under which the final CV and traj will be saved.</p></li>
+<li><p><strong>box</strong> (<em>float</em>) – Box length for applying PBC.</p></li>
+<li><p><strong>n_min</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum number of frames to add per frame, defaults to 0.</p></li>
+<li><p><strong>col</strong> (<em>int</em><em>, </em><em>optional</em>) – The column in the CV file from which to read the CV (0 indexing), defaults to 3.</p></li>
+<li><p><strong>bins</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of bins in the target histogram, defaults to 25.</p></li>
+<li><p><strong>n_max</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximal height of a histogram column, defaults to math.inf.</p></li>
 </ul>
 </dd>
 </dl>
@@ -113,13 +113,13 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>k</strong> (<em>int</em>) – Number of neighbours to consider for each atom</p></li>
-<li><p><strong>traj</strong> (<em>ndarray of float</em>) – List of coordinates to be transformed</p></li>
-<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – Number of neighbours to consider for each atom.</p></li>
+<li><p><strong>traj</strong> (<em>ndarray of float</em>) – List of coordinates to be transformed.</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Returns an array of shape n_atoms x k*n_atoms/2</p>
+<dd class="field-even"><p>Returns an array of shape n_atoms x k*n_atoms/2.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>ndarray of float</p>
@@ -130,17 +130,17 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="NNucleate.data_augmentaion.transform_frame_to_ndist_list">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.data_augmentaion.</span></span><span class="sig-name descname"><span class="pre">transform_frame_to_ndist_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.data_augmentaion.transform_frame_to_ndist_list" title="Permalink to this definition"></a></dt>
-<dd><p>Transform the the cartesian coordinates of a given trajectory frame into a sorted list of the n_dist shortest distances in the system</p>
+<dd><p>Transform the the cartesian coordinates of a given trajectory frame into a sorted list of the n_dist shortest distances in the system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n_dist</strong> (<em>int</em>) – Number of distances to include (max: n*(n-1)/2)</p></li>
-<li><p><strong>traj</strong> (<em>ndarray of float</em>) – List of list of coordinates to transform</p></li>
-<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
+<li><p><strong>n_dist</strong> (<em>int</em>) – Number of distances to include (max: n*(n-1)/2).</p></li>
+<li><p><strong>traj</strong> (<em>ndarray of float</em>) – List of list of coordinates to transform.</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Array of shape n_atoms x n_dists</p>
+<dd class="field-even"><p>Array of shape n_atoms x n_dists.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>ndarray of float</p>
@@ -155,13 +155,13 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>k</strong> (<em>int</em>) – Number of neighbours to consider for each atom</p></li>
-<li><p><strong>traj</strong> (<em>ndarray of ndarray of float</em>) – List of coordinates to be transformed</p></li>
-<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – Number of neighbours to consider for each atom.</p></li>
+<li><p><strong>traj</strong> (<em>ndarray of ndarray of float</em>) – List of coordinates to be transformed.</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Returns an array of shape n_frames x n_atoms x k*n_atoms/2</p>
+<dd class="field-even"><p>Returns an array of shape n_frames x n_atoms x k*n_atoms/2.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>ndarray of ndarray of float</p>
@@ -172,17 +172,17 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="NNucleate.data_augmentaion.transform_traj_to_ndist_list">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.data_augmentaion.</span></span><span class="sig-name descname"><span class="pre">transform_traj_to_ndist_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.data_augmentaion.transform_traj_to_ndist_list" title="Permalink to this definition"></a></dt>
-<dd><p>Transform the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system</p>
+<dd><p>Transform the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n_dist</strong> (<em>int</em>) – Number of distances to include (max: n*(n-1)/2)</p></li>
+<li><p><strong>n_dist</strong> (<em>int</em>) – Number of distances to include (max: n*(n-1)/2).</p></li>
 <li><p><strong>traj</strong> (<em>ndarray of ndarray of float</em>) – Trajectory that is to be transformed.</p></li>
-<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Array of shape n_frames x n_atoms x n_dists</p>
+<dd class="field-even"><p>Array of shape n_frames x n_atoms x n_dists.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>ndarray of ndarray of float</p>
@@ -200,21 +200,21 @@
 <p>Instantiates a dataset from a trajectory file in xtc/xyz format and a text file containing the nucleation CVs (Assumes cubic cell)</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>For .xtc give the boxlength in nm and for .xyz give the boxlength in Å</p>
+<p>For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cv_file</strong> (<em>str</em>) – Path to text file structured in columns containing the CVs</p></li>
-<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory in .xtc or .xyz file format</p></li>
-<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file in .pdb file format</p></li>
-<li><p><strong>cv_col</strong> (<em>int</em>) – Indicates the column in which the desired CV is written in the CV file (0 indexing)</p></li>
-<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic cell</p></li>
-<li><p><strong>transform</strong> (<em>function</em><em>, </em><em>optional</em>) – A function to be applied to the configuration before returning e.g. to_dist(), defaults to None</p></li>
-<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0</p></li>
-<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is read, defaults to -1</p></li>
-<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1</p></li>
-<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1</p></li>
+<li><p><strong>cv_file</strong> (<em>str</em>) – Path to text file structured in columns containing the CVs.</p></li>
+<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory in .xtc or .xyz file format.</p></li>
+<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file in .pdb file format.</p></li>
+<li><p><strong>cv_col</strong> (<em>int</em>) – Indicates the column in which the desired CV is written in the CV file (0 indexing).</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic cell.</p></li>
+<li><p><strong>transform</strong> (<em>function</em><em>, </em><em>optional</em>) – A function to be applied to the configuration before returning e.g. to_dist(), defaults to None.</p></li>
+<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0.</p></li>
+<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is read, defaults to -1.</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1.</p></li>
+<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.</p></li>
 </ul>
 </dd>
 </dl>
@@ -225,20 +225,20 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">GNNTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.GNNTrajectory" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
 <p>Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN. 
-.. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å</p>
+.. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cv_file</strong> (<em>str</em>) – Path to the cv file.</p></li>
-<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz)</p></li>
-<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb)</p></li>
-<li><p><strong>cv_col</strong> (<em>int</em>) – Gives the colimn in which the CV of interest is stored</p></li>
-<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
-<li><p><strong>rc</strong> (<em>float</em>) – Cut-off radius for the construction of the graph</p></li>
-<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0</p></li>
-<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is rea, defaults to -1</p></li>
-<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1</p></li>
-<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1</p></li>
+<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz).</p></li>
+<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb).</p></li>
+<li><p><strong>cv_col</strong> (<em>int</em>) – Gives the colimn in which the CV of interest is stored.</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box.</p></li>
+<li><p><strong>rc</strong> (<em>float</em>) – Cut-off radius for the construction of the graph.</p></li>
+<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0.</p></li>
+<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is rea, defaults to -1.</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1.</p></li>
+<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.</p></li>
 </ul>
 </dd>
 </dl>
@@ -254,21 +254,21 @@
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>For .xtc give the boxlength in nm and for .xyz give the boxlength in Å</p>
+<p>For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cv_file</strong> (<em>str</em>) – Path to the cv file.</p></li>
-<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz)</p></li>
-<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb)</p></li>
-<li><p><strong>cv_col</strong> (<em>int</em>) – Gives the colimn in which the CV of interest is stored</p></li>
-<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box</p></li>
+<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz).</p></li>
+<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb).</p></li>
+<li><p><strong>cv_col</strong> (<em>int</em>) – Gives the colimn in which the CV of interest is stored.</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box.</p></li>
 <li><p><strong>k</strong> (<em>int</em>) – Number of neighbours to consider.</p></li>
-<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0</p></li>
-<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is read, defaults to -1</p></li>
-<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1</p></li>
-<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1</p></li>
+<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0.</p></li>
+<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is read, defaults to -1.</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1.</p></li>
+<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.</p></li>
 </ul>
 </dd>
 </dl>
@@ -284,15 +284,15 @@
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>For .xtc give the boxlength in nm and for .xyz give the boxlength in Å</p>
+<p>For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cv_file</strong> (<em>str</em>) – Path to the cv file.</p></li>
-<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz)</p></li>
-<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb)</p></li>
-<li><p><strong>cv_col</strong> (<em>int</em>) – Gives the colimn in which the CV of interest is stored</p></li>
+<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz).</p></li>
+<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb).</p></li>
+<li><p><strong>cv_col</strong> (<em>int</em>) – Gives the colimn in which the CV of interest is stored.</p></li>
 <li><p><strong>box_length</strong> – Length of the cubic box.</p></li>
 </ul>
 </dd>
@@ -300,13 +300,13 @@
 <p>:type box_length:float
 :param n_dist: Number of distances to consider.
 :type n_dist: int
-:param start: Starting frame of the trajectory, defaults to 0
+:param start: Starting frame of the trajectory, defaults to 0.
 :type start: int, optional
-:param stop: The last file of the trajectory that is read, defaults to -1
+:param stop: The last file of the trajectory that is read, defaults to -1.
 :type stop: int, optional
-:param stride: The stride with which the trajectory frames are read, defaults to 1
+:param stride: The stride with which the trajectory frames are read, defaults to 1.
 :type stride: int, optional
-:param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1
+:param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
 :type root: int, optional</p>
 </dd></dl>
 
@@ -317,6 +317,15 @@
 <dt class="sig sig-object py" id="NNucleate.models.GCL">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.models.</span></span><span class="sig-name descname"><span class="pre">GCL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hidden_nf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ReLU()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GCL" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>The graph convolutional layer for the graph-based model. Do not instantiate this directly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hidden_nf</strong> (<em>int</em>) – Hidden dimensionality of the latent node representation.</p></li>
+<li><p><strong>act_fn</strong> (<em>torch.nn.modules.activation</em><em>, </em><em>optional</em>) – PyTorch activation function to be used in the multi-layer perceptrons, defaults to nn.ReLU()</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="NNucleate.models.GCL.edge_model">
 <span class="sig-name descname"><span class="pre">edge_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GCL.edge_model" title="Permalink to this definition"></a></dt>
@@ -352,6 +361,18 @@ registered hooks while the latter silently ignores them.</p>
 <dt class="sig sig-object py" id="NNucleate.models.GNNCV">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.models.</span></span><span class="sig-name descname"><span class="pre">GNNCV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_node_nf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_nf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ReLU()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GNNCV" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>_summary_</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_node_nf</strong> (<em>int</em><em>, </em><em>optional</em>) – Dimensionality of the data in the graph nodes, defaults to 3.</p></li>
+<li><p><strong>hidden_nf</strong> (<em>int</em><em>, </em><em>optional</em>) – Hidden dimensionality of the latent node representation, defaults to 3.</p></li>
+<li><p><strong>device</strong> (<em>str</em><em>, </em><em>optional</em>) – Device the model should be stored on (For GPU support), defaults to “cpu”.</p></li>
+<li><p><strong>act_fn</strong> (<em>torch.nn.modules.activation</em><em>, </em><em>optional</em>) – PyTorch activation function to be used in the multi-layer perceptrons, defaults to nn.ReLU().</p></li>
+<li><p><strong>n_layers</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of graph convolutional layers, defaults to 1.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="NNucleate.models.GNNCV.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GNNCV.forward" title="Permalink to this definition"></a></dt>
@@ -377,6 +398,17 @@ registered hooks while the latter silently ignores them.</p>
 <dt class="sig sig-object py" id="NNucleate.models.NNCV">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.models.</span></span><span class="sig-name descname"><span class="pre">NNCV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">insize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.NNCV" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Instantiates an NN for approximating CVs. Supported are architectures with up to 3 layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>insize</strong> (<em>int</em>) – Size of the input layer.</p></li>
+<li><p><strong>l1</strong> (<em>int</em>) – Size of dense layer 1.</p></li>
+<li><p><strong>l2</strong> (<em>int</em><em>, </em><em>optional</em>) – Size of dense layer 2, defaults to 0.</p></li>
+<li><p><strong>l3</strong> (<em>int</em><em>, </em><em>optional</em>) – Size of dense layer 3, defaults to 0.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="NNucleate.models.NNCV.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.NNCV.forward" title="Permalink to this definition"></a></dt>
@@ -405,29 +437,44 @@ registered hooks while the latter silently ignores them.</p>
 <dt class="sig sig-object py" id="NNucleate.trainig.test">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.trainig.</span></span><span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.trainig.test" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the current average test set loss.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>dataloader (dataloader): Dataloader loading the test set
-model (NNCV): model that is being trained
-loss_fn (function): Pytorch loss function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataloader</strong> (<em>torch.utils.data.Dataloader</em>) – Dataloader loading the test set.</p></li>
+<li><p><strong>model</strong> (<a class="reference internal" href="#NNucleate.models.NNCV" title="NNucleate.models.NNCV"><em>NNCV</em></a>) – Model that is being trained.</p></li>
+<li><p><strong>loss_fn</strong> (<em>torch.nn._Loss</em>) – Pytorch loss function.</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Pytorch device to run the calculations on. Supports CPU and GPU (cuda).</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>float: Current avg. test set loss</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Current avg. test set loss.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="NNucleate.trainig.train_egnn">
-<span class="sig-prename descclassname"><span class="pre">NNucleate.trainig.</span></span><span class="sig-name descname"><span class="pre">train_egnn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_l1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.trainig.train_egnn" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">NNucleate.trainig.</span></span><span class="sig-name descname"><span class="pre">train_egnn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.trainig.train_egnn" title="Permalink to this definition"></a></dt>
 <dd><p>Function to perform one epoch of a GNN training.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>loader (torch.utils.data.Dataloader): Wrapper around a GNNTrajectory dataset.
-n_at (int): Number of nodes per frame.
-optimizer (torch.optim): The optimizer object for the training.
-loss_l1 (torch.nn._Loss): Loss function for the training.
-model_1 (GNNCV): Graph-based model to be trained.
-device (str): Device that the training is performed on. (Required for GPU compatibility)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loader</strong> (<em>torch.utils.data.Dataloader</em>) – Wrapper around a GNNTrajectory dataset.</p></li>
+<li><p><strong>n_at</strong> (<em>int</em>) – Number of nodes per frame.</p></li>
+<li><p><strong>optimizer</strong> (<em>torch.nn._Loss</em>) – The optimizer object for the training.</p></li>
+<li><p><strong>loss</strong> (<em>torch.nn._Loss</em>) – Loss function for the training.</p></li>
+<li><p><strong>model_1</strong> (<a class="reference internal" href="#NNucleate.models.GNNCV" title="NNucleate.models.GNNCV"><em>GNNCV</em></a>) – Graph-based model to be trained.</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Device that the training is performed on. (Required for GPU compatibility)</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>float: Training loss at the end of the epoch.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Device that the training is performed on. (Required for GPU compatibility)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -436,33 +483,47 @@ device (str): Device that the training is performed on. (Required for GPU compat
 <dt class="sig sig-object py" id="NNucleate.trainig.train_linear">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.trainig.</span></span><span class="sig-name descname"><span class="pre">train_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_batch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.trainig.train_linear" title="Permalink to this definition"></a></dt>
 <dd><p>Performs one training epoch for a NNCV.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>dataloader (Dataloader): Wrappper for the training set
-model (NNCV): The network to be trained
-loss_fn (function): Pytorch loss to be used during training
-optimizer (function): Pytorch optimizer to be used during training
-device (dvice): Pytorch device to run the calculation on. Supports CPU and GPU (cuda)
-print_batch (int, optional): Set to recieve printed updates on the lost every print_batch batches. Defaults to 1000000.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataloader</strong> (<em>torch.utils.data.Dataloader</em>) – Wrappper for the training set.</p></li>
+<li><p><strong>model</strong> (<a class="reference internal" href="#NNucleate.models.NNCV" title="NNucleate.models.NNCV"><em>NNCV</em></a>) – The network to be trained.</p></li>
+<li><p><strong>loss_fn</strong> (<em>torch.nn._Loss</em>) – Pytorch loss to be used during training.</p></li>
+<li><p><strong>optimizer</strong> (<em>torch.optim</em>) – Pytorch optimizer to be used during training.</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Pytorch device to run the calculation on. Supports CPU and GPU (cuda).</p></li>
+<li><p><strong>print_batch</strong> (<em>int</em><em>, </em><em>optional</em>) – Set to recieve printed updates on the lost every print_batch batches, defaults to 1000000.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>float: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="NNucleate.trainig.train_perm">
-<span class="sig-prename descclassname"><span class="pre">NNucleate.trainig.</span></span><span class="sig-name descname"><span class="pre">train_perm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trans</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_batch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.trainig.train_perm" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">NNucleate.trainig.</span></span><span class="sig-name descname"><span class="pre">train_perm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trans</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_batch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.trainig.train_perm" title="Permalink to this definition"></a></dt>
 <dd><p>Performs one training epoch for a NNCV but the loss for each batch is not just calculated on one reference structure but a set of n_trans permutated versions of that structure.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>dataloader (Dataloader): Wrapper around the training data
-model (NNCV): The model that is to be trained
-loss_fn (function): Pytorch loss function to be used for the training
-optimizer (function): Pytorch optimizer to be used during training
-n_trans (int): Number of permutated structures used for the loss calculations
-device (device): Pytorch device to run the calculations on. Supports CPU and GPU (cuda)
-print_batch (int, optional): Set to recieve printed updates on the loss every print_batches batches. Defaults to 1000000.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loader</strong> (<em>torch.utils.data.Dataloader</em>) – Wrapper around a GNNTrajectory dataset.</p></li>
+<li><p><strong>n_at</strong> (<em>int</em>) – Number of nodes per frame.</p></li>
+<li><p><strong>optimizer</strong> (<em>torch.nn._Loss</em>) – The optimizer object for the training.</p></li>
+<li><p><strong>loss_fn</strong> (<em>torch.nn._Loss</em>) – Loss function for the training.</p></li>
+<li><p><strong>n_trans</strong> (<em>int</em>) – Number of permutated structures used for the loss calculations.</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Pytorch device to run the calculations on. Supports CPU and GPU (cuda).</p></li>
+<li><p><strong>print_batch</strong> (<em>int</em><em>, </em><em>optional</em>) – Set to recieve printed updates on the loss every print_batches batches, defaults to 1000000.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>float: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -513,14 +574,14 @@ brute-force, defaults to 10.</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>last dimension self.m</em>) – An array of points to query.</p></li>
-<li><p><strong>k</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of nearest neighbors to return, defaults to 1</p></li>
+<li><p><strong>k</strong> (<em>int</em><em>, </em><em>optional.</em>) – The number of nearest neighbors to return, defaults to 1</p></li>
 <li><p><strong>eps</strong> (<em>int</em><em>, </em><em>optional</em>) – Return approximate nearest neighbors; the kth returned value 
 is guaranteed to be no further than (1+eps) times the 
-distance to the real k-th nearest neighbor, defaults to 0</p></li>
+distance to the real k-th nearest neighbor, defaults to 0.</p></li>
 <li><p><strong>p</strong> (<em>int</em><em>, </em><em>optional</em>) – Which Minkowski p-norm to use. 
 1 is the sum-of-absolute-values “Manhattan” distance
 2 is the usual Euclidean distance
-infinity is the maximum-coordinate-difference distance, defaults to 2</p></li>
+infinity is the maximum-coordinate-difference distance, defaults to 2.</p></li>
 <li><p><strong>distance_upper_bound</strong> (<em>float</em><em>, </em><em>optional</em>) – Return only neighbors within this distance. This is used to prune
 tree searches, so if you are doing a series of nearest-neighbor
 queries, it may help to supply the distance to the nearest neighbor
@@ -558,11 +619,11 @@ PeriodicCKDTree and using query_ball_tree.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>array_like</em><em>, </em><em>shape tuple +</em><em> (</em><em>self.m</em><em>,</em><em>)</em>) – The point or points to search for neighbors of.</p></li>
 <li><p><strong>r</strong> (<em>float</em>) – The radius of points to return.</p></li>
-<li><p><strong>p</strong> (<em>float</em><em>, </em><em>optional</em>) – Which Minkowski p-norm to use.  Should be in the range [1, inf], defaults to 2.0</p></li>
+<li><p><strong>p</strong> (<em>float</em><em>, </em><em>optional</em>) – Which Minkowski p-norm to use.  Should be in the range [1, inf], defaults to 2.0.</p></li>
 <li><p><strong>eps</strong> (<em>int</em><em>, </em><em>optional</em>) – Approximate search. Branches of the tree are not explored if their
 nearest points are further than <code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">/</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">eps)</span></code>, and branches are
 added in bulk if their furthest points are nearer than
-<code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">*</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">eps)</span></code>, defaults to 0</p></li>
+<code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">*</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">eps)</span></code>, defaults to 0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -627,7 +688,7 @@ array of shape tuple containing lists of neighbors.</p>
 <dd class="field-odd"><p><strong>trajectories</strong> (<em>list of md.trajectory</em>) – A list of mdtraj.trajectory objects to be modified.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Returns a list of trajectories, the frames of which have been randomly rotated and wrapped back into the box</p>
+<dd class="field-even"><p>Returns a list of trajectories, the frames of which have been randomly rotated and wrapped back into the box.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>list of md.trajectory</p>
@@ -648,7 +709,7 @@ array of shape tuple containing lists of neighbors.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Returns a tensor shaped num_segments x data.size(1) containing all the segment sums</p>
+<dd class="field-even"><p>Returns a tensor shaped num_segments x data.size(1) containing all the segment sums.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>torch.Tensor</p>

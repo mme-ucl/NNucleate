@@ -4,15 +4,19 @@ from .utils import unsorted_segment_sum
 
 # Linear Model
 class NNCV(nn.Module):
-    def __init__(self, insize, l1, l2=0, l3=0):
-        """Instantiates an NN for approximating CVs. Supported are architectures with up to 3 layers.
+    """Instantiates an NN for approximating CVs. Supported are architectures with up to 3 layers.
 
-        Args:
-            insize (int): Size of the input layer
-            l1 (int): Size of dense layer 1
-            l2 (int, optional): Size of dense layer 2. Defaults to 0.
-            l3 (int, optional): Size of dense layer 3. Defaults to 0.
-        """
+    :param insize: Size of the input layer
+    :type insize: int
+    :param l1: Size of dense layer 1
+    :type l1: int
+    :param l2: Size of dense layer 2, defaults to 0
+    :type l2: int, optional
+    :param l3: Size of dense layer 3, defaults to 0
+    :type l3: int, optional
+    """
+
+    def __init__(self, insize, l1, l2=0, l3=0):
         super(NNCV, self).__init__()
         self.flatten = nn.Flatten()
         # defines the structure
@@ -51,13 +55,14 @@ class NNCV(nn.Module):
 
 # Graph model
 class GCL(nn.Module):
+    """The graph convolutional layer for the graph-based model. Do not instantiate this directly.
+
+    :param hidden_nf: Hidden dimensionality of the latent node representation.
+    :type hidden_nf: int
+    :param act_fn: PyTorch activation function to be used in the multi-layer perceptrons, defaults to nn.ReLU()
+    :type act_fn: torch.nn.modules.activation, optional
+    """
     def __init__(self, hidden_nf, act_fn=nn.ReLU()):
-        """The graph convolutional layer for the graph-based model. Do not instantiate this directly.
-        
-        Args:
-            hidden_nf (int): Hidden dimensionality of the latent node representation.
-            act_fn (torch.nn.modules.activation, optional): PyTorch activation function to be used in the multi-layer perceptrons.
-        """
         super(GCL, self).__init__()
 
         self.edge_mlp = nn.Sequential(
@@ -102,18 +107,23 @@ class GCL(nn.Module):
 
 
 class GNNCV(nn.Module):
+    """_summary_
+
+    :param in_node_nf: Dimensionality of the data in the graph nodes, defaults to 3
+    :type in_node_nf: int, optional
+    :param hidden_nf: Hidden dimensionality of the latent node representation, defaults to 3
+    :type hidden_nf: int, optional
+    :param device: Device the model should be stored on (For GPU support), defaults to "cpu"
+    :type device: str, optional
+    :param act_fn: PyTorch activation function to be used in the multi-layer perceptrons, defaults to nn.ReLU()
+    :type act_fn: torch.nn.modules.activation, optional
+    :param n_layers:  The number of graph convolutional layers, defaults to 1
+    :type n_layers: int, optional
+    """
     def __init__(
         self, in_node_nf=3, hidden_nf=3, device="cpu", act_fn=nn.ReLU(), n_layers=1
     ):
-        """Graph-based model for the approximation of collective variables.
 
-        Args:
-            in_node_nf (int, optional): Dimensionality of the data in the graph nodes. Defaults to 3.
-            hidden_nf (int, optional): Hidden dimensionality of the latent node representation. Defaults to 3.
-            device (str, optional): Device the model should be stored on (For GPU support). Defaults to 'cpu'.
-            act_fn (torch.nn.modules.activation, optional): PyTorch activation function to be used in the multi-layer perceptrons. Defaults to nn.ReLU().
-            n_layers (int, optional): The number of graph convolutional layers. Defaults to 1.
-        """
         super(GNNCV, self).__init__()
         self.hidden_nf = hidden_nf
         self.device = device

@@ -8,12 +8,12 @@ import math
 
 
 def augment_evenly(
-    n,
-    trajname,
-    topology,
-    cvname,
-    savename,
-    box,
+    n: int,
+    trajname: str,
+    topology: str,
+    cvname: str,
+    savename: str,
+    box: float,
     n_min=0,
     col=3,
     bins=25,
@@ -99,7 +99,7 @@ def augment_evenly(
     return
 
 
-def transform_frame_to_ndist_list(n_dist, traj, box_length):
+def transform_frame_to_ndist_list(n_dist: int, traj: np.ndarray[float], box_length: float) -> np.ndarray[float]:
     """Transform the the cartesian coordinates of a given trajectory frame into a sorted list of the n_dist shortest distances in the system.
 
     :param n_dist: Number of distances to include (max: n*(n-1)/2).
@@ -118,7 +118,7 @@ def transform_frame_to_ndist_list(n_dist, traj, box_length):
     return dist_frames
 
 
-def transform_traj_to_ndist_list(n_dist, traj, box_length):
+def transform_traj_to_ndist_list(n_dist: int, traj: np.ndarray[float], box_length: float) -> np.ndarray[float]:
     """Transform the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system.
 
     :param n_dist: Number of distances to include (max: n*(n-1)/2).
@@ -143,7 +143,7 @@ def transform_traj_to_ndist_list(n_dist, traj, box_length):
     return dist_frames
 
 
-def transform_frame_to_knn_list(k, traj, box_length):
+def transform_frame_to_knn_list(k: int, traj: np.ndarray[float], box_length: float) -> np.ndarray[float]:
     """Transforms the cartesian representation of a given trajectory frame to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
 
     :param k: Number of neighbours to consider for each atom.
@@ -165,7 +165,7 @@ def transform_frame_to_knn_list(k, traj, box_length):
     return result
 
 
-def transform_traj_to_knn_list(k, traj, box_length):
+def transform_traj_to_knn_list(k: int, traj: np.ndarray[np.ndarray[float]], box_length: float) -> np.ndarray[np.ndarray[float]]:
     """Transforms the cartesian representation of a given trajectory to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
 
     :param k: Number of neighbours to consider for each atom.

@@ -7,7 +7,7 @@ import torch
 from scipy.spatial.transform import Rotation as R
 
 
-def pbc(trajectory, box_length):
+def pbc(trajectory: md.Trajectory, box_length: float) -> md.Trajectory:
     """Centers an mdtraj Trajectory around the centre of a cubic box with the given box length and wraps all atoms into the box.
 
     :param trajectory: The trajectory that is to be modified, i.e. contains the configurations that shall be wrapped back into the simulation box.
@@ -35,7 +35,7 @@ def pbc(trajectory, box_length):
     return trajectory
 
 
-def rotate_trajs(trajectories):
+def rotate_trajs(trajectories: np.ndarray[md.Trajectory]) -> np.ndarray[md.Trajectory]:
     """Rotates each frame in the given trajectories according to a random quaternion.
 
     :param trajectories: A list of mdtraj.trajectory objects to be modified.
@@ -53,7 +53,7 @@ def rotate_trajs(trajectories):
 
 
 # GNN utils
-def unsorted_segment_sum(data, segment_ids, num_segments):
+def unsorted_segment_sum(data: torch.Tensor, segment_ids: torch.Tensor, num_segments: int) -> torch.Tensor:
     """Function that sums the segments of a matrix. Each row has a non-unique ID and all rows with the same ID are summed such that a matrix with the number of rows equal to the number of unique IDs is obtained.
 
     :param data: A tensor that contains the data that is to be summed.
@@ -72,7 +72,7 @@ def unsorted_segment_sum(data, segment_ids, num_segments):
     return result
 
 
-def get_rc_edges(rc, traj):
+def get_rc_edges(rc: float, traj: md.Trajectory) -> list[torch.Tensor]:
     """Returns the edges of the graph constructed by interpreting the atoms in the trajectory as nodes that are connected to all other nodes within a distance of rc.
 
     :param rc: Cut-off radius for the graph construction.
@@ -179,7 +179,7 @@ class PeriodicCKDTree(cKDTree):
     :type leafsize: int, optional
     """
 
-    def __init__(self, bounds, data, leafsize=10):
+    def __init__(self, bounds: np.ndarray, data: np.ndarray, leafsize=10):
         # Map all points to canonical periodic image
         self.bounds = np.array(bounds)
         self.real_data = np.asarray(data)
@@ -229,7 +229,7 @@ class PeriodicCKDTree(cKDTree):
         else:
             raise ValueError("Invalid k in periodic_kdtree._KDTree__query")
 
-    def query(self, x, k=1, eps=0, p=2, distance_upper_bound=np.inf):
+    def query(self, x: np.ndarray, k=1, eps=0, p=2, distance_upper_bound=np.inf) -> np.ndarray:
         """Query the kd-tree for nearest neighbors.
 
         :param x: An array of points to query.
@@ -338,7 +338,7 @@ class PeriodicCKDTree(cKDTree):
         return results
 
 
-    def query_ball_point(self, x, r, p=2.0, eps=0):
+    def query_ball_point(self, x: np.ndarray, r, p=2.0, eps=0) -> np.ndarray:
         """Find all points within distance r of point(s) x.
         Notes: If you have many points whose neighbors you want to find, you may
         save substantial amounts of time by putting them in a

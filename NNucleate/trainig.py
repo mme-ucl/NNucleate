@@ -1,15 +1,19 @@
+from sqlalchemy import func
 import torch
 from time import time
 from copy import deepcopy
 import numpy as np
+from NNucleate.models import GNNCV, NNCV
+from torch.utils.data import DataLoader
 
-def train_linear(dataloader, model_t, loss_fn, optimizer, device, print_batch=1000000):
+
+def train_linear(model_t: NNCV, dataloader: DataLoader, loss_fn: function, optimizer, device: str, print_batch=1000000) -> float:
     """Performs one training epoch for a NNCV.
 
-    :param dataloader: Wrappper for the training set.
-    :type dataloader: torch.utils.data.Dataloader
     :param model_t: The network to be trained.
     :type model_t: NNCV
+    :param dataloader: Wrappper for the training set.
+    :type dataloader: torch.utils.data.Dataloader
     :param loss_fn: Pytorch loss to be used during training.
     :type loss_fn: torch.nn._Loss
     :param optimizer: Pytorch optimizer to be used during training.
@@ -41,7 +45,7 @@ def train_linear(dataloader, model_t, loss_fn, optimizer, device, print_batch=10
     return loss.item()
 
 
-def train_gnn( model, loader, n_at, optimizer, loss, device):
+def train_gnn( model: GNNCV, loader: DataLoader, n_at: int, optimizer: function, loss: function, device: str) -> float:
     """Function to perform one epoch of a GNN training.
 
     :param model: Graph-based model_t to be trained.
@@ -95,14 +99,12 @@ def train_gnn( model, loader, n_at, optimizer, loss, device):
 
 
 def train_perm(
-    dataloader, model_t, optimizer, loss_fn, n_trans, device, print_batch=1000000
-):
+    model_t: NNCV, dataloader: DataLoader, optimizer: function, loss_fn: function, n_trans: int, device: str, print_batch=1000000
+) -> float:
     """Performs one training epoch for a NNCV but the loss for each batch is not just calculated on one reference structure but a set of n_trans permutated versions of that structure.
 
-    :param loader: Wrapper around a GNNTrajectory dataset.
-    :type loader: torch.utils.data.Dataloader
-    :param n_at: Number of nodes per frame.
-    :type n_at: int
+    :param dataloader: Wrapper around a GNNTrajectory dataset.
+    :type dataloader: torch.utils.data.Dataloader
     :param optimizer: The optimizer object for the training.
     :type optimizer: torch.optim
     :param loss_fn: Loss function for the training.
@@ -143,13 +145,13 @@ def train_perm(
     return loss.item()
 
 
-def test(dataloader, model_t, loss_fn, device):
+def test(model_t: NNCV, dataloader: DataLoader, loss_fn: function, device: str) -> float:
     """Calculates the current average test set loss.
 
+    :param model_t: Model that is being trained.
+    :type model_t: NNCV
     :param dataloader: Dataloader loading the test set.
     :type dataloader: torch.utils.data.Dataloader
-    :param model: Model that is being trained.
-    :type model: NNCV
     :param loss_fn: Pytorch loss function.
     :type loss_fn: torch.nn._Loss
     :param device: Device that the training is performed on. (Required for GPU compatibility)
@@ -172,7 +174,7 @@ def test(dataloader, model_t, loss_fn, device):
     return test_loss
 
 
-def test_gnn(model, loader, n_at, loss_l1, device):
+def test_gnn(model: GNNCV, loader: DataLoader, n_at: int, loss_l1: function, device: str) -> float:
     """Evaluate the test/validation error of a graph based model_t on a validation set. 
 
     :param model: Graph-based model_t to be trained.
@@ -220,7 +222,7 @@ def test_gnn(model, loader, n_at, loss_l1, device):
     return res['loss'] / res['counter']
 
 
-def early_stopping_gnn(model_t, train_loader, val_loader, n_at, optimizer, loss, device, test_freq=1):
+def early_stopping_gnn(model_t: GNNCV, train_loader: DataLoader, val_loader: DataLoader, n_at: int, optimizer: function, loss: function, device: str, test_freq=1) -> tuple[GNNCV, list[float], list[float]]:
     """Train a graph-based model according to the early-stopping approach.
     In early stopping a model is trained until the validation error (approximation for the generalisation error) worsens for the first time to prevent overfitting.
     Once an increase in the validation error is detected for the first time th eloop is exited and the model-state from the *previous* validation is returned.
@@ -274,7 +276,7 @@ def early_stopping_gnn(model_t, train_loader, val_loader, n_at, optimizer, loss,
     return model_t, conv_tr, conv_te
 
 
-def evaluate_model_gnn(model, dataloader, n_at, device):
+def evaluate_model_gnn(model: GNNCV, dataloader: DataLoader, n_at: int, device: str) -> tuple[np.ndarray, np.ndarray, float, float]:
     """Helper function that evaluates a model on a training set and calculates some properies for the generation of performance scatter plots.
 
     :param model: The model that is to be evaluated.

@@ -16,7 +16,7 @@ class NNCV(nn.Module):
     :type l3: int, optional
     """
 
-    def __init__(self, insize, l1, l2=0, l3=0):
+    def __init__(self, insize: int, l1: int, l2=0, l3=0):
         super(NNCV, self).__init__()
         self.flatten = nn.Flatten()
         # defines the structure
@@ -63,7 +63,7 @@ class GCL(nn.Module):
     :type act_fn: torch.nn.modules.activation, optional
     """
 
-    def __init__(self, hidden_nf, act_fn=nn.ReLU()):
+    def __init__(self, hidden_nf: int, act_fn=nn.ReLU()):
         super(GCL, self).__init__()
 
         self.edge_mlp = nn.Sequential(

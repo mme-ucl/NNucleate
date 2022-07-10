@@ -341,7 +341,7 @@ class PeriodicCKDTree(cKDTree):
             )
         return results
 
-    def query_ball_point(self, x: np.ndarray, r, p=2.0, eps=0) -> np.ndarray:
+    def query_ball_point(self, x: np.ndarray, r: float, p=2.0, eps=0) -> np.ndarray:
         """Find all points within distance r of point(s) x.
         Notes: If you have many points whose neighbors you want to find, you may
         save substantial amounts of time by putting them in a

@@ -5,13 +5,13 @@ from copy import deepcopy
 import numpy as np
 from NNucleate.models import GNNCV, NNCV
 from torch.utils.data import DataLoader
-
+from typing import Callable
 
 def train_linear(
     model_t: NNCV,
     dataloader: DataLoader,
-    loss_fn: function,
-    optimizer,
+    loss_fn: Callable,
+    optimizer: Callable,
     device: str,
     print_batch=1000000,
 ) -> float:
@@ -56,8 +56,8 @@ def train_gnn(
     model: GNNCV,
     loader: DataLoader,
     n_at: int,
-    optimizer: function,
-    loss: function,
+    optimizer: Callable,
+    loss: Callable,
     device: str,
 ) -> float:
     """Function to perform one epoch of a GNN training.
@@ -115,8 +115,8 @@ def train_gnn(
 def train_perm(
     model_t: NNCV,
     dataloader: DataLoader,
-    optimizer: function,
-    loss_fn: function,
+    optimizer: Callable,
+    loss_fn: Callable,
     n_trans: int,
     device: str,
     print_batch=1000000,
@@ -166,7 +166,7 @@ def train_perm(
 
 
 def test(
-    model_t: NNCV, dataloader: DataLoader, loss_fn: function, device: str
+    model_t: NNCV, dataloader: DataLoader, loss_fn: Callable, device: str
 ) -> float:
     """Calculates the current average test set loss.
 
@@ -197,7 +197,7 @@ def test(
 
 
 def test_gnn(
-    model: GNNCV, loader: DataLoader, n_at: int, loss_l1: function, device: str
+    model: GNNCV, loader: DataLoader, n_at: int, loss_l1: Callable, device: str
 ) -> float:
     """Evaluate the test/validation error of a graph based model_t on a validation set. 
 
@@ -251,8 +251,8 @@ def early_stopping_gnn(
     train_loader: DataLoader,
     val_loader: DataLoader,
     n_at: int,
-    optimizer: function,
-    loss: function,
+    optimizer: Callable,
+    loss: Callable,
     device: str,
     test_freq=1,
 ) -> tuple[GNNCV, list[float], list[float]]:

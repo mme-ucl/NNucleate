@@ -35,7 +35,7 @@ def pbc(trajectory: md.Trajectory, box_length: float) -> md.Trajectory:
     return trajectory
 
 
-def rotate_trajs(trajectories: np.ndarray[md.Trajectory]) -> np.ndarray[md.Trajectory]:
+def rotate_trajs(trajectories: np.ndarray) -> np.ndarray:
     """Rotates each frame in the given trajectories according to a random quaternion.
 
     :param trajectories: A list of mdtraj.trajectory objects to be modified.

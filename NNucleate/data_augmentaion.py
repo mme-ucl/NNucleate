@@ -100,8 +100,8 @@ def augment_evenly(
 
 
 def transform_frame_to_ndist_list(
-    n_dist: int, traj: np.ndarray[float], box_length: float
-) -> np.ndarray[float]:
+    n_dist: int, traj: np.ndarray, box_length: float
+) -> np.ndarray:
     """Transform the the cartesian coordinates of a given trajectory frame into a sorted list of the n_dist shortest distances in the system.
 
     :param n_dist: Number of distances to include (max: n*(n-1)/2).
@@ -121,8 +121,8 @@ def transform_frame_to_ndist_list(
 
 
 def transform_traj_to_ndist_list(
-    n_dist: int, traj: np.ndarray[float], box_length: float
-) -> np.ndarray[float]:
+    n_dist: int, traj: np.ndarray, box_length: float
+) -> np.ndarray:
     """Transform the cartesian coordinates of a given trajectory into a sorted list of the n_dist shortest distances in the system.
 
     :param n_dist: Number of distances to include (max: n*(n-1)/2).
@@ -148,8 +148,8 @@ def transform_traj_to_ndist_list(
 
 
 def transform_frame_to_knn_list(
-    k: int, traj: np.ndarray[float], box_length: float
-) -> np.ndarray[float]:
+    k: int, traj: np.ndarray, box_length: float
+) -> np.ndarray:
     """Transforms the cartesian representation of a given trajectory frame to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
 
     :param k: Number of neighbours to consider for each atom.
@@ -172,8 +172,8 @@ def transform_frame_to_knn_list(
 
 
 def transform_traj_to_knn_list(
-    k: int, traj: np.ndarray[np.ndarray[float]], box_length: float
-) -> np.ndarray[np.ndarray[float]]:
+    k: int, traj: np.ndarray, box_length: float
+) -> np.ndarray:
     """Transforms the cartesian representation of a given trajectory to a list of sorted distances including the distance of each atom to its k nearest neighbours. This guarantees symmetry invariances but at significant cost and risk of kinks in the CV space.
 
     :param k: Number of neighbours to consider for each atom.

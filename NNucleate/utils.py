@@ -53,7 +53,9 @@ def rotate_trajs(trajectories: np.ndarray[md.Trajectory]) -> np.ndarray[md.Traje
 
 
 # GNN utils
-def unsorted_segment_sum(data: torch.Tensor, segment_ids: torch.Tensor, num_segments: int) -> torch.Tensor:
+def unsorted_segment_sum(
+    data: torch.Tensor, segment_ids: torch.Tensor, num_segments: int
+) -> torch.Tensor:
     """Function that sums the segments of a matrix. Each row has a non-unique ID and all rows with the same ID are summed such that a matrix with the number of rows equal to the number of unique IDs is obtained.
 
     :param data: A tensor that contains the data that is to be summed.
@@ -229,7 +231,9 @@ class PeriodicCKDTree(cKDTree):
         else:
             raise ValueError("Invalid k in periodic_kdtree._KDTree__query")
 
-    def query(self, x: np.ndarray, k=1, eps=0, p=2, distance_upper_bound=np.inf) -> np.ndarray:
+    def query(
+        self, x: np.ndarray, k=1, eps=0, p=2, distance_upper_bound=np.inf
+    ) -> np.ndarray:
         """Query the kd-tree for nearest neighbors.
 
         :param x: An array of points to query.
@@ -336,7 +340,6 @@ class PeriodicCKDTree(cKDTree):
                 super(PeriodicCKDTree, self).query_ball_point(real_x, r, p, eps)
             )
         return results
-
 
     def query_ball_point(self, x: np.ndarray, r, p=2.0, eps=0) -> np.ndarray:
         """Find all points within distance r of point(s) x.

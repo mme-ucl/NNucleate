@@ -7,7 +7,14 @@ from NNucleate.models import GNNCV, NNCV
 from torch.utils.data import DataLoader
 
 
-def train_linear(model_t: NNCV, dataloader: DataLoader, loss_fn: function, optimizer, device: str, print_batch=1000000) -> float:
+def train_linear(
+    model_t: NNCV,
+    dataloader: DataLoader,
+    loss_fn: function,
+    optimizer,
+    device: str,
+    print_batch=1000000,
+) -> float:
     """Performs one training epoch for a NNCV.
 
     :param model_t: The network to be trained.
@@ -45,7 +52,14 @@ def train_linear(model_t: NNCV, dataloader: DataLoader, loss_fn: function, optim
     return loss.item()
 
 
-def train_gnn( model: GNNCV, loader: DataLoader, n_at: int, optimizer: function, loss: function, device: str) -> float:
+def train_gnn(
+    model: GNNCV,
+    loader: DataLoader,
+    n_at: int,
+    optimizer: function,
+    loss: function,
+    device: str,
+) -> float:
     """Function to perform one epoch of a GNN training.
 
     :param model: Graph-based model_t to be trained.
@@ -99,7 +113,13 @@ def train_gnn( model: GNNCV, loader: DataLoader, n_at: int, optimizer: function,
 
 
 def train_perm(
-    model_t: NNCV, dataloader: DataLoader, optimizer: function, loss_fn: function, n_trans: int, device: str, print_batch=1000000
+    model_t: NNCV,
+    dataloader: DataLoader,
+    optimizer: function,
+    loss_fn: function,
+    n_trans: int,
+    device: str,
+    print_batch=1000000,
 ) -> float:
     """Performs one training epoch for a NNCV but the loss for each batch is not just calculated on one reference structure but a set of n_trans permutated versions of that structure.
 
@@ -145,7 +165,9 @@ def train_perm(
     return loss.item()
 
 
-def test(model_t: NNCV, dataloader: DataLoader, loss_fn: function, device: str) -> float:
+def test(
+    model_t: NNCV, dataloader: DataLoader, loss_fn: function, device: str
+) -> float:
     """Calculates the current average test set loss.
 
     :param model_t: Model that is being trained.
@@ -174,7 +196,9 @@ def test(model_t: NNCV, dataloader: DataLoader, loss_fn: function, device: str) 
     return test_loss
 
 
-def test_gnn(model: GNNCV, loader: DataLoader, n_at: int, loss_l1: function, device: str) -> float:
+def test_gnn(
+    model: GNNCV, loader: DataLoader, n_at: int, loss_l1: function, device: str
+) -> float:
     """Evaluate the test/validation error of a graph based model_t on a validation set. 
 
     :param model: Graph-based model_t to be trained.
@@ -190,7 +214,7 @@ def test_gnn(model: GNNCV, loader: DataLoader, n_at: int, loss_l1: function, dev
     :return: Return the average loss over the epoch.
     :rtype: float
     """
-    res = {'loss': 0, 'counter': 0}
+    res = {"loss": 0, "counter": 0}
     for batch, (X, y, r, c) in enumerate(loader):
         model.eval()
         batch_size = len(X)
@@ -202,27 +226,36 @@ def test_gnn(model: GNNCV, loader: DataLoader, n_at: int, loss_l1: function, dev
         col_new = col_new[col_new > 0]
         j = 0
         for i in range(1, len(row_new)):
-            row_new[i] += j*n_at
-            col_new[i] += j*n_at
+            row_new[i] += j * n_at
+            col_new[i] += j * n_at
 
-            if row_new[i-1] > row_new[i]:
+            if row_new[i - 1] > row_new[i]:
                 j += 1
                 row_new[i] += n_at
                 col_new[i] += n_at
 
         edges = [row_new.long().to(device), col_new.long().to(device)]
         label = y.to(device)
-        pred = model(x=atom_positions, edges=edges, n_nodes = n_at)
-        #print(label, pred)
+        pred = model(x=atom_positions, edges=edges, n_nodes=n_at)
+        # print(label, pred)
         loss = loss_l1(pred, label)
 
-        res['loss'] += loss.item() * batch_size
-        res['counter'] += batch_size
+        res["loss"] += loss.item() * batch_size
+        res["counter"] += batch_size
 
-    return res['loss'] / res['counter']
+    return res["loss"] / res["counter"]
 
 
-def early_stopping_gnn(model_t: GNNCV, train_loader: DataLoader, val_loader: DataLoader, n_at: int, optimizer: function, loss: function, device: str, test_freq=1) -> tuple[GNNCV, list[float], list[float]]:
+def early_stopping_gnn(
+    model_t: GNNCV,
+    train_loader: DataLoader,
+    val_loader: DataLoader,
+    n_at: int,
+    optimizer: function,
+    loss: function,
+    device: str,
+    test_freq=1,
+) -> tuple[GNNCV, list[float], list[float]]:
     """Train a graph-based model according to the early-stopping approach.
     In early stopping a model is trained until the validation error (approximation for the generalisation error) worsens for the first time to prevent overfitting.
     Once an increase in the validation error is detected for the first time th eloop is exited and the model-state from the *previous* validation is returned.
@@ -248,7 +281,7 @@ def early_stopping_gnn(model_t: GNNCV, train_loader: DataLoader, val_loader: Dat
     """
     conv_tr = []
     conv_te = []
-    epoch=1
+    epoch = 1
     old_val_e = 100000000000
     old_model = deepcopy(model_t)
 
@@ -258,7 +291,7 @@ def early_stopping_gnn(model_t: GNNCV, train_loader: DataLoader, val_loader: Dat
         l = train_gnn(model_t, train_loader, n_at, optimizer, loss, device)
         conv_tr.append(l)
         print(f"training loss: %.4f" % l)
-        print(f"time per epoch: %.2f s" % (time()-t))
+        print(f"time per epoch: %.2f s" % (time() - t))
 
         if epoch % test_freq == 0:
             val_e = test_gnn(model_t, val_loader, n_at, loss, device)
@@ -269,14 +302,15 @@ def early_stopping_gnn(model_t: GNNCV, train_loader: DataLoader, val_loader: Dat
                 break
             old_val_e = val_e
 
-
             old_model = deepcopy(model_t)
         epoch += 1
 
     return model_t, conv_tr, conv_te
 
 
-def evaluate_model_gnn(model: GNNCV, dataloader: DataLoader, n_at: int, device: str) -> tuple[np.ndarray, np.ndarray, float, float]:
+def evaluate_model_gnn(
+    model: GNNCV, dataloader: DataLoader, n_at: int, device: str
+) -> tuple[np.ndarray, np.ndarray, float, float]:
     """Helper function that evaluates a model on a training set and calculates some properies for the generation of performance scatter plots.
 
     :param model: The model that is to be evaluated.
@@ -294,7 +328,7 @@ def evaluate_model_gnn(model: GNNCV, dataloader: DataLoader, n_at: int, device: 
     ys = []
     for batch, (X, y, r, c) in enumerate(dataloader):
         model.eval()
-        #optimizer.zero_grad()
+        # optimizer.zero_grad()
         batch_size = len(X)
         atom_positions = X.view(-1, 3).to(device)
         row_new = r.view(-1)
@@ -303,19 +337,19 @@ def evaluate_model_gnn(model: GNNCV, dataloader: DataLoader, n_at: int, device: 
         col_new = col_new[col_new > 0]
         j = 0
         for i in range(1, len(row_new)):
-            row_new[i] += j*n_at
-            col_new[i] += j*n_at
-            if row_new[i-1] > row_new[i]:
+            row_new[i] += j * n_at
+            col_new[i] += j * n_at
+            if row_new[i - 1] > row_new[i]:
                 j += 1
                 row_new[i] += n_at
                 col_new[i] += n_at
 
         edges = [row_new.long().to(device), col_new.long().to(device)]
-        pred = model(x=atom_positions, edges=edges, n_nodes = n_at)
+        pred = model(x=atom_positions, edges=edges, n_nodes=n_at)
         [ys.append(ref.item()) for ref in y]
         [preds.append(pre.item()) for pre in pred]
 
-    rmse = np.mean((np.array(preds) - np.array(ys))**2)**0.5
+    rmse = np.mean((np.array(preds) - np.array(ys)) ** 2) ** 0.5
     r2 = np.corrcoef(preds, ys)[0, 1]
-    
+
     return preds, ys, rmse, r2

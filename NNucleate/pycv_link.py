@@ -323,7 +323,7 @@ def write_cv_link(model, n_hid, n_layers, n_at, box_l, fname):
                       "    # repeat GCL n_layers times\n"])
         
         for i in range(n_layers):
-            f.writelines(["    #layer %d" % i,
+            f.writelines(["    #layer %d\n" % i,
                           "    j_edge = j_h[j_row] - j_h[j_col]\n",
                           "    variables = {'params': {'kernel': GCL%d_edge_weights_1, 'bias': GCL%d_edge_bias_1}}\n" % (i, i),
                           "    variables2 = {'params': {'kernel': GCL%d_edge_weights_2, 'bias': GCL%d_edge_bias_2}}\n" % (i, i),

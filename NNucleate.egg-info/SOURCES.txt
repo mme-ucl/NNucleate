@@ -6,6 +6,7 @@ NNucleate/__init__.py
 NNucleate/data_augmentation.py
 NNucleate/dataset.py
 NNucleate/models.py
+NNucleate/pycv_link.py
 NNucleate/training.py
 NNucleate/utils.py
 NNucleate.egg-info/PKG-INFO

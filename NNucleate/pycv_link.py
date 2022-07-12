@@ -318,7 +318,6 @@ def write_cv_link(model, n_hid, n_layers, n_at, box_l, fname):
                       "    j_fc = jnn.Dense(features=%d)\n" % n_hid,
                       "    j_h = j_fc.apply(variables, X)\n",
                       "\n",
-                      "    j_edge = j_h[j_row] - j_h[j_col]\n",
                       "\n",
                       "\n",
                       "    # repeat GCL n_layers times\n"])
@@ -361,7 +360,7 @@ def write_cv_link(model, n_hid, n_layers, n_at, box_l, fname):
                       "    j_fc = jnn.Dense(features=%d)\n" % n_hid,
                       "    j_fc2 = jnn.Dense(features=%d)\n" % n_hid,
                       "\n",
-                      "    j_out = j_fc.apply(variables, j_n_out)\n",
+                      "    j_out = j_fc.apply(variables, j_h)\n",
                       "    j_out = jnn.relu(j_out)\n",
                       "    j_n_dec = j_fc2.apply(variables2, j_out)\n",
                       "\n",

@@ -255,7 +255,7 @@ def early_stopping_gnn(
     loss: Callable,
     device: str,
     test_freq=1,
-) -> tuple[GNNCV, list[float], list[float]]:
+) -> tuple:
     """Train a graph-based model according to the early-stopping approach.
     In early stopping a model is trained until the validation error (approximation for the generalisation error) worsens for the first time to prevent overfitting.
     Once an increase in the validation error is detected for the first time th eloop is exited and the model-state from the *previous* validation is returned.
@@ -310,7 +310,7 @@ def early_stopping_gnn(
 
 def evaluate_model_gnn(
     model: GNNCV, dataloader: DataLoader, n_at: int, device: str
-) -> tuple[np.ndarray, np.ndarray, float, float]:
+) -> tuple:
     """Helper function that evaluates a model on a training set and calculates some properies for the generation of performance scatter plots.
 
     :param model: The model that is to be evaluated.

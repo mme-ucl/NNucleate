@@ -1,5 +1,5 @@
 from torch.optim import optimizer
-from NNucleate.trainig import test, train, NNCV, CVTrajectory, NdistTrajectory, KNNTrajectory
+from NNucleate.training import test, train, NNCV, CVTrajectory, NdistTrajectory, KNNTrajectory
 from NNucleate.data_augmentation import transform_frame_to_knn_list, transform_frame_to_ndist_list
 import matplotlib.pyplot as plt
 import torch

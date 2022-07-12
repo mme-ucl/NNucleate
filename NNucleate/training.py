@@ -102,11 +102,11 @@ def train_gnn(
         label = y.to(device)
 
         pred = model(x=atom_positions, edges=edges, n_nodes=n_at)
-        loss = loss(pred, label)
-        loss.backward()
+        l = loss(pred, label)
+        l.backward()
         optimizer.step()
 
-        res["loss"] += loss.item() * batch_size
+        res["loss"] += l.item() * batch_size
         res["counter"] += batch_size
 
     return res["loss"] / res["counter"]

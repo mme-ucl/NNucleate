@@ -74,7 +74,7 @@ def unsorted_segment_sum(
     return result
 
 
-def get_rc_edges(rc: float, traj: md.Trajectory) -> list[torch.Tensor]:
+def get_rc_edges(rc: float, traj: md.Trajectory) -> list:
     """Returns the edges of the graph constructed by interpreting the atoms in the trajectory as nodes that are connected to all other nodes within a distance of rc.
 
     :param rc: Cut-off radius for the graph construction.

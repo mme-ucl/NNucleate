@@ -4,7 +4,7 @@ import mdtraj as md
 import torch
 from torch import nn
 from .utils import pbc, get_rc_edges
-from .data_augmentaion import transform_traj_to_knn_list, transform_traj_to_ndist_list
+from .data_augmentation import transform_traj_to_knn_list, transform_traj_to_ndist_list
 
 
 class CVTrajectory(Dataset):

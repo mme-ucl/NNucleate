@@ -1,4 +1,4 @@
-from . import data_augmentaion
+from . import data_augmentation
 from . import utils
 from . import trainig
 from . import models

@@ -165,7 +165,7 @@ def train_perm(
     return loss.item()
 
 
-def test(
+def test_linear(
     model_t: NNCV, dataloader: DataLoader, loss_fn: Callable, device: str
 ) -> float:
     """Calculates the current average test set loss.

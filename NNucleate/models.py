@@ -4,6 +4,13 @@ from .utils import unsorted_segment_sum
 
 
 def initialise_weights(model: nn.Module):
+    """Initiallises the weights of a custom model using the globally set seed.
+    Usage:
+    model.apply(initialise_weights)
+
+    :param model: Model that is to be initialised
+    :type model: nn.Module
+    """
     if isinstance(model, nn.Linear):
         torch.nn.init.xavier_uniform(model.weight)
         model.bias.data.fill_(0.01)

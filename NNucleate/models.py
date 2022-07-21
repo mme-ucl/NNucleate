@@ -2,6 +2,13 @@ from torch import nn
 import torch
 from .utils import unsorted_segment_sum
 
+
+def initialise_weights(model: nn.Module):
+    if isinstance(model, nn.Linear):
+        torch.nn.init.xavier_uniform(model.weight)
+        model.bias.data.fill_(0.01)
+
+
 # Linear Model
 class NNCV(nn.Module):
     """Instantiates an NN for approximating CVs. Supported are architectures with up to 3 layers.

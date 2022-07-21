@@ -53,7 +53,7 @@ class CVTrajectory(Dataset):
         self.length = box_length
         self.configs = pbc(md.load(traj_name, top=top_file), self.length)[
             start:stop:stride
-        ]
+        ].xyz
 
         # Option to transform the configs before returning
         self.transform = transform

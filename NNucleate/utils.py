@@ -34,6 +34,29 @@ def pbc(trajectory: md.Trajectory, box_length: float) -> md.Trajectory:
 
     return trajectory
 
+def pbc_config(config: np.ndarray, box_length: float) -> md.Trajectory:
+    """Wraps all atoms in a given configuration into the box.
+
+    :param config: The trajectory that is to be modified, i.e. contains the configurations that shall be wrapped back into the simulation box.
+    :type np.ndarray: mdtraj.trajectory
+    :param box_length: Length of the cubic box which shall contain all the positions.
+    :type box_length: float
+    :return: Returns a trajectory object obeying PBC according to the given box length.
+    :rtype: np.ndarray
+    """
+    # function defining PBC
+    def transform(x):
+        while x >= box_length:
+            x -= box_length
+        while x <= 0:
+            x += box_length
+        return x
+
+    # Prepare the function for 2D mapping
+    func = np.vectorize(transform)
+
+    return func(config)
+
 
 def rotate_trajs(trajectories: np.ndarray) -> np.ndarray:
     """Rotates each frame in the given trajectories according to a random quaternion.

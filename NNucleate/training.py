@@ -9,6 +9,8 @@ from typing import Callable
 from scipy.spatial.transform import Rotation as R
 import mdtraj as md
 
+from NNucleate.utils import pbc_config
+
 def train_linear(
     model_t: NNCV,
     dataloader: DataLoader,
@@ -206,7 +208,7 @@ def train_rot(
             quat = md.utils.uniform_quaternion()
             rot = R.from_quat(quat)
             X_rot = torch.tensor([rot.apply(x) for x in X]).float()
-            pred = model_t(X_rot)
+            pred = model_t(pbc_config(X_rot, 1.0))
             loss += loss_fn(pred.flatten(), y)
 
         loss /= n_trans

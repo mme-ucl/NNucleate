@@ -6,6 +6,8 @@ import numpy as np
 from NNucleate.models import GNNCV, NNCV
 from torch.utils.data import DataLoader
 from typing import Callable
+from scipy.spatial.transform import Rotation as R
+import mdtraj as md
 
 def train_linear(
     model_t: NNCV,
@@ -149,6 +151,62 @@ def train_perm(
         for i in range(n_trans):
             # Shuffle the tensors in the batch
             pred = model_t(X[:, torch.randperm(X.size()[1])])
+            loss += loss_fn(pred.flatten(), y)
+
+        loss /= n_trans
+
+        # Backpropagation
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if batch % print_batch == 0:
+            loss, current = loss.item(), batch * len(X)
+            print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
+
+    return loss.item()
+
+
+def train_rot(
+    model_t: NNCV,
+    dataloader: DataLoader,
+    optimizer: Callable,
+    loss_fn: Callable,
+    n_trans: int,
+    device: str,
+    print_batch=1000000,
+) -> float:
+    """Performs one training epoch for a NNCV but the loss for each batch is not just calculated on one reference structure but a set of n_trans rotated versions of that structure.
+
+    :param dataloader: Wrapper around a GNNTrajectory dataset.
+    :type dataloader: torch.utils.data.Dataloader
+    :param optimizer: The optimizer object for the training.
+    :type optimizer: torch.optim
+    :param loss_fn: Loss function for the training.
+    :type loss_fn: torch.nn._Loss
+    :param n_trans: Number of rotated structures used for the loss calculations.
+    :type n_trans: int
+    :param device: Pytorch device to run the calculations on. Supports CPU and GPU (cuda).
+    :type device: str
+    :param print_batch: Set to recieve printed updates on the loss every print_batches batches, defaults to 1000000.
+    :type print_batch: int, optional
+    :return: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.
+    :rtype: float
+    """
+    size = len(dataloader.dataset)
+    for batch, (X, y) in enumerate(dataloader):
+        X, y = X.to(device), y.to(device)
+
+        # Compute prediction error
+        pred = model_t(X)
+        loss = loss_fn(pred.flatten(), y)
+
+        for i in range(n_trans):
+            # Shuffle the tensors in the batch
+            quat = md.utils.uniform_quaternion()
+            rot = R.from_quat(quat)
+            X_rot = rot.apply(X)
+            pred = model_t(X_rot)
             loss += loss_fn(pred.flatten(), y)
 
         loss /= n_trans

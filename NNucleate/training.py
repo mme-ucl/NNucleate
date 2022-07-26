@@ -205,7 +205,7 @@ def train_rot(
             # Shuffle the tensors in the batch
             quat = md.utils.uniform_quaternion()
             rot = R.from_quat(quat)
-            X_rot = rot.apply(X)
+            X_rot = torch.tensor([rot.apply(x) for x in X]).float()
             pred = model_t(X_rot)
             loss += loss_fn(pred.flatten(), y)
 

@@ -88,19 +88,14 @@ def train_gnn(
         batch_size = len(X)
         atom_positions = X.view(-1, 3).to(device)
 
-        row_new = r.view(-1)
-        col_new = c.view(-1)
-        row_new = row_new[row_new > 0]
-        col_new = col_new[col_new > 0]
-        j = 0
-        for i in range(1, len(row_new)):
-            row_new[i] += j * n_at
-            col_new[i] += j * n_at
+        row_new = []
+        col_new = []
+        for i in range(0, len(r)):
+            row_new.append(r[i][r[i] >= 0] + n_at*(i))
+            col_new.append(c[i][c[i] >= 0] + n_at*(i))
 
-            if row_new[i - 1] > row_new[i]:
-                j += 1
-                row_new[i] += n_at
-                col_new[i] += n_at
+        row_new = torch.cat([ro for ro in row_new])
+        col_new = torch.cat([co for co in col_new])
 
         edges = [row_new.long().to(device), col_new.long().to(device)]
         label = y.to(device)
@@ -280,19 +275,14 @@ def test_gnn(
         batch_size = len(X)
         atom_positions = X.view(-1, 3).to(device)
 
-        row_new = r.view(-1)
-        col_new = c.view(-1)
-        row_new = row_new[row_new > 0]
-        col_new = col_new[col_new > 0]
-        j = 0
-        for i in range(1, len(row_new)):
-            row_new[i] += j * n_at
-            col_new[i] += j * n_at
+        row_new = []
+        col_new = []
+        for i in range(0, len(r)):
+            row_new.append(r[i][r[i] >= 0] + n_at*(i))
+            col_new.append(c[i][c[i] >= 0] + n_at*(i))
 
-            if row_new[i - 1] > row_new[i]:
-                j += 1
-                row_new[i] += n_at
-                col_new[i] += n_at
+        row_new = torch.cat([ro for ro in row_new])
+        col_new = torch.cat([co for co in col_new])
 
         edges = [row_new.long().to(device), col_new.long().to(device)]
         label = y.to(device)

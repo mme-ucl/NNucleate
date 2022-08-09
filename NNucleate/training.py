@@ -97,6 +97,10 @@ def train_gnn(
         row_new = torch.cat([ro for ro in row_new])
         col_new = torch.cat([co for co in col_new])
 
+        if row_new[0] >= n_at - 1:
+            row_new -= n_at
+            col_new -= n_at
+
         edges = [row_new.long().to(device), col_new.long().to(device)]
         label = y.to(device)
 
@@ -283,6 +287,9 @@ def test_gnn(
 
         row_new = torch.cat([ro for ro in row_new])
         col_new = torch.cat([co for co in col_new])
+        if row_new[0] >= n_at - 1:
+            row_new -= n_at
+            col_new -= n_at
 
         edges = [row_new.long().to(device), col_new.long().to(device)]
         label = y.to(device)
@@ -389,6 +396,10 @@ def evaluate_model_gnn(
 
         row_new = torch.cat([ro for ro in row_new])
         col_new = torch.cat([co for co in col_new])
+
+        if row_new[0] >= n_at - 1:
+            row_new -= n_at
+            col_new -= n_at
 
         edges = [row_new.long().to(device), col_new.long().to(device)]
         pred = model(x=atom_positions, edges=edges, n_nodes=n_at)

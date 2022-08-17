@@ -325,11 +325,11 @@ class GNNMolecularTrajectory(Dataset):
         root=1,
     ):
 
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col]
+        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col]** (1 / root)
         self.length = box_length
         traj = pbc(md.load(traj_name, top=top_file), self.length)[
             start:stop:stride
-        ] ** (1 / root)
+        ] 
         self.rows, self.cols = get_mol_edges(rc, traj, n_mol, n_at, self.length)
         self.max_l = np.max([len(r) for r in self.rows])
         print(self.max_l)

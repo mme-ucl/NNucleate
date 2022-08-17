@@ -157,7 +157,7 @@ class NdistTrajectory(Dataset):
     :param cv_col: Gives the colimn in which the CV of interest is stored.
     :type cv_col: int
     :param box_length: Length of the cubic box.
-    :type box_length:float
+    :type box_length: float
     :param n_dist: Number of distances to consider.
     :type n_dist: int
     :param start: Starting frame of the trajectory, defaults to 0.

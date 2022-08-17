@@ -319,21 +319,15 @@
 <li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz).</p></li>
 <li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb).</p></li>
 <li><p><strong>cv_col</strong> (<em>int</em>) – Gives the colimn in which the CV of interest is stored.</p></li>
-<li><p><strong>box_length</strong> – Length of the cubic box.</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box.</p></li>
+<li><p><strong>n_dist</strong> (<em>int</em>) – Number of distances to consider.</p></li>
+<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0.</p></li>
+<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is read, defaults to -1.</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1.</p></li>
+<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.</p></li>
 </ul>
 </dd>
 </dl>
-<p>:type box_length:float
-:param n_dist: Number of distances to consider.
-:type n_dist: int
-:param start: Starting frame of the trajectory, defaults to 0.
-:type start: int, optional
-:param stop: The last file of the trajectory that is read, defaults to -1.
-:type stop: int, optional
-:param stride: The stride with which the trajectory frames are read, defaults to 1.
-:type stride: int, optional
-:param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
-:type root: int, optional</p>
 </dd></dl>
 
 </section>

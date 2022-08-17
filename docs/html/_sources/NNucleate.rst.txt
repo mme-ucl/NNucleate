@@ -4,10 +4,10 @@ NNucleate package
 Submodules
 ----------
 
-NNucleate.data\_augmentaion module
-----------------------------------
+NNucleate.data\_augmentation module
+-----------------------------------
 
-.. automodule:: NNucleate.data_augmentaion
+.. automodule:: NNucleate.data_augmentation
    :members:
    :undoc-members:
    :show-inheritance:
@@ -28,10 +28,18 @@ NNucleate.models module
    :undoc-members:
    :show-inheritance:
 
-NNucleate.trainig module
-------------------------
+NNucleate.pycv\_link module
+---------------------------
 
-.. automodule:: NNucleate.trainig
+.. automodule:: NNucleate.pycv_link
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+NNucleate.training module
+-------------------------
+
+.. automodule:: NNucleate.training
    :members:
    :undoc-members:
    :show-inheritance:

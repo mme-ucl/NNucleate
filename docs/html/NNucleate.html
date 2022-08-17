@@ -112,6 +112,31 @@
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="NNucleate.dataset.GNNMolecularTrajectory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">GNNMolecularTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.GNNMolecularTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<p>Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN. The edges are generated from the neighbourlist graph between the COMs of the molecules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cv_file</strong> (<em>str</em>) – Path to the cv file.</p></li>
+<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz).</p></li>
+<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb).</p></li>
+<li><p><strong>cv_col</strong> (<em>int</em>) – Gives the colimn in which the CV of interest is stored.</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box.</p></li>
+<li><p><strong>rc</strong> (<em>float</em>) – Cut-off radius for the construction of the graph.</p></li>
+<li><p><strong>n_mol</strong> (<em>int</em>) – Number of molecules in the system</p></li>
+<li><p><strong>n_at</strong> (<em>int</em>) – Number of atoms per molecule</p></li>
+<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0.</p></li>
+<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is rea, defaults to -1.</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1.</p></li>
+<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="NNucleate.dataset.GNNTrajectory">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">GNNTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.GNNTrajectory" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
@@ -449,6 +474,46 @@ array of shape tuple containing lists of neighbors.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.utils.com">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">com</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#NNucleate.utils.com" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the centre of mass of a set of coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>xyz</strong> (<em>np.ndarray</em>) – Array containing the list of 3-dimensional coordinates.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of the calculated centres of mass.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.utils.get_mol_edges">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">get_mol_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#NNucleate.utils.get_mol_edges" title="Permalink to this definition"></a></dt>
+<dd><p>Generate the edges for a neighbourlist graph based on the COMs of the given molecules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rc</strong> (<em>float</em>) – Cut off radius for the neighbourlist graph.</p></li>
+<li><p><strong>traj</strong> (<em>md.Trajectory</em>) – The Trajectory containing the frames.</p></li>
+<li><p><strong>n_mol</strong> (<em>int</em>) – Number of molecules per frame.</p></li>
+<li><p><strong>n_at</strong> (<em>int</em>) – Number of atoms per molecule.</p></li>
+<li><p><strong>box</strong> (<em>float</em>) – Length of the cubic box</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list containing two tensors which represent the adjacency matrix of the graph.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="NNucleate.utils.get_rc_edges">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">get_rc_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#NNucleate.utils.get_rc_edges" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the edges of the graph constructed by interpreting the atoms in the trajectory as nodes that are connected to all other nodes within a distance of rc.</p>
@@ -484,6 +549,26 @@ array of shape tuple containing lists of neighbors.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>mdtraj.trajectory</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.utils.pbc_config">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.utils.</span></span><span class="sig-name descname"><span class="pre">pbc_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Trajectory</span></span></span><a class="headerlink" href="#NNucleate.utils.pbc_config" title="Permalink to this definition"></a></dt>
+<dd><p>Wraps all atoms in a given configuration into the box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – The trajectory that is to be modified, i.e. contains the configurations that shall be wrapped back into the simulation box.</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box which shall contain all the positions.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns a trajectory object obeying PBC according to the given box length.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>

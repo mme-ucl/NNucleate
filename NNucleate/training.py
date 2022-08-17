@@ -11,6 +11,7 @@ import mdtraj as md
 
 from NNucleate.utils import pbc_config
 
+
 def train_linear(
     model_t: NNCV,
     dataloader: DataLoader,
@@ -59,10 +60,11 @@ def train_linear(
 def train_gnn(
     model: GNNCV,
     loader: DataLoader,
-    n_at: int,
+    n_mol: int,
     optimizer: Callable,
     loss: Callable,
     device: str,
+    n_at=1,
 ) -> float:
     """Function to perform one epoch of a GNN training.
 
@@ -78,6 +80,8 @@ def train_gnn(
     :type loss: torch.nn._Loss
     :param device: Device that the training is performed on. (Required for GPU compatibility)
     :type device: str
+    :param n_at: Number of atoms per molecule.
+    :type n_at: int, optional
     :return: Return the average loss over the epoch.
     :rtype: float
     """
@@ -86,25 +90,25 @@ def train_gnn(
         model.train()
         optimizer.zero_grad()
         batch_size = len(X)
-        atom_positions = X.view(-1, 3).to(device)
+        atom_positions = X.view(-1, 3 * n_at).to(device)
 
         row_new = []
         col_new = []
         for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_at*(i))
-            col_new.append(c[i][c[i] >= 0] + n_at*(i))
+            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
+            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
 
         row_new = torch.cat([ro for ro in row_new])
         col_new = torch.cat([co for co in col_new])
 
-        if row_new[0] >= n_at - 1:
-            row_new -= n_at
-            col_new -= n_at
+        if row_new[0] >= n_mol - 1:
+            row_new -= n_mol
+            col_new -= n_mol
 
         edges = [row_new.long().to(device), col_new.long().to(device)]
         label = y.to(device)
 
-        pred = model(x=atom_positions, edges=edges, n_nodes=n_at)
+        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
         l = loss(pred, label)
         l.backward()
         optimizer.step()
@@ -256,7 +260,7 @@ def test_linear(
 
 
 def test_gnn(
-    model: GNNCV, loader: DataLoader, n_at: int, loss_l1: Callable, device: str
+    model: GNNCV, loader: DataLoader, n_mol: int, loss_l1: Callable, device: str, n_at=1
 ) -> float:
     """Evaluate the test/validation error of a graph based model_t on a validation set. 
 
@@ -264,12 +268,14 @@ def test_gnn(
     :type model: GNNCV
     :param loader: Wrapper around a GNNTrajectory dataset.
     :type loader: torch.utils.data.Dataloader
-    :param n_at: Number of nodes per frame.
-    :type n_at: int
+    :param n_mol: Number of nodes per frame.
+    :type n_mol: int
     :param loss_l1: Loss function for the training.
     :type loss_l1: torch.nn._Loss
     :param device: Device that the training is performed on. (Required for GPU compatibility)
     :type device: str
+    :param n_at: Number of atoms per molecule.
+    :type n_at: int, optional
     :return: Return the average loss over the epoch.
     :rtype: float
     """
@@ -277,23 +283,23 @@ def test_gnn(
     for batch, (X, y, r, c) in enumerate(loader):
         model.eval()
         batch_size = len(X)
-        atom_positions = X.view(-1, 3).to(device)
+        atom_positions = X.view(-1, 3 * n_at).to(device)
 
         row_new = []
         col_new = []
         for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_at*(i))
-            col_new.append(c[i][c[i] >= 0] + n_at*(i))
+            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
+            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
 
         row_new = torch.cat([ro for ro in row_new])
         col_new = torch.cat([co for co in col_new])
-        if row_new[0] >= n_at - 1:
-            row_new -= n_at
-            col_new -= n_at
+        if row_new[0] >= n_mol - 1:
+            row_new -= n_mol
+            col_new -= n_mol
 
         edges = [row_new.long().to(device), col_new.long().to(device)]
         label = y.to(device)
-        pred = model(x=atom_positions, edges=edges, n_nodes=n_at)
+        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
         # print(label, pred)
         loss = loss_l1(pred, label)
 
@@ -366,7 +372,7 @@ def early_stopping_gnn(
 
 
 def evaluate_model_gnn(
-    model: GNNCV, dataloader: DataLoader, n_at: int, device: str
+    model: GNNCV, dataloader: DataLoader, n_mol: int, device: str, n_at=1
 ) -> tuple:
     """Helper function that evaluates a model on a training set and calculates some properies for the generation of performance scatter plots.
 
@@ -374,10 +380,12 @@ def evaluate_model_gnn(
     :type model: GNNCV
     :param dataloader: Wrapper around the dataset that the model is supposed to be evaluated on.
     :type dataloader: torch.utils.data.Dataloader
-    :param n_at: Number of nodes in the graph of each frame. (Number of atoms or molecules)
-    :type n_at: int
+    :param n_mol: Number of nodes in the graph of each frame. (Number of atoms or molecules)
+    :type n_mol: int
     :param device: Device that the training is performed on. (Required for GPU compatibility)
     :type device: str
+    :param n_at: Number of atoms per molecule.
+    :type n_at: int, optional
     :return: Returns the prediction of the model on each frame, the corresponding true values, the root mean square error of the predictions and the r2 correlation coefficient.
     :rtype: List of float, List of float, float, float
     """
@@ -387,22 +395,22 @@ def evaluate_model_gnn(
         model.eval()
         # optimizer.zero_grad()
         batch_size = len(X)
-        atom_positions = X.view(-1, 3).to(device)
+        atom_positions = X.view(-1, 3 * n_at).to(device)
         row_new = []
         col_new = []
         for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_at*(i))
-            col_new.append(c[i][c[i] >= 0] + n_at*(i))
+            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
+            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
 
         row_new = torch.cat([ro for ro in row_new])
         col_new = torch.cat([co for co in col_new])
 
-        if row_new[0] >= n_at - 1:
-            row_new -= n_at
-            col_new -= n_at
+        if row_new[0] >= n_mol - 1:
+            row_new -= n_mol
+            col_new -= n_mol
 
         edges = [row_new.long().to(device), col_new.long().to(device)]
-        pred = model(x=atom_positions, edges=edges, n_nodes=n_at)
+        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
         [ys.append(ref.item()) for ref in y]
         [preds.append(pre.item()) for pre in pred]
 

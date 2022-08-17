@@ -34,6 +34,7 @@ def pbc(trajectory: md.Trajectory, box_length: float) -> md.Trajectory:
 
     return trajectory
 
+
 def pbc_config(config: np.ndarray, box_length: float) -> md.Trajectory:
     """Wraps all atoms in a given configuration into the box.
 
@@ -125,6 +126,62 @@ def get_rc_edges(rc: float, traj: md.Trajectory) -> list:
         col_list.append(torch.Tensor(frame_col))
 
     return row_list, col_list
+
+
+def com(xyz: np.ndarray) -> list:
+    """Calculates the centre of mass of a set of coordinates.
+
+    :param xyz: Array containing the list of 3-dimensional coordinates.
+    :type xyz: np.ndarray
+    :return: A list of the calculated centres of mass.  
+    :rtype: list of float
+    """
+    coms = np.zeros((len(xyz), len(xyz[0]), 3))
+    for i in range(len(xyz)):
+        for j in range(len(xyz[0])):
+            coms[i, j, 0] = np.mean(xyz[i, j, ::3])
+            coms[i, j, 1] = np.mean(xyz[i, j, 1::3])
+            coms[i, j, 2] = np.mean(xyz[i, j, 2::3])
+
+    return coms
+
+
+def get_mol_edges(
+    rc: float, traj: md.Trajectory, n_mol: int, n_at: int, box: float
+) -> list:
+    """Generate the edges for a neighbourlist graph based on the COMs of the given molecules.
+
+    :param rc: Cut off radius for the neighbourlist graph.
+    :type rc: float
+    :param traj: The Trajectory containing the frames.
+    :type traj: md.Trajectory
+    :param n_mol: Number of molecules per frame.
+    :type n_mol: int
+    :param n_at: Number of atoms per molecule.
+    :type n_at: int
+    :param box: Length of the cubic box
+    :type box: float
+    :return: A list containing two tensors which represent the adjacency matrix of the graph.
+    :rtype: list of torch.tensor
+    """
+
+    traj_mol = traj.xyz.reshape((len(traj), n_mol, n_at * 3))
+
+    t = md.Topology()
+    for i in range(n_mol):
+        t.add_atom("suc", "H", traj.topology.residue(0))
+
+    xyz = com(traj_mol)
+    traj2 = md.Trajectory(xyz, t)
+
+    vecs = np.zeros((len(traj2), 3, 3))
+    for i in range(len(traj2)):
+        vecs[i, 0] = np.array([box, 0, 0])
+        vecs[i, 1] = np.array([0, box, 0])
+        vecs[i, 2] = np.array([0, 0, box])
+    traj2.unitcell_vectors = vecs
+
+    return get_rc_edges(rc, traj2)
 
 
 # A wrapper around scipy.spatial.kdtree to implement periodic boundary

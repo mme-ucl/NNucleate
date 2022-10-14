@@ -1,4 +1,4 @@
-Welcome to NNucleate's documentation!
+NNucleate's documentation!
 =====================================
 
 .. toctree::
@@ -10,4 +10,5 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
+* :ref:`modindex`
 * :ref:`search`

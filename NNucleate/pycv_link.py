@@ -426,7 +426,7 @@ def write_cv_link(model, n_hid, n_layers, n_at, box_l, fname):
                 "vecs[0, 1] = np.array([0, %f, 0])\n" % box_l,
                 "vecs[0, 2] = np.array([0, 0, %f])\n" % box_l,
                 "\n",)
-        # cv1
+        # cv1 
         f.writelines(
             [
                 "\n\ndef cv1(x):\n",

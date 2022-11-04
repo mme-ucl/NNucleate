@@ -414,7 +414,7 @@ def write_cv_link(model, n_hid, n_layers, n_at, box_l, fname):
         # jax grad
         f.write("\ngrad_mod = jacobian(jax_model)\n")
 
-        f.write("\n",
+        f.writelines("\n",
                 "t = md.Topology()\n",
                 "t.add_chain()\n",
                 't.add_residue("1", t.chain(0))\n',

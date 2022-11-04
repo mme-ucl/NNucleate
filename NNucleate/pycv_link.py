@@ -421,7 +421,7 @@ def write_cv_link(model, n_hid, n_layers, n_at, box_l, fname):
                 "for i in range(len(x)):\n",
                 '    t.add_atom("coll", md.element.hydrogen, t.residue(0))\n')
         
-        f.write("vecs = np.zeros((len(fake_traj), 3, 3))\n",
+        f.writelines("vecs = np.zeros((len(fake_traj), 3, 3))\n",
                 "vecs[0, 0] = np.array([%f, 0, 0])\n" % box_l,
                 "vecs[0, 1] = np.array([0, %f, 0])\n" % box_l,
                 "vecs[0, 2] = np.array([0, 0, %f])\n" % box_l,

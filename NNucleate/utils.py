@@ -137,11 +137,9 @@ def com(xyz: np.ndarray) -> list:
     :rtype: list of float
     """
     coms = np.zeros((len(xyz), len(xyz[0]), 3))
-    for i in range(len(xyz)):
-        for j in range(len(xyz[0])):
-            coms[i, j, 0] = np.mean(xyz[i, j, ::3])
-            coms[i, j, 1] = np.mean(xyz[i, j, 1::3])
-            coms[i, j, 2] = np.mean(xyz[i, j, 2::3])
+    coms[:, :, 0] = np.mean(xyz[:, :, ::3], axis=2)
+    coms[:, :, 1] = np.mean(xyz[:, :, 1::3], axis=2)
+    coms[:, :, 2] = np.mean(xyz[:, :, 2::3], axis=2)
 
     return coms
 

@@ -417,3 +417,5 @@ def evaluate_model_gnn(
     r2 = np.corrcoef(preds, ys)[0, 1]
 
     return preds, ys, rmse, r2
+
+# test

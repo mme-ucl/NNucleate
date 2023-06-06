@@ -468,7 +468,7 @@ model.apply(initialise_weights)</p>
 <span id="nnucleate-pycv-link-module"></span><h2>NNucleate.pycv_link module<a class="headerlink" href="#module-NNucleate.pycv_link" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="NNucleate.pycv_link.write_cv_link">
-<span class="sig-prename descclassname"><span class="pre">NNucleate.pycv_link.</span></span><span class="sig-name descname"><span class="pre">write_cv_link</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.pycv_link.write_cv_link" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">NNucleate.pycv_link.</span></span><span class="sig-name descname"><span class="pre">write_cv_link</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.pycv_link.write_cv_link" title="Permalink to this definition"></a></dt>
 <dd><p>Function that writes an input file for the coupling with plumed, based on a model that is passed in the parameters.
 This function assumes the following architecture:
 - Embedding layer n_at x n_hid
@@ -485,6 +485,34 @@ This function assumes the following architecture:
 <li><p><strong>n_layers</strong> (<em>int</em>) – Number of GCL layers.</p></li>
 <li><p><strong>n_at</strong> (<em>int</em>) – Number of nodes in the graph.</p></li>
 <li><p><strong>box_l</strong> (<em>float</em>) – Size of the simulation box of the system that is used in the MTD simulation.</p></li>
+<li><p><strong>rc</strong> (<em>float</em>) – Cut off radius for the neighbourlist generation</p></li>
+<li><p><strong>fname</strong> (<em>str</em>) – Name of file that is created.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.pycv_link.write_fast_link">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.pycv_link.</span></span><span class="sig-name descname"><span class="pre">write_fast_link</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.pycv_link.write_fast_link" title="Permalink to this definition"></a></dt>
+<dd><p>Function that writes an input file for the coupling with plumed, based on a model that is passed in the parameters.
+This version of the input file will be faster but requires a Cython package “neighborlist” with the same signature as the one provided in the github repository. 
+This function assumes the following architecture:
+- Embedding layer n_at x n_hid
+- N_layers GCLs
+- Edge layer n_hid x n_hid, ReLU, n_hid x n_hid
+- Node layer 2*n_hid x n_hid, ReLU, n_hid x n_hid
+- Node decoder n_hid x n_hid, ReLU, n_hid x n_hid
+- Graph decoder n_hid x n_hid, ReLU, n_hid x 1</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#NNucleate.models.GNNCV" title="NNucleate.models.GNNCV"><em>GNNCV</em></a>) – The model for which the input file shall be written. (only for graph-based models)</p></li>
+<li><p><strong>n_hid</strong> (<em>int</em>) – Number of dimensions in the model latent space.</p></li>
+<li><p><strong>n_layers</strong> (<em>int</em>) – Number of GCL layers.</p></li>
+<li><p><strong>n_at</strong> (<em>int</em>) – Number of nodes in the graph.</p></li>
+<li><p><strong>box_l</strong> (<em>float</em>) – Size of the simulation box of the system that is used in the MTD simulation.</p></li>
+<li><p><strong>rc</strong> (<em>float</em>) – Cut off radius for the neighbourlist generation</p></li>
 <li><p><strong>fname</strong> (<em>str</em>) – Name of file that is created.</p></li>
 </ul>
 </dd>

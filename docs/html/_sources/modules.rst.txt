@@ -5,4 +5,3 @@ NNucleate
    :maxdepth: 4
 
    NNucleate
-   setup

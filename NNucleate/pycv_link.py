@@ -449,7 +449,12 @@ def write_cv_link(model, n_hid, n_layers, n_at, box_l, rc, fname):
                 "    pred = jax_model(X, rows[0], cols[0])\n",
                 "    gs = grad_mod(X, rows[0], cols[0])\n",
                 "\n",
-                "    return pred.item(), np.array(gs[0])*%f*10\n" % box_l,
+                "    # Set the gradient of unconnected nodes 0 \n",
+                "    grads = np.array(gs[0])*%f \n" % box_l,
+                "    inds = np.arange(0, len(X))\n",
+                "    grads[np.delete(inds, np.unique(rows[0]))] = 0.0\n",
+                "    del inds, rows, cols\n",
+                "    return pred.item(), grads\n",
             ]
         )
 

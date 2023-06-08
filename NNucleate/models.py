@@ -122,7 +122,7 @@ class GCL(nn.Module):
 
 
 class GNNCV(nn.Module):
-    """_summary_
+    """Graph neural network class for approximating nucleation CVs.
 
     :param in_node_nf: Dimensionality of the data in the graph nodes, defaults to 3.
     :type in_node_nf: int, optional

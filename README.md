@@ -6,7 +6,7 @@ INSERT ARXIV/DOI
 
 ## Installation
 
-`pip install git+https://github.com/Flofega/NNucleate.git`
+`pip install git+https://github.com/mme-ucl/NNucleate.git`
 
 ## Documentation
 For code documentation and a tutorial visit:

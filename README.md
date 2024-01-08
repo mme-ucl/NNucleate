@@ -4,7 +4,7 @@ This is the release version of NNucleate. NNucleate is a Python package develope
 
 When using this code please cite: 
 
-*Dietrich, Florian, Xavier Rosas Advincula, Gianpaolo Gobbo, Michael Bellucci, and Matteo Salvalaglio. "Machine Learning Nucleation Collective Variables with Graph Neural Networks." The Journal of Chemical Theory and Computation, (2023),* [Link]([https://chemrxiv.org/engage/chemrxiv/article-details/651eda9945aaa5fdbb5b9274](https://pubs.acs.org/doi/10.1021/acs.jctc.3c00722?ref=pdf))
+*Dietrich, Florian, Xavier Rosas Advincula, Gianpaolo Gobbo, Michael Bellucci, and Matteo Salvalaglio. "Machine Learning Nucleation Collective Variables with Graph Neural Networks." The Journal of Chemical Theory and Computation, (2023),* [Link](https://pubs.acs.org/doi/10.1021/acs.jctc.3c00722?ref=pdf)
 
 ## Installation
 

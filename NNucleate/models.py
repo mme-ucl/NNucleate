@@ -132,18 +132,21 @@ class GNNCV(nn.Module):
     :type device: str, optional
     :param act_fn: PyTorch activation function to be used in the multi-layer perceptrons, defaults to nn.ReLU().
     :type act_fn: torch.nn.modules.activation, optional
+    :param pool_fn: Pooling function used in the final layer. Should behave analogously to torch.sum(), defaults to torch.sum
+    :type pool_fn: function, optional
     :param n_layers:  The number of graph convolutional layers, defaults to 1.
     :type n_layers: int, optional
     """
 
     def __init__(
-        self, in_node_nf=3, hidden_nf=3, device="cpu", act_fn=nn.ReLU(), n_layers=1
+        self, in_node_nf=3, hidden_nf=3, device="cpu", act_fn=nn.ReLU(), pool_fn=torch.sum, n_layers=1
     ):
 
         super(GNNCV, self).__init__()
         self.hidden_nf = hidden_nf
         self.device = device
         self.n_layers = n_layers
+        self.pool = pool_fn
 
         ### Encoder
         self.embedding = nn.Linear(in_node_nf, hidden_nf)
@@ -171,6 +174,6 @@ class GNNCV(nn.Module):
 
         h = self.node_dec(h)  # pipe H through a MLP
         h = h.view(-1, n_nodes, self.hidden_nf)  # stacks all the hidden_nf
-        h = torch.sum(h, dim=1)  # create one vector containinf the hidden h sums
+        h = self.pool(h, dim=1)  # create one vector containinf the hidden h sums
         pred = self.graph_dec(h)  #
         return pred.squeeze(1)

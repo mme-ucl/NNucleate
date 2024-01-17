@@ -280,6 +280,77 @@ class GNNTrajectory(Dataset):
         return config / self.length, label, rows, cols
 
 
+class GNNTrajectory_mult(Dataset):
+    """Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN with a multidimensional output.
+    This object loads all the columns in the provided CV file. Make sure to only use it with other functions that can account for that.
+    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.
+
+    :param cv_file: Path to the cv file.
+    :type cv_file: str
+    :param traj_name: Path to the trajectory file (.xtc/.xyz).
+    :type traj_name: str
+    :param top_file: Path to the topology file (.pdb).
+    :type top_file: str
+    :param box_length: Length of the cubic box.
+    :type box_length: float
+    :param rc: Cut-off radius for the construction of the graph.
+    :type rc: float
+    :param start: Starting frame of the trajectory, defaults to 0.
+    :type start: int, optional
+    :param stop: The last file of the trajectory that is rea, defaults to -1.
+    :type stop: int, optional
+    :param stride: The stride with which the trajectory frames are read, defaults to 1.
+    :type stride: int, optional
+    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
+    :type root: int, optional
+    """
+
+    def __init__(
+        self,
+        cv_file: str,
+        traj_name: str,
+        top_file: str,
+        box_length: float,
+        rc: float,
+        start=0,
+        stop=-1,
+        stride=1,
+        root=1,
+    ):
+
+        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, :] ** (1 / root)
+        self.length = box_length
+        traj = pbc(md.load(traj_name, top=top_file), self.length)[start:stop:stride]
+        vecs = np.zeros((len(traj), 3, 3))
+        for i in range(len(traj)):
+            vecs[i, 0] = np.array([self.length, 0, 0])
+            vecs[i, 1] = np.array([0, self.length, 0])
+            vecs[i, 2] = np.array([0, 0, self.length])
+        traj.unitcell_vectors = vecs
+        traj = pbc(traj, self.length)
+        self.rows, self.cols = get_rc_edges(rc, traj)
+        self.max_l = np.max([len(r) for r in self.rows])
+        print(self.max_l)
+        self.configs = traj.xyz
+
+    def __len__(self):
+        # Returns the length of the dataset
+        return len(self.cv_labels)
+
+    def __getitem__(self, idx):
+        # Gets a configuration from the given index
+        config = self.configs[idx]
+        # Label is read from the numpy array
+        label = torch.tensor(self.cv_labels[idx]).float()
+        # if transformation functions are set they are applied to label and image
+        config = torch.tensor(config).float()
+        rows = self.rows[idx]
+        cols = self.cols[idx]
+        rows = nn.functional.pad(rows, [0, self.max_l - len(rows)], value=-1)
+        cols = nn.functional.pad(cols, [0, self.max_l - len(cols)], value=-1)
+        return config / self.length, label, rows, cols
+
+
 class GNNMolecularTrajectory(Dataset):
     """Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN. The edges are generated from the neighbourlist graph between the COMs of the molecules.
 

@@ -708,7 +708,7 @@ def write_fast_link(model, n_hid, n_layers, n_at, box_l, rc, fname):
                 "    def transform(x):\n",
                 "        while(x >= %f):\n" % box_l,
                 "            x -= %f\n" % box_l,
-                "        if x <= 0:\n",
+                "        while(x <= 0):\n",
                 "            x += %f\n" % box_l,
                 "        return x\n",
                 "\n",

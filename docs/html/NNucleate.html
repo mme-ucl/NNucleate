@@ -271,6 +271,30 @@
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="NNucleate.dataset.GNNTrajectory_mult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">GNNTrajectory_mult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.GNNTrajectory_mult" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<p>Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN with a multidimensional output.
+This object loads all the columns in the provided CV file. Make sure to only use it with other functions that can account for that.
+.. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cv_file</strong> (<em>str</em>) – Path to the cv file.</p></li>
+<li><p><strong>traj_name</strong> (<em>str</em>) – Path to the trajectory file (.xtc/.xyz).</p></li>
+<li><p><strong>top_file</strong> (<em>str</em>) – Path to the topology file (.pdb).</p></li>
+<li><p><strong>box_length</strong> (<em>float</em>) – Length of the cubic box.</p></li>
+<li><p><strong>rc</strong> (<em>float</em>) – Cut-off radius for the construction of the graph.</p></li>
+<li><p><strong>start</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting frame of the trajectory, defaults to 0.</p></li>
+<li><p><strong>stop</strong> (<em>int</em><em>, </em><em>optional</em>) – The last file of the trajectory that is rea, defaults to -1.</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – The stride with which the trajectory frames are read, defaults to 1.</p></li>
+<li><p><strong>root</strong> (<em>int</em><em>, </em><em>optional</em>) – Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="NNucleate.dataset.KNNTrajectory">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.dataset.</span></span><span class="sig-name descname"><span class="pre">KNNTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.dataset.KNNTrajectory" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
@@ -379,7 +403,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="NNucleate.models.GNNCV">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.models.</span></span><span class="sig-name descname"><span class="pre">GNNCV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_node_nf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_nf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ReLU()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GNNCV" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.models.</span></span><span class="sig-name descname"><span class="pre">GNNCV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_node_nf=3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_nf=3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device='cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_fn=ReLU()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_fn=&lt;built-in</span> <span class="pre">method</span> <span class="pre">sum</span> <span class="pre">of</span> <span class="pre">type</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers=1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GNNCV" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <p>Graph neural network class for approximating nucleation CVs.</p>
 <dl class="field-list simple">
@@ -389,6 +413,7 @@ registered hooks while the latter silently ignores them.</p>
 <li><p><strong>hidden_nf</strong> (<em>int</em><em>, </em><em>optional</em>) – Hidden dimensionality of the latent node representation, defaults to 3.</p></li>
 <li><p><strong>device</strong> (<em>str</em><em>, </em><em>optional</em>) – Device the model should be stored on (For GPU support), defaults to “cpu”.</p></li>
 <li><p><strong>act_fn</strong> (<em>torch.nn.modules.activation</em><em>, </em><em>optional</em>) – PyTorch activation function to be used in the multi-layer perceptrons, defaults to nn.ReLU().</p></li>
+<li><p><strong>pool_fn</strong> (<em>function</em><em>, </em><em>optional</em>) – Pooling function used in the final layer. Should behave analogously to torch.sum(), defaults to torch.sum</p></li>
 <li><p><strong>n_layers</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of graph convolutional layers, defaults to 1.</p></li>
 </ul>
 </dd>
@@ -410,6 +435,45 @@ registered hooks while the latter silently ignores them.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="NNucleate.models.GNNCV.training">
 <span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#NNucleate.models.GNNCV.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="NNucleate.models.GNNCV_mult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NNucleate.models.</span></span><span class="sig-name descname"><span class="pre">GNNCV_mult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_node_nf=3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_nf=3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device='cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_fn=ReLU()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_fn=&lt;built-in</span> <span class="pre">method</span> <span class="pre">sum</span> <span class="pre">of</span> <span class="pre">type</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers=1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GNNCV_mult" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Graph neural network class for approximating multiple nucleation CVs at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out_nodes</strong> (<em>int</em>) – Dimensionality of the prediction.</p></li>
+<li><p><strong>in_node_nf</strong> (<em>int</em><em>, </em><em>optional</em>) – Dimensionality of the data in the graph nodes, defaults to 3.</p></li>
+<li><p><strong>hidden_nf</strong> (<em>int</em><em>, </em><em>optional</em>) – Hidden dimensionality of the latent node representation, defaults to 3.</p></li>
+<li><p><strong>device</strong> (<em>str</em><em>, </em><em>optional</em>) – Device the model should be stored on (For GPU support), defaults to “cpu”.</p></li>
+<li><p><strong>act_fn</strong> (<em>torch.nn.modules.activation</em><em>, </em><em>optional</em>) – PyTorch activation function to be used in the multi-layer perceptrons, defaults to nn.ReLU().</p></li>
+<li><p><strong>pool_fn</strong> (<em>function</em><em>, </em><em>optional</em>) – Pooling function used in the final layer. Should behave analogously to torch.sum(), defaults to torch.sum</p></li>
+<li><p><strong>n_layers</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of graph convolutional layers, defaults to 1.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="NNucleate.models.GNNCV_mult.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.models.GNNCV_mult.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="NNucleate.models.GNNCV_mult.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#NNucleate.models.GNNCV_mult.training" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -519,6 +583,37 @@ This function assumes the following architecture:
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.pycv_link.write_fast_link_2D">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.pycv_link.</span></span><span class="sig-name descname"><span class="pre">write_fast_link_2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sum'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NNucleate.pycv_link.write_fast_link_2D" title="Permalink to this definition"></a></dt>
+<dd><p>Function that writes an input file for the coupling with plumed, based on a model that is passed in the parameters.
+This version of the input file will be faster but requires a Cython package “neighborlist” with the same signature as the one provided in the github repository. 
+This function assumes the following architecture:
+- Embedding layer n_at x n_hid
+- N_layers GCLs
+- Edge layer n_hid x n_hid, ReLU, n_hid x n_hid
+- Node layer 2*n_hid x n_hid, ReLU, n_hid x n_hid
+- Node decoder n_hid x n_hid, ReLU, n_hid x n_hid
+- Graph decoder n_hid x n_hid, ReLU, n_hid x 1</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#NNucleate.models.GNNCV" title="NNucleate.models.GNNCV"><em>GNNCV</em></a>) – The model for which the input file shall be written. (only for graph-based models)</p></li>
+<li><p><strong>n_hid</strong> (<em>int</em>) – Number of dimensions in the model latent space.</p></li>
+<li><p><strong>n_layers</strong> (<em>int</em>) – Number of GCL layers.</p></li>
+<li><p><strong>out_nodes</strong> (<em>int</em>) – Dimensionality of the model output.</p></li>
+<li><p><strong>n_at</strong> (<em>int</em>) – Number of nodes in the graph.</p></li>
+<li><p><strong>box_l</strong> (<em>float</em>) – Size of the simulation box of the system that is used in the MTD simulation.</p></li>
+<li><p><strong>rc</strong> (<em>float</em>) – Cut off radius for the neighbourlist generation</p></li>
+<li><p><strong>dim1</strong> (<em>str</em>) – Name of the CV in the first dimension.</p></li>
+<li><p><strong>dm2</strong> – Name of the CV in the second dimension.</p></li>
+<li><p><strong>fname</strong> (<em>str</em>) – Name of file that is created.</p></li>
+<li><p><strong>pool</strong> (<em>str</em>) – Name of the pooling layer that is used. (“sum”, “mean”, “max”)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-NNucleate.training">
 <span id="nnucleate-training-module"></span><h2>NNucleate.training module<a class="headerlink" href="#module-NNucleate.training" title="Permalink to this heading"></a></h2>
@@ -574,6 +669,30 @@ Once an increase in the validation error is detected for the first time th eloop
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.training.evaluate_model_gnn_mult">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.training.</span></span><span class="sig-name descname"><span class="pre">evaluate_model_gnn_mult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#NNucleate.models.GNNCV" title="NNucleate.models.GNNCV"><span class="pre">GNNCV</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="headerlink" href="#NNucleate.training.evaluate_model_gnn_mult" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function that evaluates a model on a training set and calculates some properies for the generation of performance scatter plots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#NNucleate.models.GNNCV" title="NNucleate.models.GNNCV"><em>GNNCV</em></a>) – The model that is to be evaluated.</p></li>
+<li><p><strong>dataloader</strong> (<em>torch.utils.data.Dataloader</em>) – Wrapper around the dataset that the model is supposed to be evaluated on.</p></li>
+<li><p><strong>n_mol</strong> (<em>int</em>) – Number of nodes in the graph of each frame. (Number of atoms or molecules)</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Device that the training is performed on. (Required for GPU compatibility)</p></li>
+<li><p><strong>cols</strong> (<em>list</em>) – List of column indices representing the CVs the model is learning from the dataset.</p></li>
+<li><p><strong>n_at</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of atoms per molecule.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns the prediction of the model on each frame, the corresponding true values, the root mean square errors of the predictions and the r2 correlation coefficients.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List of List of float, List of List of float, List of float, List of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="NNucleate.training.test_gnn">
 <span class="sig-prename descclassname"><span class="pre">NNucleate.training.</span></span><span class="sig-name descname"><span class="pre">test_gnn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#NNucleate.models.GNNCV" title="NNucleate.models.GNNCV"><span class="pre">GNNCV</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_l1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#NNucleate.training.test_gnn" title="Permalink to this definition"></a></dt>
 <dd><p>Evaluate the test/validation error of a graph based model_t on a validation set.</p>
@@ -585,6 +704,31 @@ Once an increase in the validation error is detected for the first time th eloop
 <li><p><strong>n_mol</strong> (<em>int</em>) – Number of nodes per frame.</p></li>
 <li><p><strong>loss_l1</strong> (<em>torch.nn._Loss</em>) – Loss function for the training.</p></li>
 <li><p><strong>device</strong> (<em>str</em>) – Device that the training is performed on. (Required for GPU compatibility)</p></li>
+<li><p><strong>n_at</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of atoms per molecule.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Return the average loss over the epoch.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.training.test_gnn_mult">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.training.</span></span><span class="sig-name descname"><span class="pre">test_gnn_mult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#NNucleate.models.GNNCV" title="NNucleate.models.GNNCV"><span class="pre">GNNCV</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_l1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#NNucleate.training.test_gnn_mult" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the test/validation error of a graph based model with multidimensional output on a test set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#NNucleate.models.GNNCV" title="NNucleate.models.GNNCV"><em>GNNCV</em></a>) – Graph-based model_t to be trained.</p></li>
+<li><p><strong>loader</strong> (<em>torch.utils.data.Dataloader</em>) – Wrapper around a GNNTrajectory dataset.</p></li>
+<li><p><strong>n_mol</strong> (<em>int</em>) – Number of nodes per frame.</p></li>
+<li><p><strong>loss_l1</strong> (<em>torch.nn._Loss</em>) – Loss function for the training.</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Device that the training is performed on. (Required for GPU compatibility)</p></li>
+<li><p><strong>cols</strong> (<em>list</em>) – List of column indices representing the CVs the model is learning from the dataset.</p></li>
 <li><p><strong>n_at</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of atoms per molecule.</p></li>
 </ul>
 </dd>
@@ -632,6 +776,32 @@ Once an increase in the validation error is detected for the first time th eloop
 <li><p><strong>optimizer</strong> (<em>torch.optim</em>) – The optimizer object for the training.</p></li>
 <li><p><strong>loss</strong> (<em>torch.nn._Loss</em>) – Loss function for the training.</p></li>
 <li><p><strong>device</strong> (<em>str</em>) – Device that the training is performed on. (Required for GPU compatibility)</p></li>
+<li><p><strong>n_at</strong> – Number of atoms per molecule.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Return the average loss over the epoch.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="NNucleate.training.train_gnn_mult">
+<span class="sig-prename descclassname"><span class="pre">NNucleate.training.</span></span><span class="sig-name descname"><span class="pre">train_gnn_mult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#NNucleate.models.GNNCV" title="NNucleate.models.GNNCV"><span class="pre">GNNCV</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_mol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#NNucleate.training.train_gnn_mult" title="Permalink to this definition"></a></dt>
+<dd><p>Function to perform one epoch of a GNN with multidimensional output training.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#NNucleate.models.GNNCV" title="NNucleate.models.GNNCV"><em>GNNCV</em></a>) – Graph-based model_t to be trained.</p></li>
+<li><p><strong>loader</strong> (<em>torch.utils.data.Dataloader</em>) – Wrapper around a GNNTrajectory dataset.</p></li>
+<li><p><strong>n_at</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of nodes per frame.</p></li>
+<li><p><strong>optimizer</strong> (<em>torch.optim</em>) – The optimizer object for the training.</p></li>
+<li><p><strong>loss</strong> (<em>torch.nn._Loss</em>) – Loss function for the training.</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Device that the training is performed on. (Required for GPU compatibility)</p></li>
+<li><p><strong>cols</strong> (<em>list</em>) – List of column indices representing the CVs the model is learning from the dataset.</p></li>
 <li><p><strong>n_at</strong> – Number of atoms per molecule.</p></li>
 </ul>
 </dd>

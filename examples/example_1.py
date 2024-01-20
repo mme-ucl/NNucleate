@@ -8,7 +8,7 @@ from torch import nn
 from torch import optim
 from NNucleate.dataset import GNNTrajectory
 from NNucleate.models import initialise_weights, GNNCV
-from NNucleate.training import evaluate_model_gnn, early_stopping_gnn
+from NNucleate.training import evaluate_model_gnn, early_stopping_gnn, train_gnn
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print("Using {} device".format(device))
@@ -31,19 +31,25 @@ model = GNNCV(hidden_nf=10, n_layers=2, device=device)
 model.apply(initialise_weights)
 optimizer = optim.Adam(model.parameters(), lr=5e-4)
 loss = nn.MSELoss()
-model, train_conv, test_conv = early_stopping_gnn(model, dl_train, dl_GNN_val, n_at, optimizer, loss, device, test_freq=10)
+
+epochs = 1
+for epoch in epochs:
+    train_mse = train_gnn(model, dl_train, 421, optimizer, loss, device)
+    if epoch % 10 == 0:
+        print("Epoch %d: %f" % (epoch, train_mse))  
+#model, train_conv, test_conv = early_stopping_gnn(model, dl_train, dl_GNN_val, n_at, optimizer, loss, device, test_freq=10)
 preds, label, rmse, r2 = evaluate_model_gnn(model, dl_GNN_val, n_at, device)
 
 print("Final RMSE: %.4f" % rmse)
 print("Final $r^2$: %.4f" % r2)
 
-plt.plot(train_conv)
-plt.plot(test_conv)
+#plt.plot(train_conv)
+#plt.plot(test_conv)
 
-plt.yscale("log")
-plt.xlabel("epochs")
-plt.ylabel("RMSE")  
-plt.show()
+#plt.yscale("log")
+#plt.xlabel("epochs")
+#plt.ylabel("RMSE")  
+#plt.show()
 
 plt.scatter(preds, label, s=0.4)
 plt.plot(label, label, color="black")

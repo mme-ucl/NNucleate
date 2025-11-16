@@ -857,3 +857,60 @@ def evaluate_model_gnn_mult(
         r2.append(np.corrcoef(preds[:,i], ys[:,i])[0, 1])
 
     return preds, ys, rmse_1, r2
+
+
+def evaluate_model_gnn_mult_e(
+    model: GNNCV, dataloader: DataLoader, n_mol: int, device: str, cols: list, n_at=1
+) -> tuple:
+    """Helper function that evaluates a model on an energy training set and calculates some properies for the generation of performance scatter plots.
+
+    :param model: The model that is to be evaluated.
+    :type model: GNNCV
+    :param dataloader: Wrapper around the dataset that the model is supposed to be evaluated on.
+    :type dataloader: torch.utils.data.Dataloader
+    :param n_mol: Number of nodes in the graph of each frame. (Number of atoms or molecules)
+    :type n_mol: int
+    :param device: Device that the training is performed on. (Required for GPU compatibility)
+    :type device: str
+    :param cols: List of column indices representing the CVs the model is learning from the dataset.
+    :type cols: list
+    :param n_at: Number of atoms per molecule.
+    :type n_at: int, optional
+    :return: Returns the prediction of the model on each frame, the corresponding true values, the root mean square errors of the predictions and the r2 correlation coefficients.
+    :rtype: List of List of float, List of List of float, List of float, List of float
+    """
+    preds = []
+    ys = []
+    for batch, (X, y, r, c, re, ce) in enumerate(dataloader):
+        model.eval()
+        # optimizer.zero_grad()
+        batch_size = len(X)
+        atom_positions = X.view(-1, 3 * n_at).to(device)
+        row_new = []
+        col_new = []
+        for i in range(0, len(r)):
+            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
+            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
+
+        row_new = torch.cat([ro for ro in row_new])
+        col_new = torch.cat([co for co in col_new])
+
+        if row_new[0] >= n_mol - 1:
+            row_new -= n_mol
+            col_new -= n_mol
+
+        edges = [row_new.long().to(device), col_new.long().to(device)]
+        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
+
+        [ys.append(ref.cpu().detach().numpy()) for ref in y[:, cols]]
+        [preds.append(pre.cpu().detach().numpy()) for pre in pred]
+
+    preds = np.array(preds)
+    ys = np.array(ys)
+
+    rmse_1 = np.mean((preds - ys) ** 2, axis=0) ** 0.5
+    r2 = []
+    for i in range(len(cols)):
+        r2.append(np.corrcoef(preds[:,i], ys[:,i])[0, 1])
+
+    return preds, ys, rmse_1, r2

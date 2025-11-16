@@ -691,67 +691,6 @@ def test_gnn_e(
     return res["loss"] / res["counter"], res["path_loss"] / res["counter"]
 
 
-def early_stopping_gnn(
-    model_t: GNNCV,
-    train_loader: DataLoader,
-    val_loader: DataLoader,
-    n_at: int,
-    optimizer: Callable,
-    loss: Callable,
-    device: str,
-    test_freq=1,
-) -> tuple:
-    """Train a graph-based model according to the early-stopping approach.
-    In early stopping a model is trained until the validation error (approximation for the generalisation error) worsens for the first time to prevent overfitting.
-    Once an increase in the validation error is detected for the first time th eloop is exited and the model-state from the *previous* validation is returned.
-
-    :param model_t: The graph-based model hat is to be optimised.
-    :type model_t: GNNCV
-    :param train_loader: Wrapper around the training set for the model optimisation.
-    :type train_loader: torch.utils.data.Dataloader
-    :param val_loader: Wrapper around the validation set for the model optimisation.
-    :type val_loader: torch.utils.data.Dataloader
-    :param n_at: Number of nodes in the graph (Number of atoms or molecules).
-    :type n_at: int
-    :param optimizer: Optimizer to be used for the optimisation.
-    :type optimizer: torch.optim
-    :param loss: Loss function to be used for the optimisation.
-    :type loss: torch.nn._Loss
-    :param device: Device that the training is performed on. (Required for GPU compatibility)
-    :type device: str    
-    :param test_freq: The number of epochs after which the model should be evaluated. A lower number is more accurate and costs more but is reccomended for big datasets, defaults to 1
-    :type test_freq: int, optional
-    :return: This function returns the optimised model and the history of test and training errors over the course of the convergence.
-    :rtype: GNNCV, list of float, list of float
-    """
-    conv_tr = []
-    conv_te = []
-    epoch = 1
-    old_val_e = 100000000000
-    old_model = deepcopy(model_t)
-
-    while True:
-        print("Current epoch: ", epoch)
-        t = time()
-        l = train_gnn(model_t, train_loader, n_at, optimizer, loss, device)
-        conv_tr.append(l)
-        print(f"training loss: %.4f" % l)
-        print(f"time per epoch: %.2f s" % (time() - t))
-
-        if epoch % test_freq == 0:
-            val_e = test_gnn(model_t, val_loader, n_at, loss, device)
-            conv_te.append(val_e)
-            print(f"val loss: %.4f" % val_e)
-            if val_e > old_val_e:
-                model_t = old_model
-                break
-            old_val_e = val_e
-
-            old_model = deepcopy(model_t)
-        epoch += 1
-
-    return model_t, conv_tr, conv_te
-
 
 def evaluate_model_gnn(
     model: GNNCV, dataloader: DataLoader, n_mol: int, device: str, n_at=1

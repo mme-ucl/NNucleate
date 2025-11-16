@@ -7,33 +7,206 @@ from .utils import pbc, get_rc_edges, get_mol_edges
 from .data_augmentation import transform_traj_to_knn_list, transform_traj_to_ndist_list
 
 
-class CVTrajectory(Dataset):
-    """
-    Instantiates a dataset from a trajectory file in xtc/xyz format and a text file containing the nucleation CVs (Assumes cubic cell)
-    
-    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.
+class NNDataset(Dataset):
+    """Unified dataset for non-graph (NN) models.
 
-    :param cv_file: Path to text file structured in columns containing the CVs.
-    :type cv_file: str
-    :param traj_name: Path to the trajectory in .xtc or .xyz file format.
-    :type traj_name: str
-    :param top_file: Path to the topology file in .pdb file format.
-    :type top_file: str
-    :param cv_col: Indicates the column in which the desired CV is written in the CV file (0 indexing).
-    :type cv_col: int
-    :param box_length: Length of the cubic cell.
-    :type box_length: float
-    :param transform: A function to be applied to the configuration before returning e.g. to_dist(), defaults to None.
-    :type transform: function, optional
-    :param start: Starting frame of the trajectory, defaults to 0.
-    :type start: int, optional
-    :param stop: The last file of the trajectory that is read, defaults to -1.
-    :type stop: int, optional
-    :param stride: The stride with which the trajectory frames are read, defaults to 1.
-    :type stride: int, optional
-    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
-    :type root: int, optional
+    Supports three representations:
+    - mode="raw": raw atomic positions (optionally transformed)
+    - mode="knn": per-atom sorted distances to k nearest neighbors
+    - mode="ndist": globally sorted n smallest inter-atomic distances
+
+    All modes return (features, label) with features as torch.float32.
+
+    Parameters mirror prior specialized classes to preserve functionality.
     """
+
+    def __init__(
+        self,
+        cv_file: str,
+        traj_name: str,
+        top_file: str,
+        cv_col: int,
+        box_length: float,
+        mode: str = "raw",
+        *,
+    k=None,
+    n_dist=None,
+        transform=None,
+        start: int = 0,
+        stop: int = -1,
+        stride: int = 1,
+        root: int = 1,
+        normalize: bool = True,
+    ):
+        if mode not in {"raw", "knn", "ndist"}:
+            raise ValueError(f"Unsupported mode '{mode}'. Use 'raw', 'knn', or 'ndist'.")
+
+        self.mode = mode
+        self.box_length = box_length
+        self.transform = transform if mode == "raw" else None
+        self.normalize = normalize
+
+        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
+
+        # Load and wrap trajectory in PBC with cubic box of given length
+        traj = pbc(md.load(traj_name, top=top_file), self.box_length)[start:stop:stride]
+
+        if mode == "raw":
+            # Store raw coordinates; per-item transform is applied in __getitem__
+            self.configs = traj.xyz
+        elif mode == "knn":
+            if k is None:
+                raise ValueError("'k' must be provided for mode='knn'.")
+            self.configs = transform_traj_to_knn_list(
+                k,
+                traj.xyz,
+                self.box_length,
+            )
+        elif mode == "ndist":
+            if n_dist is None:
+                raise ValueError("'n_dist' must be provided for mode='ndist'.")
+            self.configs = transform_traj_to_ndist_list(
+                n_dist,
+                traj.xyz,
+                self.box_length,
+            )
+
+    def __len__(self):
+        return len(self.cv_labels)
+
+    def __getitem__(self, idx):
+        x = self.configs[idx]
+        if self.mode == "raw" and self.transform is not None:
+            x = self.transform(x)
+        x = torch.tensor(x).float()
+        y = torch.tensor(self.cv_labels[idx]).float()
+
+        if self.normalize:
+            x = x / self.box_length
+
+        return x, y
+
+
+class GNNDataset(Dataset):
+    """Unified dataset for GNN models with flexible edge construction.
+
+    Supports:
+    - Atom graph via cutoff radius rc (previous GNNTrajectory)
+    - Multi-target labels when cv_col=None is set(previous GNNTrajectory_mult)
+    - Molecular COM graph via (n_mol, n_at) and rc (previous GNNMolecularTrajectory)
+    - Optional secondary neighbor graph for energy evaluations with rc_extra (previous GNNTrajectory_energy)
+
+    Returns either:
+    - (positions, labels, rows, cols) when rc_extra is None, or
+    - (positions, labels, rows, cols, rows_e, cols_e) when rc_extra is set.
+    """
+
+    def __init__(
+        self,
+        cv_file: str,
+        traj_name: str,
+        top_file: str,
+        box_length: float,
+        *,
+    rc: float = None,
+        start: int = 0,
+        stop: int = -1,
+        stride: int = 1,
+        root: int = 1,
+    cv_col: int | None = 0,
+        graph_mode: str = "atom",  # "atom" or "molecule"
+    n_mol: int = None,
+    n_at: int = None,
+    rc_extra: float = None,
+        normalize_positions: bool = True,
+    ):
+        if graph_mode not in {"atom", "molecule"}:
+            raise ValueError("graph_mode must be 'atom' or 'molecule'.")
+        if rc is None:
+            raise ValueError("'rc' (cutoff radius) must be provided.")
+
+        self.length = box_length
+        self.graph_mode = graph_mode
+        self.normalize_positions = normalize_positions
+        self.rc_extra = rc_extra
+
+        # Load labels: single column or all columns
+        labels = np.loadtxt(cv_file)[start:stop:stride, :]
+        if cv_col is None:
+            self.cv_labels = labels ** (1 / root)
+        else:
+            self.cv_labels = labels[:, cv_col] ** (1 / root)
+
+        # Load trajectory and set cubic unitcell vectors (required for PBC edge builds)
+        traj = pbc(md.load(traj_name, top=top_file), self.length)[start:stop:stride]
+        vecs = np.zeros((len(traj), 3, 3))
+        for i in range(len(traj)):
+            vecs[i, 0] = np.array([self.length, 0, 0])
+            vecs[i, 1] = np.array([0, self.length, 0])
+            vecs[i, 2] = np.array([0, 0, self.length])
+        traj.unitcell_vectors = vecs
+        traj = pbc(traj, self.length)
+
+        # Build primary edges
+        if self.graph_mode == "atom":
+            rows, cols = get_rc_edges(rc, traj)
+        else:
+            if n_mol is None or n_at is None:
+                raise ValueError("'n_mol' and 'n_at' must be provided for graph_mode='molecule'.")
+            rows, cols = get_mol_edges(rc, traj, n_mol, n_at, self.length)
+
+        self.rows = rows
+        self.cols = cols
+        self.max_l = int(np.max([len(r) for r in self.rows])) if len(self.rows) > 0 else 0
+
+        # Optional extra edges (mirrors the edge type used for primary graph)
+        self.rows_e = None
+        self.cols_e = None
+        self.max_le = 0
+        if rc_extra is not None:
+            if self.graph_mode == "atom":
+                rows_e, cols_e = get_rc_edges(rc_extra, traj)
+            else:
+                rows_e, cols_e = get_mol_edges(rc_extra, traj, n_mol, n_at, self.length)
+            self.rows_e = rows_e
+            self.cols_e = cols_e
+            self.max_le = int(np.max([len(r) for r in self.rows_e])) if len(self.rows_e) > 0 else 0
+
+        self.configs = traj.xyz
+
+    def __len__(self):
+        return len(self.cv_labels)
+
+    def _pad_index_tensor(self, t, target_len: int):
+        # Ensure tensor and pad with -1 to a fixed length per dataset instance
+        if not torch.is_tensor(t):
+            t = torch.tensor(t, dtype=torch.long)
+        if t.dtype != torch.long:
+            t = t.long()
+        return nn.functional.pad(t, [0, target_len - len(t)], value=-1)
+
+    def __getitem__(self, idx):
+        config = torch.tensor(self.configs[idx]).float()
+        label = torch.tensor(self.cv_labels[idx]).float()
+
+        rows = self._pad_index_tensor(self.rows[idx], self.max_l)
+        cols = self._pad_index_tensor(self.cols[idx], self.max_l)
+
+        if self.normalize_positions:
+            config_out = config / self.length
+        else:
+            config_out = config
+
+        if self.rows_e is not None and self.cols_e is not None:
+            rows_e = self._pad_index_tensor(self.rows_e[idx], self.max_le)
+            cols_e = self._pad_index_tensor(self.cols_e[idx], self.max_le)
+            return config_out, label, rows, cols, rows_e, cols_e
+
+        return config_out, label, rows, cols
+
+
+class CVTrajectory(Dataset):
+    """Wrapper for backward compatibility; use NNDataset(mode='raw')."""
 
     def __init__(
         self,
@@ -48,62 +221,30 @@ class CVTrajectory(Dataset):
         stride=1,
         root=1,
     ):
-
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
-        self.length = box_length
-        self.configs = pbc(md.load(traj_name, top=top_file), self.length)[
-            start:stop:stride
-        ].xyz
-
-        # Option to transform the configs before returning
-        self.transform = transform
+        self._base = NNDataset(
+            cv_file=cv_file,
+            traj_name=traj_name,
+            top_file=top_file,
+            cv_col=cv_col,
+            box_length=box_length,
+            mode="raw",
+            transform=transform,
+            start=start,
+            stop=stop,
+            stride=stride,
+            root=root,
+            normalize=True,
+        )
 
     def __len__(self):
-        # Returns the length of the dataset
-        return len(self.cv_labels)
+        return len(self._base)
 
     def __getitem__(self, idx):
-        # Gets a configuration from the given index
-        config = self.configs[idx]
-        # Label is read from the numpy array
-        label = torch.tensor(self.cv_labels[idx]).float()
-        # if transformation functions are set they are applied to label and image
-
-        if self.transform:
-            config = torch.tensor(self.transform(config)).float()
-        else:
-            config = torch.tensor(config).float()
-
-        return config / self.length, label
+        return self._base[idx]
 
 
 class KNNTrajectory(Dataset):
-    """Generates a dataset from a trajectory in .xtc/xyz format. 
-        The trajectory frames are represented via the sorted distances of all atoms to their k nearest neighbours.
-
-    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.
-
-    :param cv_file: Path to the cv file.
-    :type cv_file: str
-    :param traj_name: Path to the trajectory file (.xtc/.xyz).
-    :type traj_name: str
-    :param top_file: Path to the topology file (.pdb).
-    :type top_file: str
-    :param cv_col: Gives the colimn in which the CV of interest is stored.
-    :type cv_col: int
-    :param box_length: Length of the cubic box.
-    :type box_length: float
-    :param k: Number of neighbours to consider.
-    :type k: int
-    :param start: Starting frame of the trajectory, defaults to 0.
-    :type start: int, optional
-    :param stop: The last file of the trajectory that is read, defaults to -1.
-    :type stop: int, optional
-    :param stride: The stride with which the trajectory frames are read, defaults to 1.
-    :type stride: int, optional
-    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
-    :type root: int, optional
-    """
+    """Wrapper for backward compatibility; use NNDataset(mode='knn')."""
 
     def __init__(
         self,
@@ -118,57 +259,30 @@ class KNNTrajectory(Dataset):
         stride=1,
         root=1,
     ):
-
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
-        self.box_length = box_length
-        self.configs = transform_traj_to_knn_list(
-            k,
-            pbc(md.load(traj_name, top=top_file), self.box_length)[
-                start:stop:stride
-            ].xyz,
-            box_length,
+        self._base = NNDataset(
+            cv_file=cv_file,
+            traj_name=traj_name,
+            top_file=top_file,
+            cv_col=cv_col,
+            box_length=box_length,
+            mode="knn",
+            k=k,
+            start=start,
+            stop=stop,
+            stride=stride,
+            root=root,
+            normalize=True,
         )
 
     def __len__(self):
-        # Returns the length of the dataset
-        return len(self.cv_labels)
+        return len(self._base)
 
     def __getitem__(self, idx):
-        # Gets a configuration from the given index
-        config = torch.tensor(self.configs[idx]).float()
-        # Label is read from the numpy array
-        label = torch.tensor(self.cv_labels[idx]).float()
-
-        return config / self.box_length, label
+        return self._base[idx]
 
 
 class NdistTrajectory(Dataset):
-    """Generates a dataset from a trajectory in .xtc/xyz format. 
-        The trajectory frames are represented via the n_dist sorted distances.
-    
-    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.
-
-    :param cv_file: Path to the cv file.
-    :type cv_file: str
-    :param traj_name: Path to the trajectory file (.xtc/.xyz).
-    :type traj_name: str
-    :param top_file: Path to the topology file (.pdb).
-    :type top_file: str
-    :param cv_col: Gives the colimn in which the CV of interest is stored.
-    :type cv_col: int
-    :param box_length: Length of the cubic box.
-    :type box_length: float
-    :param n_dist: Number of distances to consider.
-    :type n_dist: int
-    :param start: Starting frame of the trajectory, defaults to 0.
-    :type start: int, optional
-    :param stop: The last file of the trajectory that is read, defaults to -1.
-    :type stop: int, optional
-    :param stride: The stride with which the trajectory frames are read, defaults to 1.
-    :type stride: int, optional
-    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
-    :type root: int, optional
-    """
+    """Wrapper for backward compatibility; use NNDataset(mode='ndist')."""
 
     def __init__(
         self,
@@ -183,55 +297,30 @@ class NdistTrajectory(Dataset):
         stride=1,
         root=1,
     ):
-
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
-        self.box_length = box_length
-        self.configs = transform_traj_to_ndist_list(
-            n_dist,
-            pbc(md.load(traj_name, top=top_file), self.box_length)[
-                start:stop:stride
-            ].xyz,
-            box_length,
+        self._base = NNDataset(
+            cv_file=cv_file,
+            traj_name=traj_name,
+            top_file=top_file,
+            cv_col=cv_col,
+            box_length=box_length,
+            mode="ndist",
+            n_dist=n_dist,
+            start=start,
+            stop=stop,
+            stride=stride,
+            root=root,
+            normalize=True,
         )
 
     def __len__(self):
-        # Returns the length of the dataset
-        return len(self.cv_labels)
+        return len(self._base)
 
     def __getitem__(self, idx):
-        # Gets a configuration from the given index
-        config = torch.tensor(self.configs[idx]).float()
-        # Label is read from the numpy array
-        label = torch.tensor(self.cv_labels[idx]).float()
-
-        return config / self.box_length, label
+        return self._base[idx]
 
 
 class GNNTrajectory(Dataset):
-    """Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN. 
-    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.
-
-    :param cv_file: Path to the cv file.
-    :type cv_file: str
-    :param traj_name: Path to the trajectory file (.xtc/.xyz).
-    :type traj_name: str
-    :param top_file: Path to the topology file (.pdb).
-    :type top_file: str
-    :param cv_col: Gives the colimn in which the CV of interest is stored.
-    :type cv_col: int
-    :param box_length: Length of the cubic box.
-    :type box_length: float
-    :param rc: Cut-off radius for the construction of the graph.
-    :type rc: float
-    :param start: Starting frame of the trajectory, defaults to 0.
-    :type start: int, optional
-    :param stop: The last file of the trajectory that is rea, defaults to -1.
-    :type stop: int, optional
-    :param stride: The stride with which the trajectory frames are read, defaults to 1.
-    :type stride: int, optional
-    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
-    :type root: int, optional
-    """
+    """Wrapper for backward compatibility; uses GNNDataset with atom graph and single-label output."""
 
     def __init__(
         self,
@@ -246,64 +335,30 @@ class GNNTrajectory(Dataset):
         stride=1,
         root=1,
     ):
-
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col] ** (1 / root)
-        self.length = box_length
-        traj = pbc(md.load(traj_name, top=top_file), self.length)[start:stop:stride]
-        vecs = np.zeros((len(traj), 3, 3))
-        for i in range(len(traj)):
-            vecs[i, 0] = np.array([self.length, 0, 0])
-            vecs[i, 1] = np.array([0, self.length, 0])
-            vecs[i, 2] = np.array([0, 0, self.length])
-        traj.unitcell_vectors = vecs
-        traj = pbc(traj, self.length)
-        self.rows, self.cols = get_rc_edges(rc, traj)
-        self.max_l = np.max([len(r) for r in self.rows])
-        print(self.max_l)
-        self.configs = traj.xyz
+        self._base = GNNDataset(
+            cv_file=cv_file,
+            traj_name=traj_name,
+            top_file=top_file,
+            box_length=box_length,
+            rc=rc,
+            start=start,
+            stop=stop,
+            stride=stride,
+            root=root,
+            cv_col=cv_col,
+            graph_mode="atom",
+            normalize_positions=True,
+        )
 
     def __len__(self):
-        # Returns the length of the dataset
-        return len(self.cv_labels)
+        return len(self._base)
 
     def __getitem__(self, idx):
-        # Gets a configuration from the given index
-        config = self.configs[idx]
-        # Label is read from the numpy array
-        label = torch.tensor(self.cv_labels[idx]).float()
-        # if transformation functions are set they are applied to label and image
-        config = torch.tensor(config).float()
-        rows = self.rows[idx]
-        cols = self.cols[idx]
-        rows = nn.functional.pad(rows, [0, self.max_l - len(rows)], value=-1)
-        cols = nn.functional.pad(cols, [0, self.max_l - len(cols)], value=-1)
-        return config / self.length, label, rows, cols
+        return self._base[idx]
 
 
 class GNNTrajectory_mult(Dataset):
-    """Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN with a multidimensional output.
-    This object loads all the columns in the provided CV file. Make sure to only use it with other functions that can account for that.
-    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.
-
-    :param cv_file: Path to the cv file.
-    :type cv_file: str
-    :param traj_name: Path to the trajectory file (.xtc/.xyz).
-    :type traj_name: str
-    :param top_file: Path to the topology file (.pdb).
-    :type top_file: str
-    :param box_length: Length of the cubic box.
-    :type box_length: float
-    :param rc: Cut-off radius for the construction of the graph.
-    :type rc: float
-    :param start: Starting frame of the trajectory, defaults to 0.
-    :type start: int, optional
-    :param stop: The last file of the trajectory that is rea, defaults to -1.
-    :type stop: int, optional
-    :param stride: The stride with which the trajectory frames are read, defaults to 1.
-    :type stride: int, optional
-    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
-    :type root: int, optional
-    """
+    """Wrapper for backward compatibility; uses GNNDataset with atom graph and multi-label output."""
 
     def __init__(
         self,
@@ -317,68 +372,30 @@ class GNNTrajectory_mult(Dataset):
         stride=1,
         root=1,
     ):
-
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, :] ** (1 / root)
-        self.length = box_length
-        traj = pbc(md.load(traj_name, top=top_file), self.length)[start:stop:stride]
-        vecs = np.zeros((len(traj), 3, 3))
-        for i in range(len(traj)):
-            vecs[i, 0] = np.array([self.length, 0, 0])
-            vecs[i, 1] = np.array([0, self.length, 0])
-            vecs[i, 2] = np.array([0, 0, self.length])
-        traj.unitcell_vectors = vecs
-        traj = pbc(traj, self.length)
-        self.rows, self.cols = get_rc_edges(rc, traj)
-        self.max_l = np.max([len(r) for r in self.rows])
-        print(self.max_l)
-        self.configs = traj.xyz
+        self._base = GNNDataset(
+            cv_file=cv_file,
+            traj_name=traj_name,
+            top_file=top_file,
+            box_length=box_length,
+            rc=rc,
+            start=start,
+            stop=stop,
+            stride=stride,
+            root=root,
+            cv_col=None,  # all columns (multi-target)
+            graph_mode="atom",
+            normalize_positions=True,
+        )
 
     def __len__(self):
-        # Returns the length of the dataset
-        return len(self.cv_labels)
+        return len(self._base)
 
     def __getitem__(self, idx):
-        # Gets a configuration from the given index
-        config = self.configs[idx]
-        # Label is read from the numpy array
-        label = torch.tensor(self.cv_labels[idx]).float()
-        # if transformation functions are set they are applied to label and image
-        config = torch.tensor(config).float()
-        rows = self.rows[idx]
-        cols = self.cols[idx]
-        rows = nn.functional.pad(rows, [0, self.max_l - len(rows)], value=-1)
-        cols = nn.functional.pad(cols, [0, self.max_l - len(cols)], value=-1)
-        return config / self.length, label, rows, cols
+        return self._base[idx]
 
 
 class GNNMolecularTrajectory(Dataset):
-    """Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN. The edges are generated from the neighbourlist graph between the COMs of the molecules.
-
-    :param cv_file: Path to the cv file.
-    :type cv_file: str
-    :param traj_name: Path to the trajectory file (.xtc/.xyz).
-    :type traj_name: str
-    :param top_file: Path to the topology file (.pdb).
-    :type top_file: str
-    :param cv_col: Gives the colimn in which the CV of interest is stored.
-    :type cv_col: int
-    :param box_length: Length of the cubic box.
-    :type box_length: float
-    :param rc: Cut-off radius for the construction of the graph.
-    :type rc: float
-    :param n_mol: Number of molecules in the system
-    :type n_mol: int
-    :param n_at: Number of atoms per molecule
-    :type n_at: int
-    :param start: Starting frame of the trajectory, defaults to 0.
-    :type start: int, optional
-    :param stop: The last file of the trajectory that is rea, defaults to -1.
-    :type stop: int, optional
-    :param stride: The stride with which the trajectory frames are read, defaults to 1.
-    :type stride: int, optional
-    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
-    :type root: int, optional
-    """
+    """Wrapper for backward compatibility; uses GNNDataset with molecule graph (COM-based)."""
 
     def __init__(
         self,
@@ -395,58 +412,33 @@ class GNNMolecularTrajectory(Dataset):
         stride=1,
         root=1,
     ):
-
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, cv_col]** (1 / root)
-        self.length = box_length
-        traj = pbc(md.load(traj_name, top=top_file), self.length)[
-            start:stop:stride
-        ] 
-        self.rows, self.cols = get_mol_edges(rc, traj, n_mol, n_at, self.length)
-        self.max_l = np.max([len(r) for r in self.rows])
-        print(self.max_l)
-        self.configs = traj.xyz
+        self._base = GNNDataset(
+            cv_file=cv_file,
+            traj_name=traj_name,
+            top_file=top_file,
+            box_length=box_length,
+            rc=rc,
+            start=start,
+            stop=stop,
+            stride=stride,
+            root=root,
+            cv_col=cv_col,
+            graph_mode="molecule",
+            n_mol=n_mol,
+            n_at=n_at,
+            normalize_positions=True,
+        )
 
     def __len__(self):
-        # Returns the length of the dataset
-        return len(self.cv_labels)
+        return len(self._base)
 
     def __getitem__(self, idx):
-        # Gets a configuration from the given index
-        config = self.configs[idx]
-        # Label is read from the numpy array
-        label = torch.tensor(self.cv_labels[idx]).float()
-        # if transformation functions are set they are applied to label and image
-        config = torch.tensor(config).float()
-        rows = self.rows[idx]
-        cols = self.cols[idx]
-        rows = nn.functional.pad(rows, [0, self.max_l - len(rows)], value=-1)
-        cols = nn.functional.pad(cols, [0, self.max_l - len(cols)], value=-1)
-        return config / self.length, label, rows, cols
+        return self._base[idx]
 
 class GNNTrajectory_energy(Dataset):
-    """Generates a dataset from a trajectory in .xtc/.xyz format for the training of a GNN.
-    .. warning:: For .xtc give the boxlength in nm and for .xyz give the boxlength in Å.
+    """Wrapper for backward compatibility; uses GNNDataset with atom graph, multi-label output, and extra edges.
 
-    :param cv_file: Path to the cv file.
-    :type cv_file: str
-    :param traj_name: Path to the trajectory file (.xtc/.xyz).
-    :type traj_name: str
-    :param top_file: Path to the topology file (.pdb).
-    :type top_file: str
-    :param cv_col: Gives the colimn in which the CV of interest is stored.
-    :type cv_col: int
-    :param box_length: Length of the cubic box.
-    :type box_length: float
-    :param rc: Cut-off radius for the construction of the graph.
-    :type rc: float
-    :param start: Starting frame of the trajectory, defaults to 0.
-    :type start: int, optional
-    :param stop: The last file of the trajectory that is rea, defaults to -1.
-    :type stop: int, optional
-    :param stride: The stride with which the trajectory frames are read, defaults to 1.
-    :type stride: int, optional
-    :param root: Allows for the loading of the n-th root of the CV data (to compress the numerical range), defaults to 1.
-    :type root: int, optional
+    Note: keeps the original behavior of NOT normalizing positions by box length.
     """
 
     def __init__(
@@ -462,42 +454,24 @@ class GNNTrajectory_energy(Dataset):
         stride=1,
         root=1,
     ):
-
-        self.cv_labels = np.loadtxt(cv_file)[start:stop:stride, :] ** (1 / root)
-        self.length = box_length
-        traj = pbc(md.load(traj_name, top=top_file), self.length)[start:stop:stride]
-        vecs = np.zeros((len(traj), 3, 3))
-        for i in range(len(traj)):
-            vecs[i, 0] = np.array([self.length, 0, 0])
-            vecs[i, 1] = np.array([0, self.length, 0])
-            vecs[i, 2] = np.array([0, 0, self.length])
-        traj.unitcell_vectors = vecs
-        traj = pbc(traj, self.length)
-        self.rows, self.cols = get_rc_edges(rc, traj)
-        self.rows_e, self.cols_e = get_rc_edges(rc_e, traj) 
-        self.max_l = np.max([len(r) for r in self.rows])
-        self.max_le = np.max([len(r) for r in self.rows_e])
-        print(self.max_l)
-        self.configs = traj.xyz
+        self._base = GNNDataset(
+            cv_file=cv_file,
+            traj_name=traj_name,
+            top_file=top_file,
+            box_length=box_length,
+            rc=rc,
+            start=start,
+            stop=stop,
+            stride=stride,
+            root=root,
+            cv_col=None,  # energy dataset used multi-column labels
+            graph_mode="atom",
+            rc_extra=rc_e,
+            normalize_positions=False,  # keep original behavior
+        )
 
     def __len__(self):
-        # Returns the length of the dataset
-        return len(self.cv_labels)
+        return len(self._base)
 
     def __getitem__(self, idx):
-        # Gets a configuration from the given index
-        config = self.configs[idx]
-        # Label is read from the numpy array
-        label = torch.tensor(self.cv_labels[idx]).float()
-        # if transformation functions are set they are applied to label and image
-        config = torch.tensor(config).float()
-        rows = self.rows[idx]
-        cols = self.cols[idx]
-        rows = nn.functional.pad(rows, [0, self.max_l - len(rows)], value=-1)
-        cols = nn.functional.pad(cols, [0, self.max_l - len(cols)], value=-1)
-        
-        rows_e = self.rows_e[idx]
-        cols_e = self.cols_e[idx]
-        rows_e = nn.functional.pad(rows_e, [0, self.max_le - len(rows_e)], value=-1)
-        cols_e = nn.functional.pad(cols_e, [0, self.max_le - len(cols_e)], value=-1)
-        return config, label, rows, cols, rows_e, cols_e
+        return self._base[idx]

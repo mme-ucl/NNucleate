@@ -183,6 +183,68 @@ def train_gnn_mult(
 
     return res["loss"] / res["counter"]
 
+def train_gnn_e(
+    model,
+    loader: DataLoader,
+    n_mol: int,
+    optimizer,
+    loss,
+    cols,
+    device: str,
+    n_at=1,
+) -> float:
+    """Function to perform one epoch of a GNN training.
+
+    :param model: Graph-based model_t to be trained.
+    :type model: GNNCV
+    :param loader: Wrapper around a GNNTrajectory dataset.
+    :type loader: torch.utils.data.Dataloader
+    :param n_at: Number of nodes per frame.
+    :type n_at: int
+    :param optimizer: The optimizer object for the training.
+    :type optimizer: torch.optim
+    :param loss: Loss function for the training.
+    :type loss: torch.nn._Loss
+    :param device: Device that the training is performed on. (Required for GPU compatibility)
+    :type device: str
+    :param n_at: Number of atoms per molecule.
+    :type n_at: int, optional
+    :return: Return the average loss over the epoch.
+    :rtype: float
+    """
+    resi = {"loss": 0, "counter": 0}
+    for batch, (X, y, r, c, re, ce) in enumerate(loader):
+        model.train()
+        optimizer.zero_grad()
+        batch_size = len(X)
+        X.requires_grad = True
+        ap = X.view(-1, 3 * n_at).to(device)
+        row_new = []
+        col_new = []
+        for i in range(0, len(r)):
+            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
+            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
+
+        row_new = torch.cat([ro for ro in row_new])
+        col_new = torch.cat([co for co in col_new])
+
+        if row_new[0] >= n_mol - 1:
+            row_new -= n_mol
+            col_new -= n_mol
+
+        edges = [row_new.long().to(device), col_new.long().to(device)]
+        label = y[:,cols].to(device)
+        pred = model(x=ap, edges=edges, n_nodes=n_mol)
+        #print(path_loss)
+        l = loss(pred, label)
+        l.backward()
+        optimizer.step()
+
+        resi["loss"] += l.item() * batch_size
+        resi["counter"] += batch_size
+
+    return  resi["loss"] / resi["counter"]
+
 
 def train_perm(
     model_t: NNCV,
@@ -291,6 +353,119 @@ def train_rot(
             print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
 
     return loss.item()
+
+
+from committor_regularisation import e_path_loss
+
+def train_gnn_comm_reg(
+    model: GNNCV,
+    loader: DataLoader,
+    n_mol: int,
+    optimizer,
+    loss,
+    cols,
+    device: str,
+    kT: float,
+    calc,
+    box_length: float,
+    lamb=1,
+    n_at=1,
+    alpha=0.9,
+    emax=10,
+    L=5
+) -> float:
+    """Performs one training epoch for a GNN with Committor Regularisation.
+
+    :param model: The model to be trained
+    :type model: GNNCV
+    :param loader: Wrapper around a GNNTrajectory dataset.
+    :type loader: DataLoader
+    :param n_mol: Number of nodes per frame.
+    :type n_mol: int
+    :param optimizer: The optimizer object for the training.
+    :type optimizer: torch.optim.Optimizer
+    :param loss: Loss function for the training.
+    :type loss: torch.nn._Loss
+    :param cols: Columns to be used from the dataset.
+    :type cols: list
+    :param device: Device that the training is performed on. (Required for GPU compatibility)
+    :type device: str
+    :param kT: kT value for the CR Loss
+    :type kT: float
+    :param calc: Calculator object for energy calculations.
+    :type calc: _type_
+    :param box_length: Box length for periodic boundary conditions.
+    :type box_length: float
+    :param lamb: Regularization parameter for mixing CR loss and default loss, defaults to 1
+    :type lamb: int, optional
+    :param n_at: Number of atoms per node, defaults to 1
+    :type n_at: int, optional
+    :param alpha: Decay parameter for the CR Loss, defaults to 0.9
+    :type alpha: float, optional
+    :param emax: Maximum energy threshold for the CR Loss, defaults to 10
+    :type emax: int, optional
+    :param L: Number of steps taking in the path loss evaluation, defaults to 5
+    :type L: int, optional
+    :return: Return the average total loss over the epoch.
+    :rtype: float
+    """
+    resi = {"loss": 0, "path_loss":0, "total_loss":0, "counter": 0}
+    for batch, (X, y, r, c, re, ce) in enumerate(loader):
+        model.train()
+        optimizer.zero_grad()
+        batch_size = len(X)
+        X.requires_grad = True
+        ap = X.view(-1, 3 * n_at).to(device)
+        row_new = []
+        col_new = []
+        for i in range(0, len(r)):
+            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
+            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
+
+        row_new = torch.cat([ro for ro in row_new])
+        col_new = torch.cat([co for co in col_new])
+
+        if row_new[0] >= n_mol - 1:
+            row_new -= n_mol
+            col_new -= n_mol
+
+        edges = [row_new.long().to(device), col_new.long().to(device)]
+
+        row_new_e = []
+        col_new_e = []
+        for i in range(0, len(r)):
+            row_new_e.append(re[i][re[i] >= 0] + n_mol * (i))
+            col_new_e.append(ce[i][ce[i] >= 0] + n_mol * (i))
+
+        row_new_e = torch.cat([ro for ro in row_new_e])
+        col_new_e = torch.cat([co for co in col_new_e])
+
+        if row_new_e[0] >= n_mol - 1:
+            row_new_e -= n_mol
+            col_new_e -= n_mol
+
+        edges_e = [row_new_e.long().to(device), col_new_e.long().to(device)]
+
+        label = y[:,cols].to(device)
+        beta = 1/(kT)
+        pred = model(x=ap, edges=edges, n_nodes=n_mol)
+
+        path_loss = torch.mean(e_path_loss(model, calc, ap, edges, edges_e, n_mol, box_length, batch_size, beta, alpha, emax, L, device))
+        #print(path_loss)
+        l = loss(pred, label)
+        resi["loss"] += l.item() * batch_size
+        resi["path_loss"] += torch.mean(path_loss).item() * batch_size
+
+        #print(comm_reg)
+        l += lamb*torch.mean(path_loss)
+
+        l.backward()
+        optimizer.step()
+
+        resi["total_loss"] += l.item() * batch_size
+        resi["counter"] += batch_size
+
+    return resi["total_loss"] / resi["counter"], resi["loss"] / resi["counter"], resi["path_loss"] / resi["counter"]
 
 
 def test_linear(
@@ -423,6 +598,97 @@ def test_gnn_mult(
         res["counter"] += batch_size
 
     return res["loss"] / res["counter"]
+
+
+def test_gnn_e(
+    model: GNNCV, loader: DataLoader, n_mol: int, loss_l1, cols, device: str, kT: float, calc, boxlength: float,
+    n_at=1,
+    alpha=0.9,
+    emax=10,
+    L=5
+
+    ):
+    """Evaluate the test/validation error and CR/Committor Path Loss for a GNN
+
+    :param model: Model to be evaluated
+    :type model: GNNCV
+    :param loader: dataloader containing the test frames
+    :type loader: DataLoader
+    :param n_mol: Number of molecules/number of nodes in the model
+    :type n_mol: int
+    :param loss_l1: Loss function to be used for the test error
+    :type loss_l1: torch.nn._Loss
+    :param cols: List of column indices representing the target CVs in the dataset
+    :type cols: List[int]
+    :param device: Device to perform the computation on
+    :type device: str
+    :param kT: kT value for the CR Loss
+    :type kT: float
+    :param calc: Calculator object for evaluating the energy of a frame
+    :type calc: Object
+    :param boxlength: Box length for periodic boundary conditions
+    :type boxlength: float
+    :param n_at: Number of atoms per molecule, defaults to 1
+    :type n_at: int, optional
+    :param alpha: Decay factor for the path loss, defaults to 0.9
+    :type alpha: float, optional
+    :param emax: Maximum error value for the path loss, defaults to 10
+    :type emax: int, optional
+    :param L: Number of steps for the path loss, defaults to 5
+    :type L: int, optional
+    :return: Tuple containing the average loss and average path loss over the epoch
+    :rtype: Tuple[float, float]
+    """
+    res = {"loss": 0, "counter": 0, "path_loss": 0}
+    for batch, (X, y, r, c, re, ce) in enumerate(loader):
+        model.eval()
+        batch_size = len(X)
+
+        X.requires_grad = True
+        atom_positions = X.view(-1, 3 * n_at).to(device)
+
+        row_new = []
+        col_new = []
+        for i in range(0, len(r)):
+            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
+            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
+
+        row_new = torch.cat([ro for ro in row_new])
+        col_new = torch.cat([co for co in col_new])
+        if row_new[0] >= n_mol - 1:
+            row_new -= n_mol
+            col_new -= n_mol
+
+        edges = [row_new.long().to(device), col_new.long().to(device)]
+        
+        row_new_e = []
+        col_new_e = []
+        for i in range(0, len(r)):
+            row_new_e.append(re[i][re[i] >= 0] + n_mol * (i))
+            col_new_e.append(ce[i][ce[i] >= 0] + n_mol * (i))
+
+        row_new_e = torch.cat([ro for ro in row_new_e])
+        col_new_e = torch.cat([co for co in col_new_e])
+
+        if row_new_e[0] >= n_mol - 1:
+            row_new_e -= n_mol
+            col_new_e -= n_mol
+
+        edges_e = [row_new_e.long().to(device), col_new_e.long().to(device)]
+
+        label = y[:,cols].to(device)
+        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
+        # print(label, pred)
+        loss = loss_l1(pred, label)
+
+        beta = 1/(kT)
+
+        path_loss = torch.mean(e_path_loss(model, calc, atom_positions, edges, edges_e, n_mol, boxlength, batch_size, beta, alpha, emax, L, device))
+        res["loss"] += loss.item() * batch_size
+        res["counter"] += batch_size
+        res["path_loss"] += path_loss.item() * batch_size
+
+    return res["loss"] / res["counter"], res["path_loss"] / res["counter"]
 
 
 def early_stopping_gnn(

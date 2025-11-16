@@ -8,848 +8,396 @@ from typing import Callable
 from scipy.spatial.transform import Rotation as R
 import mdtraj as md
 
-from NNucleate.utils import pbc_config
+from NNucleate.utils import pbc_config, flatten_graph_edges, select_labels
 
+# ==========================
+# Unified NN (linear) training/testing/evaluation
+# ==========================
 
-def train_linear(
-    model_t: NNCV,
+def train_nn(
+    model: NNCV,
     dataloader: DataLoader,
-    loss_fn: Callable,
-    optimizer: Callable,
+    loss_fn: callable,
+    optimizer: callable,
     device: str,
-    print_batch=1000000,
+    print_batch: int = 1000000,
+    augment: str = None,  # None | 'permute' | 'rotate'
+    n_trans: int = 1,
 ) -> float:
-    """Performs one training epoch for a NNCV.
+    """One training epoch for an NN model with optional augmentation.
 
-    :param model_t: The network to be trained.
-    :type model_t: NNCV
-    :param dataloader: Wrappper for the training set.
-    :type dataloader: torch.utils.data.Dataloader
-    :param loss_fn: Pytorch loss to be used during training.
-    :type loss_fn: torch.nn._Loss
-    :param optimizer: Pytorch optimizer to be used during training.
-    :type optimizer: torch.optim
-    :param device: Pytorch device to run the calculation on. Supports CPU and GPU (cuda).
-    :type device: str
-    :param print_batch: Set to recieve printed updates on the lost every print_batch batches, defaults to 1000000.
-    :type print_batch: int, optional
-    :return: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.
-    :rtype: float
+    augment='permute' reproduces train_perm; augment='rotate' reproduces train_rot.
     """
     size = len(dataloader.dataset)
+    last_loss = 0.0
     for batch, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
 
-        # Compute prediction error
-        pred = model_t(X)
+        pred = model(X)
         loss = loss_fn(pred.flatten(), y)
 
-        # Backpropagation
+        if augment == 'permute' and n_trans > 0:
+            for _ in range(n_trans):
+                pred_perm = model(X[:, torch.randperm(X.size(1))])
+                loss += loss_fn(pred_perm.flatten(), y)
+            loss /= n_trans
+        elif augment == 'rotate' and n_trans > 0:
+            for _ in range(n_trans):
+                quat = md.utils.uniform_quaternion()
+                rot = R.from_quat(quat)
+                # Inputs are normalized by box length in datasets; keep 1.0 as in original
+                X_rot = torch.tensor([pbc_config(rot.apply(x.cpu().numpy()), 1.0) for x in X]).float().to(device)
+                pred_rot = model(X_rot)
+                loss += loss_fn(pred_rot.flatten(), y)
+            loss /= n_trans
+
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
+        last_loss = loss.item()
         if batch % print_batch == 0:
-            loss, current = loss.item(), batch * len(X)
-            print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
+            current = batch * len(X)
+            print(f"loss: {last_loss:>7f} [{current:>5d}/{size:>5d}]")
 
-    return loss.item()
+    return last_loss
 
 
-def train_gnn(
-    model: GNNCV,
-    loader: DataLoader,
-    n_mol: int,
-    optimizer: Callable,
-    loss: Callable,
-    device: str,
-    n_at=1,
-) -> float:
-    """Function to perform one epoch of a GNN training.
-
-    :param model: Graph-based model_t to be trained.
-    :type model: GNNCV
-    :param loader: Wrapper around a GNNTrajectory dataset.
-    :type loader: torch.utils.data.Dataloader
-    :param n_at: Number of nodes per frame.
-    :type n_at: int
-    :param optimizer: The optimizer object for the training.
-    :type optimizer: torch.optim
-    :param loss: Loss function for the training.
-    :type loss: torch.nn._Loss
-    :param device: Device that the training is performed on. (Required for GPU compatibility)
-    :type device: str
-    :param n_at: Number of atoms per molecule.
-    :type n_at: int, optional
-    :return: Return the average loss over the epoch.
-    :rtype: float
-    """
-    res = {"loss": 0, "counter": 0}
-    for batch, (X, y, r, c) in enumerate(loader):
-        model.train()
-        optimizer.zero_grad()
-        batch_size = len(X)
-        atom_positions = X.view(-1, 3 * n_at).to(device)
-
-        row_new = []
-        col_new = []
-        for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
-            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
-
-        row_new = torch.cat([ro for ro in row_new])
-        col_new = torch.cat([co for co in col_new])
-
-        if row_new[0] >= n_mol - 1:
-            row_new -= n_mol
-            col_new -= n_mol
-
-        edges = [row_new.long().to(device), col_new.long().to(device)]
-        label = y.to(device)
-
-        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
-        l = loss(pred, label)
-        l.backward()
-        optimizer.step()
-
-        res["loss"] += l.item() * batch_size
-        res["counter"] += batch_size
-
-    return res["loss"] / res["counter"]
-
-
-def train_gnn_mult(
-    model: GNNCV,
-    loader: DataLoader,
-    n_mol: int,
-    optimizer,
-    loss,
-    device: str,
-    cols: list,
-    n_at=1,
-) -> float:
-    """Function to perform one epoch of a GNN with multidimensional output training.
-
-    :param model: Graph-based model_t to be trained.
-    :type model: GNNCV
-    :param loader: Wrapper around a GNNTrajectory dataset.
-    :type loader: torch.utils.data.Dataloader
-    :param n_at: Number of nodes per frame.
-    :type n_at: int
-    :param optimizer: The optimizer object for the training.
-    :type optimizer: torch.optim
-    :param loss: Loss function for the training.
-    :type loss: torch.nn._Loss
-    :param device: Device that the training is performed on. (Required for GPU compatibility)
-    :type device: str
-    :param cols: List of column indices representing the CVs the model is learning from the dataset.
-    :type cols: list
-    :param n_at: Number of atoms per molecule.
-    :type n_at: int, optional
-    :return: Return the average loss over the epoch.
-    :rtype: float
-    """
-    res = {"loss": 0, "counter": 0}
-    for batch, (X, y, r, c) in enumerate(loader):
-        model.train()
-        optimizer.zero_grad()
-        batch_size = len(X)
-        atom_positions = X.view(-1, 3 * n_at).to(device)
-
-        row_new = []
-        col_new = []
-        for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
-            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
-
-        row_new = torch.cat([ro for ro in row_new])
-        col_new = torch.cat([co for co in col_new])
-
-        if row_new[0] >= n_mol - 1:
-            row_new -= n_mol
-            col_new -= n_mol
-
-        edges = [row_new.long().to(device), col_new.long().to(device)]
-        label = y[:,cols].to(device)
-
-        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
-
-        l = loss(pred, label)
-        l.backward()
-        optimizer.step()
-
-        res["loss"] += l.item() * batch_size
-        res["counter"] += batch_size
-
-    return res["loss"] / res["counter"]
-
-def train_gnn_e(
-    model,
-    loader: DataLoader,
-    n_mol: int,
-    optimizer,
-    loss,
-    cols,
-    device: str,
-    n_at=1,
-) -> float:
-    """Function to perform one epoch of a GNN training.
-
-    :param model: Graph-based model_t to be trained.
-    :type model: GNNCV
-    :param loader: Wrapper around a GNNTrajectory dataset.
-    :type loader: torch.utils.data.Dataloader
-    :param n_at: Number of nodes per frame.
-    :type n_at: int
-    :param optimizer: The optimizer object for the training.
-    :type optimizer: torch.optim
-    :param loss: Loss function for the training.
-    :type loss: torch.nn._Loss
-    :param device: Device that the training is performed on. (Required for GPU compatibility)
-    :type device: str
-    :param n_at: Number of atoms per molecule.
-    :type n_at: int, optional
-    :return: Return the average loss over the epoch.
-    :rtype: float
-    """
-    resi = {"loss": 0, "counter": 0}
-    for batch, (X, y, r, c, re, ce) in enumerate(loader):
-        model.train()
-        optimizer.zero_grad()
-        batch_size = len(X)
-        X.requires_grad = True
-        ap = X.view(-1, 3 * n_at).to(device)
-        row_new = []
-        col_new = []
-        for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
-            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
-
-        row_new = torch.cat([ro for ro in row_new])
-        col_new = torch.cat([co for co in col_new])
-
-        if row_new[0] >= n_mol - 1:
-            row_new -= n_mol
-            col_new -= n_mol
-
-        edges = [row_new.long().to(device), col_new.long().to(device)]
-        label = y[:,cols].to(device)
-        pred = model(x=ap, edges=edges, n_nodes=n_mol)
-        #print(path_loss)
-        l = loss(pred, label)
-        l.backward()
-        optimizer.step()
-
-        resi["loss"] += l.item() * batch_size
-        resi["counter"] += batch_size
-
-    return  resi["loss"] / resi["counter"]
-
-
-def train_perm(
-    model_t: NNCV,
-    dataloader: DataLoader,
-    optimizer: Callable,
-    loss_fn: Callable,
-    n_trans: int,
-    device: str,
-    print_batch=1000000,
-) -> float:
-    """Performs one training epoch for a NNCV but the loss for each batch is not just calculated on one reference structure but a set of n_trans permutated versions of that structure.
-
-    :param dataloader: Wrapper around a GNNTrajectory dataset.
-    :type dataloader: torch.utils.data.Dataloader
-    :param optimizer: The optimizer object for the training.
-    :type optimizer: torch.optim
-    :param loss_fn: Loss function for the training.
-    :type loss_fn: torch.nn._Loss
-    :param n_trans: Number of permutated structures used for the loss calculations.
-    :type n_trans: int
-    :param device: Pytorch device to run the calculations on. Supports CPU and GPU (cuda).
-    :type device: str
-    :param print_batch: Set to recieve printed updates on the loss every print_batches batches, defaults to 1000000.
-    :type print_batch: int, optional
-    :return: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.
-    :rtype: float
-    """
-    size = len(dataloader.dataset)
-    for batch, (X, y) in enumerate(dataloader):
-        X, y = X.to(device), y.to(device)
-
-        # Compute prediction error
-        pred = model_t(X)
-        loss = loss_fn(pred.flatten(), y)
-
-        for i in range(n_trans):
-            # Shuffle the tensors in the batch
-            pred = model_t(X[:, torch.randperm(X.size()[1])])
-            loss += loss_fn(pred.flatten(), y)
-
-        loss /= n_trans
-
-        # Backpropagation
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        if batch % print_batch == 0:
-            loss, current = loss.item(), batch * len(X)
-            print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
-
-    return loss.item()
-
-
-def train_rot(
-    model_t: NNCV,
-    dataloader: DataLoader,
-    optimizer: Callable,
-    loss_fn: Callable,
-    n_trans: int,
-    device: str,
-    print_batch=1000000,
-) -> float:
-    """Performs one training epoch for a NNCV but the loss for each batch is not just calculated on one reference structure but a set of n_trans rotated versions of that structure.
-
-    :param dataloader: Wrapper around a GNNTrajectory dataset.
-    :type dataloader: torch.utils.data.Dataloader
-    :param optimizer: The optimizer object for the training.
-    :type optimizer: torch.optim
-    :param loss_fn: Loss function for the training.
-    :type loss_fn: torch.nn._Loss
-    :param n_trans: Number of rotated structures used for the loss calculations.
-    :type n_trans: int
-    :param device: Pytorch device to run the calculations on. Supports CPU and GPU (cuda).
-    :type device: str
-    :param print_batch: Set to recieve printed updates on the loss every print_batches batches, defaults to 1000000.
-    :type print_batch: int, optional
-    :return: Returns the last loss item. For easy learning curve recording. Alternatively one can use a Tensorboard.
-    :rtype: float
-    """
-    size = len(dataloader.dataset)
-    for batch, (X, y) in enumerate(dataloader):
-        X, y = X.to(device), y.to(device)
-
-        # Compute prediction error
-        pred = model_t(X)
-        loss = loss_fn(pred.flatten(), y)
-
-        for i in range(n_trans):
-            # Shuffle the tensors in the batch
-            quat = md.utils.uniform_quaternion()
-            rot = R.from_quat(quat)
-            X_rot = torch.tensor([pbc_config(rot.apply(x), 1.0) for x in X]).float()
-            pred = model_t(X_rot)
-            loss += loss_fn(pred.flatten(), y)
-
-        loss /= n_trans
-
-        # Backpropagation
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        if batch % print_batch == 0:
-            loss, current = loss.item(), batch * len(X)
-            print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
-
-    return loss.item()
-
-
-from committor_regularisation import e_path_loss
-
-def train_gnn_comm_reg(
-    model: GNNCV,
-    loader: DataLoader,
-    n_mol: int,
-    optimizer,
-    loss,
-    cols,
-    device: str,
-    kT: float,
-    calc,
-    box_length: float,
-    lamb=1,
-    n_at=1,
-    alpha=0.9,
-    emax=10,
-    L=5
-) -> float:
-    """Performs one training epoch for a GNN with Committor Regularisation.
-
-    :param model: The model to be trained
-    :type model: GNNCV
-    :param loader: Wrapper around a GNNTrajectory dataset.
-    :type loader: DataLoader
-    :param n_mol: Number of nodes per frame.
-    :type n_mol: int
-    :param optimizer: The optimizer object for the training.
-    :type optimizer: torch.optim.Optimizer
-    :param loss: Loss function for the training.
-    :type loss: torch.nn._Loss
-    :param cols: Columns to be used from the dataset.
-    :type cols: list
-    :param device: Device that the training is performed on. (Required for GPU compatibility)
-    :type device: str
-    :param kT: kT value for the CR Loss
-    :type kT: float
-    :param calc: Calculator object for energy calculations.
-    :type calc: _type_
-    :param box_length: Box length for periodic boundary conditions.
-    :type box_length: float
-    :param lamb: Regularization parameter for mixing CR loss and default loss, defaults to 1
-    :type lamb: int, optional
-    :param n_at: Number of atoms per node, defaults to 1
-    :type n_at: int, optional
-    :param alpha: Decay parameter for the CR Loss, defaults to 0.9
-    :type alpha: float, optional
-    :param emax: Maximum energy threshold for the CR Loss, defaults to 10
-    :type emax: int, optional
-    :param L: Number of steps taking in the path loss evaluation, defaults to 5
-    :type L: int, optional
-    :return: Return the average total loss over the epoch.
-    :rtype: float
-    """
-    resi = {"loss": 0, "path_loss":0, "total_loss":0, "counter": 0}
-    for batch, (X, y, r, c, re, ce) in enumerate(loader):
-        model.train()
-        optimizer.zero_grad()
-        batch_size = len(X)
-        X.requires_grad = True
-        ap = X.view(-1, 3 * n_at).to(device)
-        row_new = []
-        col_new = []
-        for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
-            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
-
-        row_new = torch.cat([ro for ro in row_new])
-        col_new = torch.cat([co for co in col_new])
-
-        if row_new[0] >= n_mol - 1:
-            row_new -= n_mol
-            col_new -= n_mol
-
-        edges = [row_new.long().to(device), col_new.long().to(device)]
-
-        row_new_e = []
-        col_new_e = []
-        for i in range(0, len(r)):
-            row_new_e.append(re[i][re[i] >= 0] + n_mol * (i))
-            col_new_e.append(ce[i][ce[i] >= 0] + n_mol * (i))
-
-        row_new_e = torch.cat([ro for ro in row_new_e])
-        col_new_e = torch.cat([co for co in col_new_e])
-
-        if row_new_e[0] >= n_mol - 1:
-            row_new_e -= n_mol
-            col_new_e -= n_mol
-
-        edges_e = [row_new_e.long().to(device), col_new_e.long().to(device)]
-
-        label = y[:,cols].to(device)
-        beta = 1/(kT)
-        pred = model(x=ap, edges=edges, n_nodes=n_mol)
-
-        path_loss = torch.mean(e_path_loss(model, calc, ap, edges, edges_e, n_mol, box_length, batch_size, beta, alpha, emax, L, device))
-        #print(path_loss)
-        l = loss(pred, label)
-        resi["loss"] += l.item() * batch_size
-        resi["path_loss"] += torch.mean(path_loss).item() * batch_size
-
-        #print(comm_reg)
-        l += lamb*torch.mean(path_loss)
-
-        l.backward()
-        optimizer.step()
-
-        resi["total_loss"] += l.item() * batch_size
-        resi["counter"] += batch_size
-
-    return resi["total_loss"] / resi["counter"], resi["loss"] / resi["counter"], resi["path_loss"] / resi["counter"]
-
-
-def test_linear(
-    model_t: NNCV, dataloader: DataLoader, loss_fn: Callable, device: str
-) -> float:
-    """Calculates the current average test set loss.
-
-    :param model_t: Model that is being trained.
-    :type model_t: NNCV
-    :param dataloader: Dataloader loading the test set.
-    :type dataloader: torch.utils.data.Dataloader
-    :param loss_fn: Pytorch loss function.
-    :type loss_fn: torch.nn._Loss
-    :param device: Device that the training is performed on. (Required for GPU compatibility)
-    :type device: str
-    :return: Return the validation loss.
-    :rtype: float
-    """
-    size = len(dataloader.dataset)
+def test_nn(model: NNCV, dataloader: DataLoader, loss_fn: callable, device: str) -> float:
+    model.eval()
     num_batches = len(dataloader)
-    model_t.eval()
-    test_loss = 0
+    test_loss = 0.0
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
-            pred = model_t(X)
+            pred = model(X)
             test_loss += loss_fn(pred.flatten(), y).item()
-
-    test_loss /= num_batches
+    test_loss /= max(1, num_batches)
     print(f"Avg. Test loss: {test_loss:>8f} \n")
     return test_loss
 
 
-def test_gnn(
-    model: GNNCV, loader: DataLoader, n_mol: int, loss_l1: Callable, device: str, n_at=1
-) -> float:
-    """Evaluate the test/validation error of a graph based model_t on a validation set. 
-
-    :param model: Graph-based model_t to be trained.
-    :type model: GNNCV
-    :param loader: Wrapper around a GNNTrajectory dataset.
-    :type loader: torch.utils.data.Dataloader
-    :param n_mol: Number of nodes per frame.
-    :type n_mol: int
-    :param loss_l1: Loss function for the training.
-    :type loss_l1: torch.nn._Loss
-    :param device: Device that the training is performed on. (Required for GPU compatibility)
-    :type device: str
-    :param n_at: Number of atoms per molecule.
-    :type n_at: int, optional
-    :return: Return the average loss over the epoch.
-    :rtype: float
-    """
-    res = {"loss": 0, "counter": 0}
-    for batch, (X, y, r, c) in enumerate(loader):
-        model.eval()
-        batch_size = len(X)
-        atom_positions = X.view(-1, 3 * n_at).to(device)
-
-        row_new = []
-        col_new = []
-        for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
-            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
-
-        row_new = torch.cat([ro for ro in row_new])
-        col_new = torch.cat([co for co in col_new])
-        if row_new[0] >= n_mol - 1:
-            row_new -= n_mol
-            col_new -= n_mol
-
-        edges = [row_new.long().to(device), col_new.long().to(device)]
-        label = y.to(device)
-        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
-        # print(label, pred)
-        loss = loss_l1(pred, label)
-
-        res["loss"] += loss.item() * batch_size
-        res["counter"] += batch_size
-
-    return res["loss"] / res["counter"]
-
-
-def test_gnn_mult(
-    model: GNNCV, loader: DataLoader, n_mol: int, loss_l1, device: str, cols: list, n_at=1
-) -> float:
-    """Evaluate the test/validation error of a graph based model with multidimensional output on a test set.
-
-    :param model: Graph-based model_t to be trained.
-    :type model: GNNCV
-    :param loader: Wrapper around a GNNTrajectory dataset.
-    :type loader: torch.utils.data.Dataloader
-    :param n_mol: Number of nodes per frame.
-    :type n_mol: int
-    :param loss_l1: Loss function for the training.
-    :type loss_l1: torch.nn._Loss
-    :param device: Device that the training is performed on. (Required for GPU compatibility)
-    :type device: str
-    :param cols: List of column indices representing the CVs the model is learning from the dataset.
-    :type cols: list
-    :param n_at: Number of atoms per molecule.
-    :type n_at: int, optional
-    :return: Return the average loss over the epoch.
-    :rtype: float
-    """
-    res = {"loss": 0, "counter": 0}
-    for batch, (X, y, r, c) in enumerate(loader):
-        model.eval()
-        batch_size = len(X)
-        atom_positions = X.view(-1, 3 * n_at).to(device)
-
-        row_new = []
-        col_new = []
-        for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
-            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
-
-        row_new = torch.cat([ro for ro in row_new])
-        col_new = torch.cat([co for co in col_new])
-        if row_new[0] >= n_mol - 1:
-            row_new -= n_mol
-            col_new -= n_mol
-
-        edges = [row_new.long().to(device), col_new.long().to(device)]
-        label = y[:,cols].to(device)
-        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
-        loss = loss_l1(pred, label)
-
-        res["loss"] += loss.item() * batch_size
-        res["counter"] += batch_size
-
-    return res["loss"] / res["counter"]
-
-
-def test_gnn_e(
-    model: GNNCV, loader: DataLoader, n_mol: int, loss_l1, cols, device: str, kT: float, calc, boxlength: float,
-    n_at=1,
-    alpha=0.9,
-    emax=10,
-    L=5
-
-    ):
-    """Evaluate the test/validation error and CR/Committor Path Loss for a GNN
-
-    :param model: Model to be evaluated
-    :type model: GNNCV
-    :param loader: dataloader containing the test frames
-    :type loader: DataLoader
-    :param n_mol: Number of molecules/number of nodes in the model
-    :type n_mol: int
-    :param loss_l1: Loss function to be used for the test error
-    :type loss_l1: torch.nn._Loss
-    :param cols: List of column indices representing the target CVs in the dataset
-    :type cols: List[int]
-    :param device: Device to perform the computation on
-    :type device: str
-    :param kT: kT value for the CR Loss
-    :type kT: float
-    :param calc: Calculator object for evaluating the energy of a frame
-    :type calc: Object
-    :param boxlength: Box length for periodic boundary conditions
-    :type boxlength: float
-    :param n_at: Number of atoms per molecule, defaults to 1
-    :type n_at: int, optional
-    :param alpha: Decay factor for the path loss, defaults to 0.9
-    :type alpha: float, optional
-    :param emax: Maximum error value for the path loss, defaults to 10
-    :type emax: int, optional
-    :param L: Number of steps for the path loss, defaults to 5
-    :type L: int, optional
-    :return: Tuple containing the average loss and average path loss over the epoch
-    :rtype: Tuple[float, float]
-    """
-    res = {"loss": 0, "counter": 0, "path_loss": 0}
-    for batch, (X, y, r, c, re, ce) in enumerate(loader):
-        model.eval()
-        batch_size = len(X)
-
-        X.requires_grad = True
-        atom_positions = X.view(-1, 3 * n_at).to(device)
-
-        row_new = []
-        col_new = []
-        for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
-            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
-
-        row_new = torch.cat([ro for ro in row_new])
-        col_new = torch.cat([co for co in col_new])
-        if row_new[0] >= n_mol - 1:
-            row_new -= n_mol
-            col_new -= n_mol
-
-        edges = [row_new.long().to(device), col_new.long().to(device)]
-        
-        row_new_e = []
-        col_new_e = []
-        for i in range(0, len(r)):
-            row_new_e.append(re[i][re[i] >= 0] + n_mol * (i))
-            col_new_e.append(ce[i][ce[i] >= 0] + n_mol * (i))
-
-        row_new_e = torch.cat([ro for ro in row_new_e])
-        col_new_e = torch.cat([co for co in col_new_e])
-
-        if row_new_e[0] >= n_mol - 1:
-            row_new_e -= n_mol
-            col_new_e -= n_mol
-
-        edges_e = [row_new_e.long().to(device), col_new_e.long().to(device)]
-
-        label = y[:,cols].to(device)
-        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
-        # print(label, pred)
-        loss = loss_l1(pred, label)
-
-        beta = 1/(kT)
-
-        path_loss = torch.mean(e_path_loss(model, calc, atom_positions, edges, edges_e, n_mol, boxlength, batch_size, beta, alpha, emax, L, device))
-        res["loss"] += loss.item() * batch_size
-        res["counter"] += batch_size
-        res["path_loss"] += path_loss.item() * batch_size
-
-    return res["loss"] / res["counter"], res["path_loss"] / res["counter"]
-
-
-
-def evaluate_model_gnn(
-    model: GNNCV, dataloader: DataLoader, n_mol: int, device: str, n_at=1
-) -> tuple:
-    """Helper function that evaluates a model on a training set and calculates some properies for the generation of performance scatter plots.
-
-    :param model: The model that is to be evaluated.
-    :type model: GNNCV
-    :param dataloader: Wrapper around the dataset that the model is supposed to be evaluated on.
-    :type dataloader: torch.utils.data.Dataloader
-    :param n_mol: Number of nodes in the graph of each frame. (Number of atoms or molecules)
-    :type n_mol: int
-    :param device: Device that the training is performed on. (Required for GPU compatibility)
-    :type device: str
-    :param n_at: Number of atoms per molecule.
-    :type n_at: int, optional
-    :return: Returns the prediction of the model on each frame, the corresponding true values, the root mean square error of the predictions and the r2 correlation coefficient.
-    :rtype: List of float, List of float, float, float
-    """
-    preds = []
-    ys = []
-    for batch, (X, y, r, c) in enumerate(dataloader):
-        model.eval()
-        # optimizer.zero_grad()
-        batch_size = len(X)
-        atom_positions = X.view(-1, 3 * n_at).to(device)
-        row_new = []
-        col_new = []
-        for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
-            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
-
-        row_new = torch.cat([ro for ro in row_new])
-        col_new = torch.cat([co for co in col_new])
-
-        if row_new[0] >= n_mol - 1:
-            row_new -= n_mol
-            col_new -= n_mol
-
-        edges = [row_new.long().to(device), col_new.long().to(device)]
-        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
-        [ys.append(ref.item()) for ref in y]
-        [preds.append(pre.item()) for pre in pred]
-
-    rmse = np.mean((np.array(preds) - np.array(ys)) ** 2) ** 0.5
-    r2 = np.corrcoef(preds, ys)[0, 1]
-
+def evaluate_nn(model: NNCV, dataloader: DataLoader, device: str):
+    model.eval()
+    preds, ys = [], []
+    with torch.no_grad():
+        for X, y in dataloader:
+            X = X.to(device)
+            pred = model(X).flatten().cpu().numpy()
+            preds.extend(pred.tolist())
+            ys.extend(y.cpu().numpy().tolist())
+    preds_arr = np.array(preds)
+    ys_arr = np.array(ys)
+    rmse = np.mean((preds_arr - ys_arr) ** 2) ** 0.5
+    r2 = np.corrcoef(preds_arr, ys_arr)[0, 1]
     return preds, ys, rmse, r2
 
 
-def evaluate_model_gnn_mult(
-    model: GNNCV, dataloader: DataLoader, n_mol: int, device: str, cols: list, n_at=1
-) -> tuple:
-    """Helper function that evaluates a model on a training set and calculates some properies for the generation of performance scatter plots.
+# ==========================
+# Unified GNN training/testing/evaluation
+# ==========================
 
-    :param model: The model that is to be evaluated.
-    :type model: GNNCV
-    :param dataloader: Wrapper around the dataset that the model is supposed to be evaluated on.
-    :type dataloader: torch.utils.data.Dataloader
-    :param n_mol: Number of nodes in the graph of each frame. (Number of atoms or molecules)
-    :type n_mol: int
-    :param device: Device that the training is performed on. (Required for GPU compatibility)
-    :type device: str
-    :param cols: List of column indices representing the CVs the model is learning from the dataset.
-    :type cols: list
-    :param n_at: Number of atoms per molecule.
-    :type n_at: int, optional
-    :return: Returns the prediction of the model on each frame, the corresponding true values, the root mean square errors of the predictions and the r2 correlation coefficients.
-    :rtype: List of List of float, List of List of float, List of float, List of float
+try:
+    # Prefer package-relative import
+    from .committor_regularisation import e_path_loss
+except Exception:
+    # Fallback to original local import path for compatibility
+    from committor_regularisation import e_path_loss
+
+
+def train_gnn_unified(
+    model: GNNCV,
+    loader: DataLoader,
+    n_mol: int,
+    optimizer: callable,
+    loss_fn: callable,
+    device: str,
+    *,
+    n_at: int = 1,
+    cols: list = None,
+    committor: dict = None,  # {kT, calc, box_length, lamb, alpha, emax, L}
+) -> float | tuple:
+    """One training epoch for a GNN model.
+
+    - cols: select multi-output columns if provided (replaces train_gnn_mult, train_gnn_e)
+    - committor: if provided and loader yields extra edges (re, ce), add path loss as in train_gnn_comm_reg
+    Returns avg loss; if committor provided, returns (avg_total_loss, avg_pred_loss, avg_path_loss)
+    """
+    res = {"loss": 0.0, "path_loss": 0.0, "total_loss": 0.0, "counter": 0}
+    use_comm = committor is not None
+    for batch in loader:
+        # Support batches with or without extra edges
+        if len(batch) == 4:
+            X, y, r, c = batch
+            re = ce = None
+        elif len(batch) == 6:
+            X, y, r, c, re, ce = batch
+        else:
+            raise ValueError("Unexpected batch structure for GNN loader.")
+
+        model.train()
+        optimizer.zero_grad()
+        batch_size = len(X)
+        atom_positions = X.view(-1, 3 * n_at).to(device)
+
+        edges = flatten_graph_edges(r, c, n_mol)
+        edges = [edges[0].to(device), edges[1].to(device)]
+
+        label = flatten_graph_edges(y, cols).to(device)
+        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
+
+        l_pred = loss_fn(pred, label)
+
+        if use_comm:
+            if re is None or ce is None:
+                raise ValueError("Committor regularisation requires dataset to provide extra edges (re, ce).")
+            edges_e = flatten_graph_edges(re, ce, n_mol)
+            edges_e = [edges_e[0].to(device), edges_e[1].to(device)]
+
+            beta = 1.0 / committor["kT"]
+            path_l = torch.mean(
+                e_path_loss(
+                    model,
+                    committor["calc"],
+                    atom_positions,
+                    edges,
+                    edges_e,
+                    n_mol,
+                    committor["box_length"],
+                    batch_size,
+                    beta,
+                    committor.get("alpha", 0.9),
+                    committor.get("emax", 10),
+                    committor.get("L", 5),
+                    device,
+                )
+            )
+            total_l = l_pred + committor.get("lamb", 1) * path_l
+            total_l.backward()
+            optimizer.step()
+
+            res["loss"] += l_pred.item() * batch_size
+            res["path_loss"] += float(path_l.item()) * batch_size
+            res["total_loss"] += float(total_l.item()) * batch_size
+            res["counter"] += batch_size
+        else:
+            l_pred.backward()
+            optimizer.step()
+            res["loss"] += l_pred.item() * batch_size
+            res["counter"] += batch_size
+
+    if use_comm:
+        return (
+            res["total_loss"] / res["counter"],
+            res["loss"] / res["counter"],
+            res["path_loss"] / res["counter"],
+        )
+    return res["loss"] / res["counter"]
+
+
+def test_gnn_unified(
+    model: GNNCV,
+    loader: DataLoader,
+    n_mol: int,
+    loss_fn: callable,
+    device: str,
+    *,
+    n_at: int = 1,
+    cols: list = None,
+    committor: dict = None,
+):
+    """Evaluate GNN model on a validation/test set.
+
+    Returns avg loss; if committor provided, also returns avg path loss.
+    """
+    res = {"loss": 0.0, "counter": 0, "path_loss": 0.0}
+    use_comm = committor is not None
+    model.eval()
+    with torch.no_grad():
+        for batch in loader:
+            if len(batch) == 4:
+                X, y, r, c = batch
+                re = ce = None
+            elif len(batch) == 6:
+                X, y, r, c, re, ce = batch
+            else:
+                raise ValueError("Unexpected batch structure for GNN loader.")
+
+            batch_size = len(X)
+            atom_positions = X.view(-1, 3 * n_at).to(device)
+            edges = flatten_graph_edges(r, c, n_mol)
+            edges = [edges[0].to(device), edges[1].to(device)]
+            label = select_labels(y, cols).to(device)
+
+            pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
+            l = loss_fn(pred, label)
+            res["loss"] += float(l.item()) * batch_size
+            res["counter"] += batch_size
+
+            if use_comm:
+                if re is None or ce is None:
+                    raise ValueError("Committor evaluation requires dataset to provide extra edges (re, ce).")
+                edges_e = flatten_graph_edges(re, ce, n_mol)
+                edges_e = [edges_e[0].to(device), edges_e[1].to(device)]
+                beta = 1.0 / committor["kT"]
+                pl = torch.mean(
+                    e_path_loss(
+                        model,
+                        committor["calc"],
+                        atom_positions,
+                        edges,
+                        edges_e,
+                        n_mol,
+                        committor["box_length"],
+                        batch_size,
+                        beta,
+                        committor.get("alpha", 0.9),
+                        committor.get("emax", 10),
+                        committor.get("L", 5),
+                        device,
+                    )
+                )
+                res["path_loss"] += float(pl.item()) * batch_size
+
+    if use_comm:
+        return res["loss"] / res["counter"], res["path_loss"] / res["counter"]
+    return res["loss"] / res["counter"]
+
+
+def evaluate_gnn_unified(
+    model: GNNCV,
+    dataloader: DataLoader,
+    n_mol: int,
+    device: str,
+    *,
+    n_at: int = 1,
+    cols: list = None,
+):
+    """Evaluate GNN and return predictions, targets, RMSE, and R^2.
+
+    For single target: rmse, r2 are scalars; for multi-target (cols provided): arrays per target.
     """
     preds = []
     ys = []
-    for batch, (X, y, r, c) in enumerate(dataloader):
-        model.eval()
-        # optimizer.zero_grad()
-        batch_size = len(X)
-        atom_positions = X.view(-1, 3 * n_at).to(device)
-        row_new = []
-        col_new = []
-        for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
-            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
+    model.eval()
+    with torch.no_grad():
+        for batch in dataloader:
+            if len(batch) == 4:
+                X, y, r, c = batch
+            elif len(batch) == 6:
+                X, y, r, c, _, _ = batch
+            else:
+                raise ValueError("Unexpected batch structure for GNN loader.")
+            atom_positions = X.view(-1, 3 * n_at).to(device)
+            edges = flatten_graph_edges(r, c, n_mol)
+            edges = [edges[0].to(device), edges[1].to(device)]
+            pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
 
-        row_new = torch.cat([ro for ro in row_new])
-        col_new = torch.cat([co for co in col_new])
-
-        if row_new[0] >= n_mol - 1:
-            row_new -= n_mol
-            col_new -= n_mol
-
-        edges = [row_new.long().to(device), col_new.long().to(device)]
-        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
-
-        [ys.append(ref.cpu().detach().numpy()) for ref in y[:, cols]]
-        [preds.append(pre.cpu().detach().numpy()) for pre in pred]
+            if cols is None:
+                ys.extend([ref.item() for ref in y])
+                preds.extend([pre.item() for pre in pred])
+            else:
+                ys.extend(y[:, cols].cpu().detach().numpy())
+                preds.extend(pred.cpu().detach().numpy())
 
     preds = np.array(preds)
     ys = np.array(ys)
 
-    rmse_1 = np.mean((preds - ys) ** 2, axis=0) ** 0.5
-    r2 = []
-    for i in range(len(cols)):
-        r2.append(np.corrcoef(preds[:,i], ys[:,i])[0, 1])
+    if cols is None:
+        rmse = np.mean((preds - ys) ** 2) ** 0.5
+        r2 = np.corrcoef(preds, ys)[0, 1]
+        return preds.tolist(), ys.tolist(), rmse, r2
+    else:
+        rmse = np.mean((preds - ys) ** 2, axis=0) ** 0.5
+        r2 = []
+        for i in range(preds.shape[1]):
+            r2.append(np.corrcoef(preds[:, i], ys[:, i])[0, 1])
+        return preds, ys, rmse, r2
 
-    return preds, ys, rmse_1, r2
+
+def train_linear(model_t: NNCV, dataloader: DataLoader, loss_fn: Callable, optimizer: Callable, device: str, print_batch=1000000) -> float:
+    """Backward-compatible wrapper; uses train_nn without augmentation."""
+    return train_nn(model_t, dataloader, loss_fn, optimizer, device, print_batch=print_batch, augment=None)
 
 
-def evaluate_model_gnn_mult_e(
-    model: GNNCV, dataloader: DataLoader, n_mol: int, device: str, cols: list, n_at=1
-) -> tuple:
-    """Helper function that evaluates a model on an energy training set and calculates some properies for the generation of performance scatter plots.
+def train_gnn(model: GNNCV, loader: DataLoader, n_mol: int, optimizer: Callable, loss: Callable, device: str, n_at=1) -> float:
+    """Backward-compatible wrapper: single-output atom-graph training."""
+    return train_gnn_unified(model, loader, n_mol, optimizer, loss, device, n_at=n_at, cols=None, committor=None)
 
-    :param model: The model that is to be evaluated.
-    :type model: GNNCV
-    :param dataloader: Wrapper around the dataset that the model is supposed to be evaluated on.
-    :type dataloader: torch.utils.data.Dataloader
-    :param n_mol: Number of nodes in the graph of each frame. (Number of atoms or molecules)
-    :type n_mol: int
-    :param device: Device that the training is performed on. (Required for GPU compatibility)
-    :type device: str
-    :param cols: List of column indices representing the CVs the model is learning from the dataset.
-    :type cols: list
-    :param n_at: Number of atoms per molecule.
-    :type n_at: int, optional
-    :return: Returns the prediction of the model on each frame, the corresponding true values, the root mean square errors of the predictions and the r2 correlation coefficients.
-    :rtype: List of List of float, List of List of float, List of float, List of float
-    """
-    preds = []
-    ys = []
-    for batch, (X, y, r, c, re, ce) in enumerate(dataloader):
-        model.eval()
-        # optimizer.zero_grad()
-        batch_size = len(X)
-        atom_positions = X.view(-1, 3 * n_at).to(device)
-        row_new = []
-        col_new = []
-        for i in range(0, len(r)):
-            row_new.append(r[i][r[i] >= 0] + n_mol * (i))
-            col_new.append(c[i][c[i] >= 0] + n_mol * (i))
 
-        row_new = torch.cat([ro for ro in row_new])
-        col_new = torch.cat([co for co in col_new])
+def train_gnn_mult(model: GNNCV, loader: DataLoader, n_mol: int, optimizer, loss, device: str, cols: list, n_at=1) -> float:
+    """Backward-compatible wrapper: multi-output training using selected columns."""
+    return train_gnn_unified(model, loader, n_mol, optimizer, loss, device, n_at=n_at, cols=cols, committor=None)
 
-        if row_new[0] >= n_mol - 1:
-            row_new -= n_mol
-            col_new -= n_mol
+def train_gnn_e(model, loader: DataLoader, n_mol: int, optimizer, loss, cols, device: str, n_at=1) -> float:
+    """Backward-compatible wrapper: energy dataset training (multi-output columns)."""
+    return train_gnn_unified(model, loader, n_mol, optimizer, loss, device, n_at=n_at, cols=cols, committor=None)
 
-        edges = [row_new.long().to(device), col_new.long().to(device)]
-        pred = model(x=atom_positions, edges=edges, n_nodes=n_mol)
 
-        [ys.append(ref.cpu().detach().numpy()) for ref in y[:, cols]]
-        [preds.append(pre.cpu().detach().numpy()) for pre in pred]
+def train_perm(model_t: NNCV, dataloader: DataLoader, optimizer: Callable, loss_fn: Callable, n_trans: int, device: str, print_batch=1000000) -> float:
+    """Backward-compatible wrapper; uses train_nn with augment='permute'."""
+    return train_nn(model_t, dataloader, loss_fn, optimizer, device, print_batch=print_batch, augment='permute', n_trans=n_trans)
 
-    preds = np.array(preds)
-    ys = np.array(ys)
 
-    rmse_1 = np.mean((preds - ys) ** 2, axis=0) ** 0.5
-    r2 = []
-    for i in range(len(cols)):
-        r2.append(np.corrcoef(preds[:,i], ys[:,i])[0, 1])
+def train_rot(model_t: NNCV, dataloader: DataLoader, optimizer: Callable, loss_fn: Callable, n_trans: int, device: str, print_batch=1000000) -> float:
+    """Backward-compatible wrapper; uses train_nn with augment='rotate'."""
+    return train_nn(model_t, dataloader, loss_fn, optimizer, device, print_batch=print_batch, augment='rotate', n_trans=n_trans)
 
-    return preds, ys, rmse_1, r2
+
+def train_gnn_comm_reg(model: GNNCV, loader: DataLoader, n_mol: int, optimizer, loss, cols, device: str, kT: float, calc, box_length: float, lamb=1, n_at=1, alpha=0.9, emax=10, L=5) -> float:
+    """Backward-compatible wrapper: committor-regularized GNN training."""
+    comm = {
+        "kT": kT,
+        "calc": calc,
+        "box_length": box_length,
+        "lamb": lamb,
+        "alpha": alpha,
+        "emax": emax,
+        "L": L,
+    }
+    return train_gnn_unified(model, loader, n_mol, optimizer, loss, device, n_at=n_at, cols=cols, committor=comm)
+
+
+def test_linear(model_t: NNCV, dataloader: DataLoader, loss_fn: Callable, device: str) -> float:
+    """Backward-compatible wrapper; uses test_nn."""
+    return test_nn(model_t, dataloader, loss_fn, device)
+
+
+def test_gnn(model: GNNCV, loader: DataLoader, n_mol: int, loss_l1: Callable, device: str, n_at=1) -> float:
+    """Backward-compatible wrapper: single-output atom-graph testing."""
+    return test_gnn_unified(model, loader, n_mol, loss_l1, device, n_at=n_at, cols=None, committor=None)
+
+
+def test_gnn_mult(model: GNNCV, loader: DataLoader, n_mol: int, loss_l1, device: str, cols: list, n_at=1) -> float:
+    """Backward-compatible wrapper: multi-output testing."""
+    return test_gnn_unified(model, loader, n_mol, loss_l1, device, n_at=n_at, cols=cols, committor=None)
+
+
+def test_gnn_e(model: GNNCV, loader: DataLoader, n_mol: int, loss_l1, cols, device: str, kT: float, calc, boxlength: float, n_at=1, alpha=0.9, emax=10, L=5):
+    """Backward-compatible wrapper: evaluation with committor path loss reporting."""
+    comm = {
+        "kT": kT,
+        "calc": calc,
+        "box_length": boxlength,
+        "alpha": alpha,
+        "emax": emax,
+        "L": L,
+    }
+    return test_gnn_unified(model, loader, n_mol, loss_l1, device, n_at=n_at, cols=cols, committor=comm)
+
+
+
+def evaluate_model_gnn(model: GNNCV, dataloader: DataLoader, n_mol: int, device: str, n_at=1) -> tuple:
+    """Backward-compatible wrapper: single-output evaluation."""
+    preds, ys, rmse, r2 = evaluate_gnn_unified(model, dataloader, n_mol, device, n_at=n_at, cols=None)
+    return preds, ys, rmse, r2
+
+
+def evaluate_model_gnn_mult(model: GNNCV, dataloader: DataLoader, n_mol: int, device: str, cols: list, n_at=1) -> tuple:
+    """Backward-compatible wrapper: multi-output evaluation."""
+    return evaluate_gnn_unified(model, dataloader, n_mol, device, n_at=n_at, cols=cols)
+
+
+def evaluate_model_gnn_mult_e(model: GNNCV, dataloader: DataLoader, n_mol: int, device: str, cols: list, n_at=1) -> tuple:
+    """Backward-compatible wrapper: energy multi-output evaluation (same as multi)."""
+    return evaluate_gnn_unified(model, dataloader, n_mol, device, n_at=n_at, cols=cols)

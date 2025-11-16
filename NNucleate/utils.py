@@ -182,6 +182,37 @@ def get_mol_edges(
     return get_rc_edges(rc, traj2)
 
 
+# ==========================
+# Unified helpers
+# ==========================
+
+def flatten_graph_edges(r_batch, c_batch, n_mol: int):
+    """Flatten per-sample edge lists (padded with -1) into a single edge index for the batch.
+
+    Mirrors the original logic including the post-adjustment by -n_mol when needed.
+    """
+    row_new = []
+    col_new = []
+    for i in range(0, len(r_batch)):
+        row_new.append(r_batch[i][r_batch[i] >= 0] + n_mol * (i))
+        col_new.append(c_batch[i][c_batch[i] >= 0] + n_mol * (i))
+
+    row_new = torch.cat([ro for ro in row_new]) if len(row_new) > 0 else torch.tensor([], dtype=torch.long)
+    col_new = torch.cat([co for co in col_new]) if len(col_new) > 0 else torch.tensor([], dtype=torch.long)
+
+    if row_new.numel() > 0 and row_new[0] >= n_mol - 1:
+        row_new -= n_mol
+        col_new -= n_mol
+
+    return [row_new.long(), col_new.long()]
+
+
+def select_labels(y: torch.Tensor, cols):
+    """Select target columns if provided, else return y as-is."""
+    if cols is None:
+        return y
+    return y[:, cols]
+
 # A wrapper around scipy.spatial.kdtree to implement periodic boundary
 # conditions
 #

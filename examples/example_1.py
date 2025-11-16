@@ -6,50 +6,76 @@ import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from torch import nn
 from torch import optim
-from NNucleate.dataset import GNNTrajectory
+
+from NNucleate.dataset import GNNDataset
 from NNucleate.models import initialise_weights, GNNCV
-from NNucleate.training import evaluate_model_gnn, early_stopping_gnn
+from NNucleate.training import train_gnn_unified, evaluate_gnn_unified
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-print("Using {} device".format(device))
 
-top_path="reference.pdb"
-set_train = GNNTrajectory("train_cv.dat", "train.xyz", top_path, 1, 9.283, 0.6,root=3)
-dl_train = DataLoader(set_train, batch_size=64, shuffle=True)
+def main():
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"Using {device} device")
 
-val_cv_path = "cn_val.dat"
-val_traj_path = "val.xyz"
-ds_GNN_val = GNNTrajectory(val_cv_path, val_traj_path, top_path, 3, 9.283, 0.6, root=3)
-dl_GNN_val = DataLoader(ds_GNN_val, batch_size=64, shuffle=False)
+    top_path = "reference.pdb"
 
-n_at = 421
+    # Unified GNN dataset (single target via cv_col)
+    ds_train = GNNDataset(
+        cv_file="train_cv.dat",
+        traj_name="train.xyz",
+        top_file=top_path,
+        box_length=9.283,
+        rc=0.6,
+        cv_col=1,
+        root=3,
+    )
+    dl_train = DataLoader(ds_train, batch_size=64, shuffle=True)
 
-seed = 2351453
-torch.manual_seed(seed)
+    ds_val = GNNDataset(
+        cv_file="cn_val.dat",
+        traj_name="val.xyz",
+        top_file=top_path,
+        box_length=9.283,
+        rc=0.6,
+        cv_col=3,
+        root=3,
+    )
+    dl_val = DataLoader(ds_val, batch_size=64, shuffle=False)
 
-model = GNNCV(hidden_nf=10, n_layers=2, device=device)
-model.apply(initialise_weights)
-optimizer = optim.Adam(model.parameters(), lr=5e-4)
-loss = nn.MSELoss()
-model, train_conv, test_conv = early_stopping_gnn(model, dl_train, dl_GNN_val, n_at, optimizer, loss, device, test_freq=10)
-preds, label, rmse, r2 = evaluate_model_gnn(model, dl_GNN_val, n_at, device)
+    # Number of nodes per frame (atoms or molecules)
+    n_mol = 421
 
-print("Final RMSE: %.4f" % rmse)
-print("Final $r^2$: %.4f" % r2)
+    # Seed and model
+    seed = 2351453
+    torch.manual_seed(seed)
 
-plt.plot(train_conv)
-plt.plot(test_conv)
+    model = GNNCV(hidden_nf=10, n_layers=2, device=device)
+    model.apply(initialise_weights)
+    optimizer = optim.Adam(model.parameters(), lr=5e-4)
+    loss_fn = nn.MSELoss()
 
-plt.yscale("log")
-plt.xlabel("epochs")
-plt.ylabel("RMSE")  
-plt.show()
+    epochs = 1
+    for epoch in range(epochs):
+        train_mse = train_gnn_unified(
+            model, dl_train, n_mol=n_mol, optimizer=optimizer, loss_fn=loss_fn, device=device
+        )
+        if epoch % 10 == 0:
+            print(f"Epoch {epoch}: {train_mse:.6f}")
 
-plt.scatter(preds, label, s=0.4)
-plt.plot(label, label, color="black")
-plt.title("Train: r = %.4f" % r2)   
-plt.xlabel("Prediction")
-plt.ylabel("Label")
-plt.show()
+    preds, labels, rmse, r2 = evaluate_gnn_unified(model, dl_val, n_mol=n_mol, device=device)
 
-torch.save(model, "model_.pt")
+    print(f"Final RMSE: {rmse:.4f}")
+    print(f"Final r^2: {r2:.4f}")
+
+    plt.scatter(preds, labels, s=0.4)
+    plt.plot(labels, labels, color="black")
+    plt.title(f"Validation: r = {r2:.4f}")
+    plt.xlabel("Prediction")
+    plt.ylabel("Label")
+    plt.tight_layout()
+    plt.show()
+
+    torch.save(model, "model_.pt")
+
+
+if __name__ == "__main__":
+    main()
